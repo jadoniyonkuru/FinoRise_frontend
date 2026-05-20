@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -10,8 +11,6 @@ import {
   MessageSquareQuote, 
   Trophy, 
   BarChart3, 
-  Settings, 
-  UserCircle,
   Zap,
   ChevronRight
 } from "lucide-react"
@@ -30,6 +29,8 @@ import {
 } from "@/components/ui/sidebar"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Progress } from "@/components/ui/progress"
+import { useUser, useFirestore, useDoc, useMemoFirebase } from "@/firebase"
+import { doc } from "firebase/firestore"
 
 const navItems = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -42,6 +43,20 @@ const navItems = [
 
 export function FinoSidebar() {
   const pathname = usePathname()
+  const { user } = useUser()
+  const db = useFirestore()
+
+  const userDocRef = useMemoFirebase(() => {
+    if (!db || !user?.uid) return null
+    return doc(db, "users", user.uid)
+  }, [db, user?.uid])
+
+  const { data: profile } = useDoc(userDocRef)
+
+  const xp = profile?.xp || 0
+  const level = profile?.level || 1
+  const nextLevelXP = level * 1000
+  const progress = (xp % 1000) / 10
 
   return (
     <Sidebar variant="inset" collapsible="icon">
@@ -85,12 +100,12 @@ export function FinoSidebar() {
         <SidebarGroup className="mt-auto group-data-[collapsible=icon]:hidden">
           <div className="mx-4 p-4 rounded-xl glass bg-primary/5">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold text-primary uppercase">Level 12</span>
-              <span className="text-xs text-muted-foreground">2,450 / 3,000 XP</span>
+              <span className="text-xs font-bold text-primary uppercase">Level {level}</span>
+              <span className="text-xs text-muted-foreground">{xp.toLocaleString()} XP</span>
             </div>
-            <Progress value={81} className="h-1.5" />
+            <Progress value={progress} className="h-1.5" />
             <p className="text-[10px] mt-2 text-muted-foreground leading-tight">
-              550 XP to unlock <strong>Risk Analyst</strong> badge!
+              Earn XP in simulations to level up!
             </p>
           </div>
         </SidebarGroup>
@@ -102,12 +117,12 @@ export function FinoSidebar() {
             <SidebarMenuButton asChild className="h-12 w-full p-2 hover:bg-white/5">
               <Link href="/profile" className="flex items-center gap-3">
                 <Avatar className="w-8 h-8 ring-2 ring-primary/20">
-                  <AvatarImage src="https://picsum.photos/seed/user123/100" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarImage src={profile?.avatarUrl} />
+                  <AvatarFallback>{profile?.displayName?.charAt(0) || "U"}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                  <span className="text-sm font-semibold truncate">Alex Johnson</span>
-                  <span className="text-[10px] text-muted-foreground truncate">Free Plan</span>
+                  <span className="text-sm font-semibold truncate">{profile?.displayName || "User"}</span>
+                  <span className="text-[10px] text-muted-foreground truncate">{profile?.email || "No email"}</span>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto group-data-[collapsible=icon]:hidden" />
               </Link>

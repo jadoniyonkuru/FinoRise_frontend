@@ -8,18 +8,65 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Zap, Github, Mail } from "lucide-react"
+import { Zap } from "lucide-react"
+import { createUserWithEmailAndPassword } from "firebase/auth"
+import { doc, setDoc } from "firebase/firestore"
+import { useAuth, useFirestore } from "@/firebase"
+import { errorEmitter } from "@/firebase/error-emitter"
+import { FirestorePermissionError } from "@/firebase/errors"
+import { useToast } from "@/hooks/use-toast"
 
 export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [name, setName] = useState("")
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const auth = useAuth()
+  const db = useFirestore()
+  const { toast } = useToast()
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
-    // Mock signup for navigation
-    router.push("/dashboard")
+    if (!auth || !db) return
+
+    setLoading(true)
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+
+      const userProfile = {
+        uid: user.uid,
+        displayName: name,
+        email: email,
+        xp: 0,
+        level: 1,
+        streak: 0,
+        completedModules: [],
+        avatarUrl: `https://picsum.photos/seed/${user.uid}/200`
+      }
+
+      const docRef = doc(db, "users", user.uid)
+      setDoc(docRef, userProfile)
+        .catch(async (error) => {
+          const permissionError = new FirestorePermissionError({
+            path: docRef.path,
+            operation: "create",
+            requestResourceData: userProfile,
+          })
+          errorEmitter.emit("permission-error", permissionError)
+        })
+
+      router.push("/dashboard")
+    } catch (error: any) {
+      toast({
+        variant: "destructive",
+        title: "Signup Failed",
+        description: error.message
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -81,8 +128,8 @@ export default function SignupPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
-              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20">
-                Create Account
+              <Button type="submit" className="w-full bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20" disabled={loading}>
+                {loading ? "Creating Account..." : "Create Account"}
               </Button>
               <p className="text-sm text-center text-muted-foreground">
                 Already have an account?{" "}
