@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
-import { Zap, Play, Target, Award, ArrowUpRight, TrendingUp } from "lucide-react"
+import { Zap, Play, Target, Award, ArrowUpRight, TrendingUp, Shield } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
