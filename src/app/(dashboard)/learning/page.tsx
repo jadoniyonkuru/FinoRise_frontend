@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Play, CheckCircle2, Clock, Award, BookOpen } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
 
 const modules = [
@@ -127,8 +128,13 @@ export default function LearningHubPage() {
                     style={{ width: `${mod.progress}%` }} 
                   />
                 </div>
-                <Button className={`w-full ${mod.progress === 100 ? 'bg-white/5 text-white' : 'bg-primary hover:bg-primary/90'}`}>
-                  {mod.progress === 100 ? 'Review Module' : mod.progress > 0 ? 'Continue' : 'Start Now'}
+                <Button 
+                  asChild
+                  className={`w-full ${mod.progress === 100 ? 'bg-white/5 text-white hover:bg-white/10' : 'bg-primary hover:bg-primary/90'}`}
+                >
+                  <Link href={`/learning/${mod.id}`}>
+                    {mod.progress === 100 ? 'Review Module' : mod.progress > 0 ? 'Continue' : 'Start Now'}
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
