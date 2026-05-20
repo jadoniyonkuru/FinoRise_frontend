@@ -1,0 +1,28 @@
+{
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Abstract futuristic financial data visualization",
+      "imageUrl": "https://picsum.photos/seed/finorise-hero/1200/800",
+      "imageHint": "finance technology"
+    },
+    {
+      "id": "module-budgeting",
+      "description": "Concept of smart budgeting and saving",
+      "imageUrl": "https://picsum.photos/seed/budgeting/400/250",
+      "imageHint": "savings budgeting"
+    },
+    {
+      "id": "module-investing",
+      "description": "Stock market chart and investment concept",
+      "imageUrl": "https://picsum.photos/seed/investing/400/250",
+      "imageHint": "investing stocks"
+    },
+    {
+      "id": "module-credit",
+      "description": "Credit score and debt management",
+      "imageUrl": "https://picsum.photos/seed/credit/400/250",
+      "imageHint": "credit debt"
+    }
+  ]
+}
