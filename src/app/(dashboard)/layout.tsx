@@ -1,8 +1,10 @@
+
 import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { FinoSidebar } from "@/components/fino-sidebar"
 import { Bell, Search, Zap } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { ModeToggle } from "@/components/mode-toggle"
 
 export default function DashboardLayout({
   children,
@@ -13,7 +15,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <FinoSidebar />
       <SidebarInset>
-        <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 sticky top-0 bg-background/80 backdrop-blur-md z-40">
+        <header className="h-16 flex items-center justify-between px-6 border-b border-white/5 dark:border-white/5 sticky top-0 bg-background/80 backdrop-blur-md z-40">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
             <div className="relative hidden md:block">
@@ -30,6 +32,7 @@ export default function DashboardLayout({
               <Zap className="w-4 h-4 text-primary" />
               <span className="text-xs font-bold tracking-tight">1,240 XP</span>
             </div>
+            <ModeToggle />
             <Button variant="ghost" size="icon" className="relative glass">
               <Bell className="w-5 h-5" />
               <span className="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-primary border-2 border-background" />
