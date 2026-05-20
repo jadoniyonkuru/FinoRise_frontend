@@ -132,7 +132,10 @@ export default function SimulationsPage() {
           <p className="text-sm text-muted-foreground leading-relaxed mb-6 max-w-[200px]">
             Define your own starting capital and goals for an AI-narrated session.
           </p>
-          <Button variant="outline" className="glass border-white/20 group-hover:border-primary/50 group-hover:text-primary">
+          <Button 
+            variant="outline" 
+            className="glass border-white/20 group-hover:border-primary/50 group-hover:bg-primary group-hover:text-white hover:bg-primary hover:text-white transition-all"
+          >
             Unlock at Level 15
           </Button>
         </Card>
