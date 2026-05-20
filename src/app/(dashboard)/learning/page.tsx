@@ -1,4 +1,3 @@
-
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -56,6 +55,8 @@ const modules = [
 ]
 
 export default function LearningHubPage() {
+  const fallbackUrl = "https://picsum.photos/seed/placeholder/400/250";
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -77,16 +78,19 @@ export default function LearningHubPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {modules.map((mod) => {
-          const modImg = PlaceHolderImages.find(img => img.id === mod.id) || PlaceHolderImages[0];
+          const modImg = PlaceHolderImages.find(img => img.id === mod.id);
+          const imageUrl = modImg?.imageUrl || fallbackUrl;
+          const imageHint = modImg?.imageHint || "learning finance";
+
           return (
             <Card key={mod.id} className="glass border-white/5 group overflow-hidden flex flex-col">
               <div className="relative aspect-video overflow-hidden">
                 <Image 
-                  src={modImg.imageUrl}
+                  src={imageUrl}
                   alt={mod.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  data-ai-hint={modImg.imageHint}
+                  data-ai-hint={imageHint}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                 <Badge className="absolute top-4 left-4 bg-black/60 backdrop-blur-md border-white/10 uppercase tracking-widest text-[10px]">
