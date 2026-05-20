@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Trophy, Zap, Star, Gift, ExternalLink, ShieldCheck } from "lucide-react"
+import Link from "next/link"
 
 const rewards = [
   {
@@ -92,10 +93,13 @@ export default function RewardsPage() {
                 {reward.desc}
               </CardDescription>
               <Button 
-                className="w-full bg-white/5 hover:bg-primary hover:text-white transition-all group-hover:border-primary/50"
+                asChild
+                className="w-full bg-white/5 hover:bg-primary hover:text-white transition-all group-hover:border-primary/50 group-hover:text-white"
                 disabled={currentXP < reward.cost}
               >
-                {currentXP < reward.cost ? 'Insufficient XP' : 'Redeem Reward'}
+                <Link href={`/rewards/${reward.id}`}>
+                  {currentXP < reward.cost ? 'Insufficient XP' : 'Redeem Reward'}
+                </Link>
               </Button>
             </CardContent>
             {/* Decorative BG Icon */}
