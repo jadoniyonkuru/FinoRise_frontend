@@ -9,50 +9,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Zap, Github, Mail } from "lucide-react"
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth"
-import { useAuth } from "@/firebase"
-import { useToast } from "@/hooks/use-toast"
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const auth = useAuth()
-  const { toast } = useToast()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!auth) return
-
     setLoading(true)
-    try {
-      await signInWithEmailAndPassword(auth, email, password)
+    // Stable mock navigation
+    setTimeout(() => {
       router.push("/dashboard")
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Login Failed",
-        description: error.message
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleGoogleLogin = async () => {
-    if (!auth) return
-    const provider = new GoogleAuthProvider()
-    try {
-      await signInWithPopup(auth, provider)
-      router.push("/dashboard")
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Google Login Failed",
-        description: error.message
-      })
-    }
+    }, 800)
   }
 
   return (
@@ -79,11 +47,11 @@ export default function LoginPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <Button variant="outline" className="glass border-white/10" type="button" disabled>
+                <Button variant="outline" className="glass border-white/10" type="button">
                   <Github className="mr-2 h-4 w-4" />
                   Github
                 </Button>
-                <Button variant="outline" className="glass border-white/10" type="button" onClick={handleGoogleLogin}>
+                <Button variant="outline" className="glass border-white/10" type="button">
                   <Mail className="mr-2 h-4 w-4" />
                   Google
                 </Button>
@@ -98,26 +66,11 @@ export default function LoginPage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input 
-                  id="email" 
-                  type="email" 
-                  placeholder="name@example.com" 
-                  className="glass border-white/10"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                <Input id="email" type="email" placeholder="name@example.com" className="glass border-white/10" required />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input 
-                  id="password" 
-                  type="password" 
-                  className="glass border-white/10"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <Input id="password" type="password" className="glass border-white/10" required />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
