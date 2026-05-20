@@ -1,12 +1,14 @@
+
 import type {Metadata} from 'next';
 import './globals.css';
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: 'FinoRise — Elevate Your Financial Future',
   description: 'AI-powered financial literacy platform for the next generation.',
 };
 
-export default function RootLayout({
+export default function RootLabel({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -20,6 +22,7 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased bg-background text-foreground selection:bg-primary/30 selection:text-primary">
         {children}
+        <Toaster />
       </body>
     </html>
   );

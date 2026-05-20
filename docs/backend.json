@@ -1,0 +1,62 @@
+
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Extended user information including stats and preferences.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "xp": { "type": "number" },
+        "level": { "type": "number" },
+        "streak": { "type": "number" },
+        "completedModules": { "type": "array", "items": { "type": "string" } },
+        "avatarUrl": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "SimulationResult": {
+      "title": "Simulation Result",
+      "description": "History of decisions and outcomes from financial simulations.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "simulationId": { "type": "string" },
+        "score": { "type": "number" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "feedback": { "type": "string" }
+      }
+    },
+    "Reward": {
+      "title": "Reward",
+      "description": "Available perks or badges users can redeem with XP.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "cost": { "type": "number" },
+        "type": { "type": "string", "enum": ["perk", "badge", "partner"] }
+      }
+    }
+  },
+  "auth": {
+    "providers": ["password", "google"]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile and progress data."
+    },
+    "/users/{userId}/simulations/{simId}": {
+      "schema": "SimulationResult",
+      "description": "Individual simulation attempts."
+    },
+    "/rewards": {
+      "schema": "Reward",
+      "description": "Global catalog of redeemable rewards."
+    }
+  }
+}
