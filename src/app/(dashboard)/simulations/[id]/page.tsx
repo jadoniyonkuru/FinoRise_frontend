@@ -18,6 +18,7 @@ import {
   CheckCircle2,
   ChevronLeft
 } from "lucide-react"
+import Link from "next/link"
 import { aiSimulationFeedback, type SimulationFeedbackOutput } from "@/ai/flows/ai-simulation-feedback"
 
 const SIM_DATA: Record<string, any> = {
@@ -25,6 +26,7 @@ const SIM_DATA: Record<string, any> = {
     title: "The Rent Trap",
     description: "Your landlord just raised rent by 20%. You need to find $400 extra this month.",
     initialState: { cash: 2000, debt: 0, savings: 1000, investments: 500 },
+    xp: 250,
     steps: [
       {
         question: "How do you handle the immediate shock to your monthly budget?",
@@ -67,6 +69,7 @@ const SIM_DATA: Record<string, any> = {
     title: "The Bull Run",
     description: "The market is up 15% this month. FOMO is setting in.",
     initialState: { cash: 5000, debt: 0, savings: 2000, investments: 10000 },
+    xp: 500,
     steps: [
       {
         question: "Your friends are talking about a hot new tech stock. Do you jump in?",
@@ -158,7 +161,7 @@ export default function SimulationPlayerPage({ params }: { params: Promise<{ id:
             <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto mb-4 shadow-xl shadow-primary/20">
               <CheckCircle2 className="w-10 h-10 text-white" />
             </div>
-            <CardTitle className="text-3xl font-headline font-bold">Great Effort, Alex!</CardTitle>
+            <CardTitle className="text-3xl font-headline font-bold">Great Effort!</CardTitle>
             <CardDescription className="text-base mt-2">You earned +{sim.xp} XP and a new behavioral insight.</CardDescription>
           </CardHeader>
           <CardContent className="p-8">
@@ -263,14 +266,14 @@ export default function SimulationPlayerPage({ params }: { params: Promise<{ id:
               <Button
                 key={i}
                 variant="outline"
-                className="w-full h-auto p-6 justify-between items-center group glass hover:border-primary/50 transition-all text-left"
+                className="w-full h-auto p-6 justify-between items-center group glass hover:bg-primary hover:border-primary/50 transition-all text-left"
                 onClick={() => handleDecision(option)}
                 disabled={isFinishing}
               >
                 <div className="flex-1 pr-8">
-                  <p className="font-bold text-lg group-hover:text-primary transition-colors">{option.text}</p>
+                  <p className="font-bold text-lg group-hover:text-white transition-colors">{option.text}</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-white group-hover:translate-x-1 transition-all" />
               </Button>
             ))}
           </div>
