@@ -1,3 +1,6 @@
+
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -6,6 +9,7 @@ import Link from "next/link"
 
 const scenarios = [
   {
+    id: "the-rent-trap",
     title: "The Rent Trap",
     category: "Budgeting",
     desc: "Your landlord just raised rent by 20%. How will you adjust your spending to survive the month?",
@@ -16,6 +20,7 @@ const scenarios = [
     color: "text-blue-400"
   },
   {
+    id: "the-bull-run",
     title: "The Bull Run",
     category: "Investments",
     desc: "The market is euphoric. Do you ride the wave or pull out before the crash? Time is ticking.",
@@ -26,6 +31,7 @@ const scenarios = [
     color: "text-purple-400"
   },
   {
+    id: "debt-spiral",
     title: "Debt Spiral",
     category: "Debt Management",
     desc: "Credit card debt is compounding. Strategize your way out using Avalanche vs Snowball methods.",
@@ -36,6 +42,7 @@ const scenarios = [
     color: "text-red-400"
   },
   {
+    id: "startup-hustle",
     title: "Startup Hustle",
     category: "Career",
     desc: "You've been offered stock options or a higher salary. Which choice fuels your future wealth?",
@@ -102,20 +109,21 @@ export default function SimulationsPage() {
               
               <div className="mt-6">
                 <Button 
+                  asChild
                   className={`w-full ${scenario.status === 'locked' ? 'bg-muted pointer-events-none' : 'bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20'}`}
                   disabled={scenario.status === 'locked'}
                 >
-                  {scenario.status === 'completed' ? 'Replay Scenario' : 'Start Simulation'}
+                  <Link href={`/simulations/${scenario.id}`}>
+                    {scenario.status === 'completed' ? 'Replay Scenario' : 'Start Simulation'}
+                  </Link>
                 </Button>
               </div>
             </CardContent>
 
-            {/* Decorative background icon */}
             <scenario.icon className="absolute -right-8 -bottom-8 w-32 h-32 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity rotate-12" />
           </Card>
         ))}
 
-        {/* Create Custom Simulation CTA */}
         <Card className="glass border-dashed border-white/10 flex flex-col items-center justify-center p-8 text-center bg-white/[0.02] hover:bg-white/[0.04] transition-colors cursor-pointer group">
           <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
             <Gamepad2 className="w-8 h-8 text-muted-foreground" />
