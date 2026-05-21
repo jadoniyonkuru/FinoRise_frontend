@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "dev": "cd FinoRise-app && npm run dev",
+    "build": "cd FinoRise-app && npm run build",
+    "lint": "cd FinoRise-app && npm run lint",
+    "preview": "cd FinoRise-app && npm run preview"
+  },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",
     "axios": "^1.16.1",
