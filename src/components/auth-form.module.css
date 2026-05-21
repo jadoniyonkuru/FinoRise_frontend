@@ -1,0 +1,64 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.field input,
+.field select {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-elevated);
+  color: var(--text);
+}
+
+.field input:focus,
+.field select:focus {
+  outline: 2px solid var(--auth);
+  outline-offset: 0;
+  border-color: transparent;
+}
+
+.submit {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--auth);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submit:hover {
+  filter: brightness(1.1);
+}
+
+.footer {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.footer a {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}

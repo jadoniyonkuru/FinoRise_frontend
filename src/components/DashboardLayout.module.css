@@ -1,0 +1,148 @@
+.page {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+
+.roleBadge {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+}
+
+.navLink,
+.navActive {
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.navLink {
+  color: var(--text-muted);
+}
+
+.navLink:hover {
+  color: var(--text);
+  background: var(--surface-elevated);
+}
+
+.navActive {
+  background: color-mix(in srgb, var(--accent) 15%, var(--surface-elevated));
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.navItemMuted {
+  padding: 0.55rem 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.logout {
+  margin-top: auto;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.logout:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.main {
+  padding: 2rem 2.5rem;
+  overflow: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.header p {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.switchRole {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.switchRole:hover {
+  color: var(--text);
+}
+
+@media (max-width: 768px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .nav {
+    flex-direction: row;
+    flex: unset;
+  }
+
+  .logout {
+    margin-top: 0;
+  }
+}

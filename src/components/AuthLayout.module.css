@@ -1,0 +1,74 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(100, 116, 139, 0.15), transparent),
+    var(--bg);
+}
+
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 1.35rem;
+}
+
+.tag {
+  font-size: 0.7rem;
+  color: var(--auth);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card h1 {
+  margin: 0 0 0.35rem;
+  font-size: 1.5rem;
+}
+
+.subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.roles {
+  margin-top: 1.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.75rem;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.roles a {
+  color: var(--text);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  background: var(--surface-elevated);
+  font-size: 0.8rem;
+}
+
+.roles a:hover {
+  background: var(--border);
+}
