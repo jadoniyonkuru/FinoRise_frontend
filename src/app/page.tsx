@@ -37,7 +37,7 @@ export default function LandingPage() {
             >
               Log in
             </Link>
-            <Button asChild className="bg-primary hover:bg-secondary text-white h-14 px-8 font-bold text-[10px] uppercase tracking-widest rounded-2xl">
+            <Button asChild className="bg-primary hover:bg-primary/90 text-white h-14 px-8 font-bold text-[10px] uppercase tracking-widest rounded-2xl">
               <Link href="/dashboard">Get Started</Link>
             </Button>
           </div>
@@ -65,13 +65,13 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Button size="lg" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest bg-primary hover:bg-secondary text-white group shadow-xl shadow-primary/20 font-bold rounded-2xl" asChild>
+              <Button size="lg" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest bg-primary hover:bg-primary/90 text-white group shadow-xl shadow-primary/20 font-bold rounded-2xl" asChild>
                 <Link href="/dashboard">
                   Start Your Journey
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest glass group border-black/10 hover:bg-secondary hover:text-white font-bold rounded-2xl" asChild>
+              <Button size="lg" variant="outline" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest glass group border-black/10 hover:bg-primary hover:text-white font-bold rounded-2xl" asChild>
                 <Link href="#simulations">
                   Try Simulation
                   <Play className="ml-2 w-4 h-4 fill-current" />
@@ -111,9 +111,9 @@ export default function LandingPage() {
                 { title: "Curated Content", desc: "Micro-learning modules designed for high retention and impact.", icon: Layout },
                 { title: "Gold Rewards", desc: "Redeem performance for tangible benefits from fintech partners.", icon: Trophy }
               ].map((feature, i) => (
-                <div key={i} className="p-10 white-card rounded-3xl group text-left flex flex-col items-start h-full hover:bg-secondary hover:text-white transition-all duration-300 cursor-pointer">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
-                    <feature.icon className="w-6 h-6 text-primary" />
+                <div key={i} className="p-10 white-card rounded-3xl group text-left flex flex-col items-start h-full hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-8 group-hover:scale-110 group-hover:bg-white/20 transition-transform">
+                    <feature.icon className="w-6 h-6 text-primary group-hover:text-white" />
                   </div>
                   <h3 className="font-headline font-bold text-2xl mb-4 group-hover:text-white transition-colors">{feature.title}</h3>
                   <p className="text-muted-foreground group-hover:text-white/80 leading-relaxed flex-1 transition-colors">
@@ -151,7 +151,7 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <Button size="lg" className="h-16 px-10 text-sm uppercase tracking-widest bg-primary hover:bg-secondary text-white font-bold rounded-2xl" asChild>
+                <Button size="lg" className="h-16 px-10 text-sm uppercase tracking-widest bg-primary hover:bg-primary/90 text-white font-bold rounded-2xl" asChild>
                   <Link href="/simulations">Enter Simulator</Link>
                 </Button>
               </div>
@@ -183,9 +183,9 @@ export default function LandingPage() {
                 { title: "Foundational Knowledge", desc: "Perfect for beginners. Master budgeting, basic saving, and credit health basics.", icon: Star },
                 { title: "Advanced Strategy", desc: "Deep dives into tax optimization, asset allocation, and complex market structures.", icon: TrendingUp }
               ].map((card, i) => (
-                <div key={i} className="white-card p-12 rounded-[2.5rem] text-left group hover:bg-secondary hover:text-white transition-all duration-300 cursor-pointer">
-                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
-                    <card.icon className="w-7 h-7 text-primary" />
+                <div key={i} className="white-card p-12 rounded-[2.5rem] text-left group hover:bg-primary hover:text-white transition-all duration-300 cursor-pointer">
+                  <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-10 group-hover:scale-110 group-hover:bg-white/20 transition-transform">
+                    <card.icon className="w-7 h-7 text-primary group-hover:text-white" />
                   </div>
                   <h3 className="font-headline font-bold text-2xl mb-4 group-hover:text-white transition-colors">{card.title}</h3>
                   <p className="text-muted-foreground group-hover:text-white/80 leading-relaxed mb-10 transition-colors">{card.desc}</p>

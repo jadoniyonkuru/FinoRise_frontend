@@ -38,7 +38,7 @@ export default function DashboardLayout({
             
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="relative glass h-12 w-12 hover:bg-secondary hover:text-white transition-all">
+                <Button variant="ghost" size="icon" className="relative glass h-12 w-12 hover:bg-primary hover:text-white transition-all">
                   <Bell className="w-6 h-6" />
                   <span className="absolute top-3 right-3 w-2.5 h-2.5 rounded-full bg-primary border-2 border-background" />
                 </Button>
@@ -56,9 +56,9 @@ export default function DashboardLayout({
                       { title: "Market Alert", desc: "A new simulation scenario is available.", time: "3h ago", icon: TrendingUp, color: "text-[#FFBF00]" },
                       { title: "Coach Tip", desc: "Alex, your latest budget sim could be improved.", time: "5h ago", icon: MessageSquareQuote, color: "text-primary" }
                     ].map((n, i) => (
-                      <button key={i} className="flex gap-4 p-4 text-left hover:bg-secondary hover:text-white transition-all border-b border-black/5 last:border-0 group">
+                      <button key={i} className="flex gap-4 p-4 text-left hover:bg-primary hover:text-white transition-all border-b border-black/5 last:border-0 group">
                         <div className="w-10 h-10 rounded-xl bg-black/5 flex items-center justify-center shrink-0 border border-black/5 group-hover:border-white/20 transition-all">
-                          <n.icon className={`w-5 h-5 ${n.color}`} />
+                          <n.icon className={`w-5 h-5 ${n.color} group-hover:text-white`} />
                         </div>
                         <div className="space-y-1 flex-1">
                           <p className="text-xs font-bold leading-none">{n.title}</p>
@@ -70,7 +70,7 @@ export default function DashboardLayout({
                   </div>
                 </ScrollArea>
                 <div className="p-3 text-center border-t border-black/5 bg-black/[0.01]">
-                  <Button variant="ghost" size="sm" className="text-[10px] h-8 w-full text-muted-foreground hover:text-secondary uppercase tracking-widest font-bold">
+                  <Button variant="ghost" size="sm" className="text-[10px] h-8 w-full text-muted-foreground hover:text-primary uppercase tracking-widest font-bold">
                     Mark all as read
                   </Button>
                 </div>
