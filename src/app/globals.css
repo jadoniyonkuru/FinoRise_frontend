@@ -7,13 +7,13 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 260 20% 4%;
-    --card: 0 0% 98%;
+    --card: 0 0% 100%;
     --card-foreground: 260 20% 4%;
     --popover: 0 0% 100%;
     --popover-foreground: 260 20% 4%;
     --primary: 263 90% 66%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 221 83% 53%;
+    --secondary: 0 0% 0%;
     --secondary-foreground: 0 0% 100%;
     --muted: 240 4.8% 95.9%;
     --muted-foreground: 240 3.8% 46.1%;
@@ -24,11 +24,7 @@
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 263 90% 66%;
-    --chart-1: 263 90% 66%;
-    --chart-2: 221 83% 53%;
-    --chart-3: 173 58% 39%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --reward-gold: 45 100% 50%; /* #FFBF00 */
     --radius: 0.75rem;
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -49,7 +45,7 @@
     --popover-foreground: 0 0% 98%;
     --primary: 263 90% 66%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 221 83% 53%;
+    --secondary: 0 0% 0%;
     --secondary-foreground: 0 0% 100%;
     --muted: 260 15% 15%;
     --muted-foreground: 260 5% 65%;
@@ -60,11 +56,6 @@
     --border: 260 15% 15%;
     --input: 260 15% 15%;
     --ring: 263 90% 66%;
-    --chart-1: 263 90% 66%;
-    --chart-2: 221 83% 53%;
-    --chart-3: 173 58% 39%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
     --sidebar-background: 260 20% 5%;
     --sidebar-foreground: 240 5% 85%;
     --sidebar-primary: 263 90% 66%;
@@ -85,24 +76,22 @@
   }
 }
 
+.text-gold {
+  color: #FFBF00;
+}
+
+.bg-gold {
+  background-color: #FFBF00;
+}
+
+.border-gold {
+  border-color: #FFBF00;
+}
+
 .glass {
-  @apply bg-card/60 backdrop-blur-md border border-black/5 dark:border-white/5;
+  @apply backdrop-blur-md border border-black/5 dark:border-white/5;
 }
 
-.glass-hover {
-  @apply hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300;
-}
-
-.gradient-text {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary bg-[length:200%_auto] animate-gradient;
-}
-
-@keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-.animate-gradient {
-  animation: gradient 8s ease infinite;
+.white-card {
+  @apply bg-white dark:bg-card border border-black/5 shadow-md hover:shadow-xl transition-all duration-300;
 }

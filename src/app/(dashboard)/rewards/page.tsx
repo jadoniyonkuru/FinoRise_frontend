@@ -15,7 +15,7 @@ const rewards = [
     cost: 5000,
     type: "Perk",
     icon: Star,
-    color: "text-yellow-400"
+    color: "text-[#FFBF00]"
   },
   {
     id: 2,
@@ -33,7 +33,7 @@ const rewards = [
     cost: 3000,
     type: "Partner",
     icon: ExternalLink,
-    color: "text-blue-400"
+    color: "text-primary"
   },
   {
     id: 4,
@@ -42,7 +42,7 @@ const rewards = [
     cost: 2500,
     type: "Trophy",
     icon: Trophy,
-    color: "text-secondary"
+    color: "text-[#FFBF00]"
   }
 ]
 
@@ -50,51 +50,52 @@ export default function RewardsPage() {
   const currentXP = 2450;
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/10 via-background to-background p-10 border border-white/5">
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="space-y-4">
-            <h1 className="font-headline font-bold text-4xl">Your Rewards</h1>
-            <p className="text-muted-foreground max-w-md">
-              Redeem your hard-earned XP for exclusive perks, digital collectibles, and real-world financial benefits.
+    <div className="space-y-12 max-w-7xl mx-auto">
+      <div className="relative overflow-hidden rounded-[3rem] bg-black p-12 text-white shadow-2xl">
+        <div className="absolute top-0 right-0 w-[500px] h-[300px] bg-[#FFBF00]/10 blur-[100px] rounded-full" />
+        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-10">
+          <div className="space-y-6">
+            <h1 className="font-headline font-bold text-5xl md:text-6xl">Your Rewards</h1>
+            <p className="text-muted-foreground text-xl max-w-lg leading-relaxed">
+              Redeem your XP for exclusive perks, digital collectibles, and real-world financial benefits.
             </p>
             <div className="flex gap-4">
-              <Badge className="bg-primary px-4 py-1 text-sm font-bold shadow-lg shadow-primary/20">
+              <Badge className="bg-[#FFBF00] text-black px-6 py-2 text-sm font-bold uppercase tracking-widest shadow-xl shadow-[#FFBF00]/20">
                 Level 12
               </Badge>
-              <Badge variant="outline" className="glass px-4 py-1 text-sm font-bold border-white/10">
+              <Badge variant="outline" className="glass px-6 py-2 text-sm font-bold uppercase tracking-widest border-white/20">
                 Gold Member
               </Badge>
             </div>
           </div>
-          <div className="glass p-8 rounded-2xl flex flex-col items-center justify-center min-w-[200px] border-white/10">
-            <Zap className="w-10 h-10 text-primary mb-2" />
-            <span className="text-3xl font-bold font-headline">{currentXP.toLocaleString()}</span>
-            <span className="text-xs uppercase font-bold text-muted-foreground tracking-widest">Available XP</span>
+          <div className="bg-white/5 backdrop-blur-xl p-10 rounded-[2rem] flex flex-col items-center justify-center min-w-[240px] border border-white/10 shadow-2xl">
+            <Zap className="w-12 h-12 text-[#FFBF00] mb-4" />
+            <span className="text-5xl font-bold font-headline mb-1">{currentXP.toLocaleString()}</span>
+            <span className="text-sm uppercase font-bold text-muted-foreground tracking-widest">Available XP</span>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {rewards.map((reward) => (
-          <Card key={reward.id} className="glass border-white/5 flex flex-col group relative overflow-hidden">
-            <CardHeader>
-              <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <reward.icon className={`w-6 h-6 ${reward.color}`} />
+          <Card key={reward.id} className="white-card rounded-[2.5rem] flex flex-col group relative overflow-hidden p-2">
+            <CardHeader className="p-6">
+              <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform border border-black/5">
+                <reward.icon className={`w-8 h-8 ${reward.color}`} />
               </div>
-              <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{reward.type}</span>
-                <span className="text-xs font-bold text-primary">{reward.cost} XP</span>
+                <span className="text-sm font-bold text-primary">{reward.cost} XP</span>
               </div>
-              <CardTitle className="text-lg font-headline">{reward.title}</CardTitle>
+              <CardTitle className="text-2xl font-headline text-secondary">{reward.title}</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 space-y-4">
-              <CardDescription className="leading-relaxed">
+            <CardContent className="flex-1 space-y-6 p-6">
+              <CardDescription className="text-base leading-relaxed font-medium">
                 {reward.desc}
               </CardDescription>
               <Button 
                 asChild
-                className="w-full bg-white/5 hover:bg-primary hover:text-white transition-all group-hover:border-primary/50 group-hover:text-white"
+                className="w-full h-14 font-bold bg-primary hover:bg-primary/90 shadow-xl shadow-primary/20"
                 disabled={currentXP < reward.cost}
               >
                 <Link href={`/rewards/${reward.id}`}>
@@ -103,30 +104,30 @@ export default function RewardsPage() {
               </Button>
             </CardContent>
             {/* Decorative BG Icon */}
-            <reward.icon className="absolute -right-6 -bottom-6 w-24 h-24 opacity-[0.03] rotate-12" />
+            <reward.icon className="absolute -right-8 -bottom-8 w-32 h-32 opacity-[0.03] rotate-12 group-hover:opacity-[0.06] transition-opacity" />
           </Card>
         ))}
       </div>
 
-      <div className="pt-12">
-        <h2 className="font-headline font-bold text-2xl mb-6">Recent Redemptions</h2>
-        <Card className="glass border-white/5">
+      <div className="pt-16">
+        <h2 className="font-headline font-bold text-3xl mb-10 text-secondary">Recent Redemptions</h2>
+        <Card className="white-card rounded-3xl overflow-hidden p-2">
           <CardContent className="p-0">
             {[
-              { name: "Investment Master Badge", date: "2 days ago", cost: "2,000 XP" },
-              { name: "Coffee Reward - Starbucks", date: "1 week ago", cost: "1,500 XP" }
+              { name: "Investment Master Badge", date: "2 days ago", cost: "2,000 XP", icon: ShieldCheck, color: "text-primary" },
+              { name: "Coffee Reward - Starbucks", date: "1 week ago", cost: "1,500 XP", icon: Gift, color: "text-[#FFBF00]" }
             ].map((item, i) => (
-              <div key={i} className={`flex items-center justify-between p-6 ${i !== 0 ? 'border-t border-white/5' : ''}`}>
-                <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Gift className="w-5 h-5 text-primary" />
+              <div key={i} className={`flex items-center justify-between p-8 ${i !== 0 ? 'border-t border-black/5' : ''} hover:bg-black/[0.01] transition-colors`}>
+                <div className="flex items-center gap-6">
+                  <div className="w-14 h-14 rounded-2xl bg-black/5 flex items-center justify-center border border-black/5">
+                    <item.icon className={`w-7 h-7 ${item.color}`} />
                   </div>
                   <div>
-                    <p className="font-bold">{item.name}</p>
-                    <p className="text-xs text-muted-foreground">{item.date}</p>
+                    <p className="text-lg font-bold text-secondary">{item.name}</p>
+                    <p className="text-sm font-bold text-muted-foreground">{item.date}</p>
                   </div>
                 </div>
-                <span className="text-sm font-bold text-muted-foreground">-{item.cost}</span>
+                <span className="text-lg font-bold text-secondary">-{item.cost}</span>
               </div>
             ))}
           </CardContent>

@@ -113,7 +113,7 @@ export default function SimulationPlayerPage({ params }: { params: Promise<{ id:
     setDecisions(newDecisions)
 
     // Update financial state
-    setFinancialState(prev => ({
+    setFinancialState((prev: { cash: any; debt: any; savings: any; investments: any }) => ({
       ...prev,
       cash: prev.cash + (option.impact.cash || 0),
       debt: prev.debt + (option.impact.debt || 0),
