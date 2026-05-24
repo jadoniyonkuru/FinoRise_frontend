@@ -10,34 +10,34 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col min-h-screen scroll-smooth">
-      {/* Header - Refined to match image */}
+      {/* Header */}
       <header className="fixed top-0 w-full z-50 glass border-b border-black/5 bg-background/80">
         <div className="container mx-auto px-6 h-24 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="font-headline font-bold text-2xl tracking-tighter">
+            <span className="font-headline font-bold text-2xl tracking-tighter text-secondary">
               Fino<span className="text-primary">Rise</span>
             </span>
           </Link>
           
-          <nav className="hidden lg:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          <nav className="hidden lg:flex items-center gap-8 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
             <Link href="#features" className="hover:text-primary transition-colors">Features</Link>
             <Link href="#simulations" className="hover:text-primary transition-colors">Simulations</Link>
             <Link href="#learning" className="hover:text-primary transition-colors">Learning Hub</Link>
             <Link href="#rewards" className="hover:text-primary transition-colors">Rewards</Link>
           </nav>
 
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6">
             <ModeToggle />
             <Link 
               href="/login" 
-              className="font-bold text-lg hover:text-primary transition-colors text-secondary"
+              className="text-sm font-bold uppercase tracking-widest hover:text-primary transition-colors text-secondary"
             >
               Log in
             </Link>
-            <Button asChild className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 h-14 px-8 font-bold text-sm uppercase tracking-widest rounded-2xl">
+            <Button asChild className="bg-primary hover:bg-secondary text-white h-14 px-8 font-bold text-[10px] uppercase tracking-widest rounded-2xl">
               <Link href="/dashboard">Get Started</Link>
             </Button>
           </div>
@@ -65,13 +65,13 @@ export default function LandingPage() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <Button size="lg" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest bg-primary hover:bg-primary/90 group shadow-xl shadow-primary/20 font-bold" asChild>
+              <Button size="lg" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest bg-primary hover:bg-secondary text-white group shadow-xl shadow-primary/20 font-bold rounded-2xl" asChild>
                 <Link href="/dashboard">
                   Start Your Journey
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest glass group border-black/10 font-bold" asChild>
+              <Button size="lg" variant="outline" className="h-16 w-full sm:w-64 text-sm uppercase tracking-widest glass group border-black/10 hover:bg-secondary hover:text-white font-bold rounded-2xl" asChild>
                 <Link href="#simulations">
                   Try Simulation
                   <Play className="ml-2 w-4 h-4 fill-current" />
@@ -111,12 +111,12 @@ export default function LandingPage() {
                 { title: "Curated Content", desc: "Micro-learning modules designed for high retention and impact.", icon: Layout },
                 { title: "Gold Rewards", desc: "Redeem performance for tangible benefits from fintech partners.", icon: Trophy }
               ].map((feature, i) => (
-                <div key={i} className="p-10 white-card rounded-3xl group text-left flex flex-col items-start h-full">
+                <div key={i} className="p-10 white-card rounded-3xl group text-left flex flex-col items-start h-full hover:bg-secondary hover:text-white transition-all duration-300 cursor-pointer">
                   <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
                     <feature.icon className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="font-headline font-bold text-2xl mb-4 text-secondary">{feature.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed flex-1">
+                  <h3 className="font-headline font-bold text-2xl mb-4 group-hover:text-white transition-colors">{feature.title}</h3>
+                  <p className="text-muted-foreground group-hover:text-white/80 leading-relaxed flex-1 transition-colors">
                     {feature.desc}
                   </p>
                 </div>
@@ -151,7 +151,7 @@ export default function LandingPage() {
                     </div>
                   ))}
                 </div>
-                <Button size="lg" className="h-16 px-10 text-sm uppercase tracking-widest bg-primary hover:bg-primary/90 font-bold" asChild>
+                <Button size="lg" className="h-16 px-10 text-sm uppercase tracking-widest bg-primary hover:bg-secondary text-white font-bold rounded-2xl" asChild>
                   <Link href="/simulations">Enter Simulator</Link>
                 </Button>
               </div>
@@ -162,7 +162,7 @@ export default function LandingPage() {
                    </div>
                    <div className="absolute bottom-12 left-12 p-6 glass rounded-2xl border-white/20 shadow-xl max-w-[200px]">
                       <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Scenario Active</p>
-                      <p className="text-sm font-semibold">The Bull Run</p>
+                      <p className="text-sm font-semibold text-secondary">The Bull Run</p>
                    </div>
                 </div>
               </div>
@@ -180,16 +180,16 @@ export default function LandingPage() {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
               {[
-                { title: "Foundational", desc: "Perfect for beginners. Master budgeting, basic saving, and credit health basics.", icon: Star },
+                { title: "Foundational Knowledge", desc: "Perfect for beginners. Master budgeting, basic saving, and credit health basics.", icon: Star },
                 { title: "Advanced Strategy", desc: "Deep dives into tax optimization, asset allocation, and complex market structures.", icon: TrendingUp }
               ].map((card, i) => (
-                <div key={i} className="white-card p-12 rounded-[2.5rem] text-left group">
+                <div key={i} className="white-card p-12 rounded-[2.5rem] text-left group hover:bg-secondary hover:text-white transition-all duration-300 cursor-pointer">
                   <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-10 group-hover:scale-110 transition-transform">
                     <card.icon className="w-7 h-7 text-primary" />
                   </div>
-                  <h3 className="font-headline font-bold text-2xl mb-4 text-secondary">{card.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed mb-10">{card.desc}</p>
-                  <Button variant="link" className="text-primary font-bold uppercase tracking-widest p-0 flex items-center gap-2 group/btn h-auto">
+                  <h3 className="font-headline font-bold text-2xl mb-4 group-hover:text-white transition-colors">{card.title}</h3>
+                  <p className="text-muted-foreground group-hover:text-white/80 leading-relaxed mb-10 transition-colors">{card.desc}</p>
+                  <Button variant="link" className="text-primary font-bold uppercase tracking-widest p-0 flex items-center gap-2 group/btn h-auto group-hover:text-white transition-colors">
                     Learn More <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                 </div>
@@ -225,7 +225,7 @@ export default function LandingPage() {
                ))}
             </div>
 
-            <Button size="lg" className="h-16 px-12 text-sm uppercase tracking-widest bg-[#FFBF00] hover:bg-[#FFBF00]/90 text-black font-bold shadow-xl shadow-[#FFBF00]/20" asChild>
+            <Button size="lg" className="h-16 px-12 text-sm uppercase tracking-widest bg-[#FFBF00] hover:bg-secondary hover:text-white text-black font-bold shadow-xl shadow-[#FFBF00]/20 rounded-2xl transition-all" asChild>
               <Link href="/rewards">Claim Your Gold <ArrowRight className="ml-2 w-4 h-4" /></Link>
             </Button>
           </div>
