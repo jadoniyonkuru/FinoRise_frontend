@@ -1,17 +1,18 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Zap, Shield, TrendingUp, Cpu, ArrowRight, Play, Trophy, Star, Gift, Layout, GraduationCap, Gamepad2 } from 'lucide-react';
+import { Zap, Shield, TrendingUp, Cpu, ArrowRight, Play, Trophy, Star, Layout, Gamepad2 } from 'lucide-react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { ModeToggle } from '@/components/mode-toggle';
 
 export default function LandingPage() {
   const heroImg = PlaceHolderImages.find(img => img.id === 'hero-bg');
 
   return (
     <div className="flex flex-col min-h-screen scroll-smooth">
-      {/* Header */}
+      {/* Header - Refined to match image */}
       <header className="fixed top-0 w-full z-50 glass border-b border-black/5 bg-background/80">
-        <div className="container mx-auto px-6 h-20 flex items-center justify-between">
+        <div className="container mx-auto px-6 h-24 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/30">
               <Zap className="w-6 h-6 text-white" />
@@ -28,11 +29,15 @@ export default function LandingPage() {
             <Link href="#rewards" className="hover:text-primary transition-colors">Rewards</Link>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild className="hidden sm:inline-flex font-bold text-xs uppercase tracking-widest">
-              <Link href="/login">Log in</Link>
-            </Button>
-            <Button asChild className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 h-12 px-6 font-bold text-xs uppercase tracking-widest">
+          <div className="flex items-center gap-8">
+            <ModeToggle />
+            <Link 
+              href="/login" 
+              className="font-bold text-lg hover:text-primary transition-colors text-secondary"
+            >
+              Log in
+            </Link>
+            <Button asChild className="bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 h-14 px-8 font-bold text-sm uppercase tracking-widest rounded-2xl">
               <Link href="/dashboard">Get Started</Link>
             </Button>
           </div>
@@ -200,7 +205,7 @@ export default function LandingPage() {
               <Trophy className="w-4 h-4 text-[#FFBF00]" />
               <span className="text-[10px] font-bold text-[#FFBF00] uppercase tracking-widest">Premium Rewards</span>
             </div>
-            <h2 className="font-headline font-bold text-4xl md:text-6xl mb-8 text-secondary tracking-tight">Real-World Gold</h2>
+            <h2 className="font-headline font-bold text-4xl md:text-6xl mb-8 text-secondary tracking-tight">Real-World <span className="text-[#FFBF00]">Gold</span></h2>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-20 leading-relaxed">
               Your excellence in simulations pays off. Redeem your hard-earned XP for digital perks and real-world financial benefits.
             </p>
