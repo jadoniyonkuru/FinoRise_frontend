@@ -1,9 +1,8 @@
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { 
-  LineChart as ReChartLine, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -18,7 +17,7 @@ import {
   Radar
 } from "recharts"
 import { Badge } from "@/components/ui/badge"
-import { TrendingUp, ShieldCheck, Zap, ArrowDownRight, ArrowUpRight } from "lucide-react"
+import { TrendingUp, ShieldCheck, Zap, ArrowUpRight } from "lucide-react"
 
 const performanceData = [
   { month: "Jan", score: 620 },
@@ -39,6 +38,8 @@ const behaviorData = [
 ]
 
 export default function AnalyticsPage() {
+  const PRIMARY_COLOR = "#00A3FF" // Equivalent to hsl(201 96% 50%)
+
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -48,7 +49,7 @@ export default function AnalyticsPage() {
         </div>
         <div className="flex gap-2">
           <Badge variant="outline" className="glass h-10 px-4 border-white/10">Last 6 Months</Badge>
-          <Badge className="bg-primary shadow-lg shadow-primary/20 h-10 px-4">Download Report</Badge>
+          <Badge className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 h-10 px-4 cursor-pointer transition-all">Download Report</Badge>
         </div>
       </div>
 
@@ -63,7 +64,7 @@ export default function AnalyticsPage() {
               </div>
               <div className="text-right">
                 <span className="text-2xl font-bold font-headline text-primary">840</span>
-                <p className="text-[10px] text-green-400 flex items-center justify-end font-bold">
+                <p className="text-[10px] text-primary flex items-center justify-end font-bold uppercase tracking-wider">
                   <ArrowUpRight className="w-3 h-3 mr-1" />
                   +12.4%
                 </p>
@@ -75,8 +76,8 @@ export default function AnalyticsPage() {
               <AreaChart data={performanceData}>
                 <defs>
                   <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                    <stop offset="5%" stopColor={PRIMARY_COLOR} stopOpacity={0.3}/>
+                    <stop offset="95%" stopColor={PRIMARY_COLOR} stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
@@ -92,12 +93,12 @@ export default function AnalyticsPage() {
                 />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#14111A', borderColor: '#ffffff10', borderRadius: '12px' }}
-                  itemStyle={{ color: '#8B5CF6' }}
+                  itemStyle={{ color: PRIMARY_COLOR }}
                 />
                 <Area 
                   type="monotone" 
                   dataKey="score" 
-                  stroke="#8B5CF6" 
+                  stroke={PRIMARY_COLOR} 
                   strokeWidth={3}
                   fillOpacity={1} 
                   fill="url(#colorScore)" 
@@ -122,8 +123,8 @@ export default function AnalyticsPage() {
                 <Radar
                   name="Alex"
                   dataKey="A"
-                  stroke="#8B5CF6"
-                  fill="#8B5CF6"
+                  stroke={PRIMARY_COLOR}
+                  fill={PRIMARY_COLOR}
                   fillOpacity={0.3}
                 />
               </RadarChart>
@@ -134,21 +135,21 @@ export default function AnalyticsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Learning Hours", value: "24.5h", trend: "+12%", icon: Zap, color: "text-primary" },
-          { label: "Avg. Quiz Score", value: "92%", trend: "+2%", icon: TrendingUp, color: "text-secondary" },
-          { label: "Simulated Net Worth", value: "$45,200", trend: "+$4k", icon: ShieldCheck, color: "text-primary" },
-          { label: "Decisions Made", value: "142", trend: "+18", icon: TrendingUp, color: "text-secondary" },
+          { label: "Learning Hours", value: "24.5h", trend: "+12%", icon: Zap },
+          { label: "Avg. Quiz Score", value: "92%", trend: "+2%", icon: TrendingUp },
+          { label: "Simulated Net Worth", value: "$45,200", trend: "+$4k", icon: ShieldCheck },
+          { label: "Decisions Made", value: "142", trend: "+18", icon: TrendingUp },
         ].map((stat, i) => (
-          <Card key={i} className="glass border-white/5 p-5">
+          <Card key={i} className="glass border-white/5 p-5 group hover:bg-primary transition-all duration-300 cursor-pointer">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                <stat.icon className={`w-5 h-5 ${stat.color}`} />
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-white/20 transition-all">
+                <stat.icon className={`w-5 h-5 text-primary group-hover:text-white`} />
               </div>
               <div className="space-y-0.5">
-                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest">{stat.label}</p>
+                <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-widest group-hover:text-white/70 transition-colors">{stat.label}</p>
                 <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold font-headline">{stat.value}</span>
-                  <span className="text-[10px] font-bold text-green-400">{stat.trend}</span>
+                  <span className="text-xl font-bold font-headline group-hover:text-white transition-colors">{stat.value}</span>
+                  <span className="text-[10px] font-bold text-primary group-hover:text-white transition-colors">{stat.trend}</span>
                 </div>
               </div>
             </div>
