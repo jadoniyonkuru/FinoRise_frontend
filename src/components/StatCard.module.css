@@ -9,10 +9,11 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.25rem;
+  box-shadow: var(--shadow);
 }
 
 .card[data-accent] {
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-color: #bae6fd;
 }
 
 .label {
@@ -25,6 +26,7 @@
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: var(--text);
 }
 
 .hint {
@@ -39,12 +41,14 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 1.5rem;
+  box-shadow: var(--shadow);
 }
 
 .panel h2 {
   margin: 0 0 1rem;
   font-size: 1rem;
   font-weight: 600;
+  color: var(--text);
 }
 
 .list {

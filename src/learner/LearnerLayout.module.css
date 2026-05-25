@@ -1,0 +1,126 @@
+/* ── Shell ── */
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f8f9ff;
+  color: #111827;
+  font-family: "DM Sans", system-ui, sans-serif;
+  --lp: #0ea5e9;
+  --lp-dim: #e0f2fe;
+}
+
+/* ── Top navbar ── */
+/* ── Body ── */
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  width: 185px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid #e5e7eb;
+  padding: 1.1rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.groupLabel {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  padding: 0 0.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.sideLink {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.86rem;
+  font-weight: 500;
+  color: #6b7280;
+  text-decoration: none;
+  transition: color 0.15s, background 0.15s;
+}
+
+.sideLink:hover {
+  color: #374151;
+  background: #f9fafb;
+}
+
+.sideLinkActive {
+  background: var(--lp-dim);
+  color: var(--lp);
+  font-weight: 600;
+}
+
+/* ── Main ── */
+.logoutBtn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: auto;
+  padding: 0.55rem 0.6rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #6b7280;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.logoutBtn:hover {
+  border-color: #7dd3fc;
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.main {
+  flex: 1;
+  padding: 1.75rem 2rem;
+  overflow: auto;
+  min-width: 0;
+}
+
+/* ── Optional page header ── */
+.pageHeader {
+  margin-bottom: 1.5rem;
+}
+
+.pageTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.2rem;
+}
+
+.pageSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+}

@@ -7,4 +7,5 @@ export const adminNavItems: NavItem[] = [
   { label: "Simulation mgr", path: "/admin/simulation-manager" },
   { label: "Rewards manager", path: "/admin/rewards-manager" },
   { label: "Analytics", path: "/admin/analytics" },
+  { label: "Profile", path: "/admin/profile" },
 ];

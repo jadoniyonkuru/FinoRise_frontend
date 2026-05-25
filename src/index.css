@@ -5,13 +5,13 @@
   --border: #2e3344;
   --text: #f0f2f8;
   --text-muted: #9aa3b8;
-  --learner: #22c55e;
-  --learner-dim: #166534;
-  --admin: #a855f7;
-  --admin-dim: #6b21a8;
-  --partner: #f59e0b;
-  --partner-dim: #b45309;
-  --auth: #64748b;
+  --learner: #0ea5e9;
+  --learner-dim: #0284c7;
+  --admin: #0ea5e9;
+  --admin-dim: #0284c7;
+  --partner: #0ea5e9;
+  --partner-dim: #0284c7;
+  --auth: #0ea5e9;
   --radius: 12px;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
 }

@@ -66,7 +66,7 @@ export default function DashboardLayout({
           className={styles.logout}
           onClick={() => navigate("/auth/login")}
         >
-          Sign out
+          Log out
         </button>
       </aside>
       <main className={styles.main}>

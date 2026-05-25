@@ -2,10 +2,19 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
+  background: #f8f9ff;
+  color: #0f172a;
+  --surface: #ffffff;
+  --surface-elevated: #f8fafc;
+  --border: #e4e7f3;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --radius: 14px;
+  --shadow: 0 12px 26px rgba(15, 23, 42, 0.07);
 }
 
 .sidebar {
-  background: var(--surface);
+  background: #ffffff;
   border-right: 1px solid var(--border);
   padding: 1.5rem;
   display: flex;
@@ -23,6 +32,7 @@
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: -0.02em;
+  color: #0f172a;
 }
 
 .roleBadge {
@@ -32,9 +42,9 @@
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
-  background: color-mix(in srgb, var(--accent) 20%, transparent);
-  color: var(--accent);
-  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  background: #e0f2fe;
+  color: #0284c7;
+  border: 1px solid #7dd3fc;
 }
 
 .nav {
@@ -57,14 +67,14 @@
 }
 
 .navLink:hover {
-  color: var(--text);
-  background: var(--surface-elevated);
+  color: #0f172a;
+  background: #f8fafc;
 }
 
 .navActive {
-  background: color-mix(in srgb, var(--accent) 15%, var(--surface-elevated));
-  color: var(--accent);
-  font-weight: 500;
+  background: #e0f2fe;
+  color: #0284c7;
+  font-weight: 700;
 }
 
 .navItemMuted {
@@ -84,8 +94,8 @@
 }
 
 .logout:hover {
-  color: var(--text);
-  border-color: var(--text-muted);
+  color: #0284c7;
+  border-color: #7dd3fc;
 }
 
 .main {
@@ -106,6 +116,7 @@
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: #0f172a;
 }
 
 .header p {
@@ -122,7 +133,8 @@
 }
 
 .switchRole:hover {
-  color: var(--text);
+  color: #0284c7;
+  border-color: #7dd3fc;
 }
 
 @media (max-width: 768px) {
