@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import LearnerLayout from "../LearnerLayout";
 import s from "./simulations.module.css";
 
@@ -74,10 +75,50 @@ function HomeIcon() {
     </svg>
   );
 }
+function RepeatIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
+      <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
+    </svg>
+  );
+}
+function SparkleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+    </svg>
+  );
+}
+function BuildingIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="7" width="9" height="14" /><rect x="13" y="3" width="9" height="18" />
+      <line x1="2" y1="21" x2="22" y2="21" />
+      <line x1="6" y1="11" x2="7" y2="11" /><line x1="6" y1="15" x2="7" y2="15" />
+      <line x1="17" y1="7" x2="18" y2="7" /><line x1="17" y1="11" x2="18" y2="11" /><line x1="17" y1="15" x2="18" y2="15" />
+    </svg>
+  );
+}
+function BotIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M12 11V5" /><circle cx="12" cy="4" r="1" />
+      <line x1="8" y1="15" x2="8" y2="15" strokeWidth="3" /><line x1="12" y1="15" x2="12" y2="15" strokeWidth="3" /><line x1="16" y1="15" x2="16" y2="15" strokeWidth="3" />
+    </svg>
+  );
+}
+function ArrowRightIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" />
+    </svg>
+  );
+}
 
 /* ── Types ── */
 type Difficulty = "Beginner" | "Intermediate" | "Advanced";
-type Category   = "Budgeting" | "Investing" | "Emergency" | "Business" | "Planning";
+type Category   = "Budgeting" | "Investing" | "Emergency" | "Business" | "Planning" | "Crisis" | "Retirement" | "Real Estate";
 type Status     = "available" | "in-progress" | "completed" | "locked";
 
 type Simulation = {
@@ -169,10 +210,46 @@ const simulations: Simulation[] = [
     headerBg: "linear-gradient(135deg,#475569,#94a3b8)",
     icon: <HomeIcon />,
   },
+  {
+    id: 7,
+    category: "Crisis",
+    title: "Debt Snowball vs Avalanche",
+    description: "You have 4 sources of debt. Strategize the most efficient way to reach zero balance.",
+    difficulty: "Beginner",
+    duration: "12 mins",
+    xp: 350,
+    status: "available",
+    headerBg: "linear-gradient(135deg,#7c3aed,#a78bfa)",
+    icon: <RepeatIcon />,
+  },
+  {
+    id: 8,
+    category: "Retirement",
+    title: "FIRE: Early Retirement",
+    description: "Aggressive saving meets lifestyle choices. Can you reach your target number by age 45?",
+    difficulty: "Advanced",
+    duration: "25 mins",
+    xp: 750,
+    status: "available",
+    headerBg: "linear-gradient(135deg,#0369a1,#38bdf8)",
+    icon: <SparkleIcon />,
+  },
+  {
+    id: 9,
+    category: "Real Estate",
+    title: "Rental Property Pivot",
+    description: "Convert your primary residence into a rental. Calculate ROI and manage tenant risks.",
+    difficulty: "Intermediate",
+    duration: "18 mins",
+    xp: 500,
+    status: "available",
+    headerBg: "linear-gradient(135deg,#065f46,#34d399)",
+    icon: <BuildingIcon />,
+  },
 ];
 
 type FilterKey = "All" | Category | "Completed";
-const filters: FilterKey[] = ["All", "Budgeting", "Investing", "Emergency", "Business", "Completed"];
+const filters: FilterKey[] = ["All", "Budgeting", "Investing", "Crisis", "Retirement", "Real Estate", "Completed"];
 
 function badgeClass(d: Difficulty) {
   if (d === "Beginner")     return s.badgeBeginner;
@@ -195,6 +272,7 @@ function statusLabel(st: Status) {
 }
 
 export default function LearnerSimulationsPage() {
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<FilterKey>("All");
   const [search, setSearch] = useState("");
 
@@ -317,14 +395,33 @@ export default function LearnerSimulationsPage() {
                   </span>
                 </div>
 
-                {sim.status === "available"    && <button type="button" className={s.startBtn}>Start</button>}
-                {sim.status === "in-progress"  && <button type="button" className={s.resumeBtn}>Continue</button>}
-                {sim.status === "completed"    && <button type="button" className={s.replayBtn}>Replay</button>}
+                {sim.status === "available"    && <button type="button" className={s.startBtn} onClick={() => navigate("/learner/simulation-runner")}>Start Simulation</button>}
+                {sim.status === "in-progress"  && <button type="button" className={s.resumeBtn} onClick={() => navigate("/learner/simulation-runner")}>Continue</button>}
+                {sim.status === "completed"    && <button type="button" className={s.replayBtn} onClick={() => navigate("/learner/simulation-runner")}>Replay</button>}
                 {sim.status === "locked"       && <button type="button" className={s.lockedBtn} disabled><LockIcon /> Locked</button>}
               </div>
             </div>
           ))
         )}
+      </div>
+
+      {/* AI assistant callout */}
+      <div className={s.aiCallout}>
+        <div className={s.aiCalloutLeft}>
+          <div className={s.aiCalloutBadge}><BotIcon /> New AI Feature</div>
+          <h3 className={s.aiCalloutTitle}>Unsure where to start?</h3>
+          <p className={s.aiCalloutDesc}>
+            Our AI Assistant can analyze your current progress and financial goals to
+            suggest the perfect simulation to build your confidence.
+          </p>
+        </div>
+        <button
+          type="button"
+          className={s.aiCalloutBtn}
+          onClick={() => navigate("/learner/ai-coach")}
+        >
+          Ask AI Assistant <ArrowRightIcon />
+        </button>
       </div>
     </LearnerLayout>
   );

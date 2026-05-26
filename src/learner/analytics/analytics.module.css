@@ -1,0 +1,301 @@
+/* ── Page header ── */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.03em;
+}
+
+.pageSubtitle {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-shrink: 0;
+  padding-top: 0.25rem;
+}
+
+.periodLabel {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.35rem;
+  background: #0ea5e9;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.downloadBtn:hover {
+  opacity: 0.88;
+  transform: translateY(-1px);
+}
+
+/* ── Main two-panel row ── */
+.mainRow {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  align-items: start;
+}
+
+/* ── Financial Growth Score card ── */
+.scoreCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem 1rem;
+  overflow: hidden;
+}
+
+.scoreCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.scoreMeta {}
+
+.scoreTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.2rem;
+}
+
+.scoreDesc {
+  font-size: 0.8rem;
+  color: #9ca3af;
+}
+
+.scoreRight {
+  text-align: right;
+}
+
+.scoreNumber {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #0ea5e9;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.scoreTrend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #22c55e;
+  margin-top: 0.3rem;
+}
+
+/* ── Radar / Risk Profile card ── */
+.radarCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem 1.25rem 1rem;
+}
+
+.radarTitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.2rem;
+}
+
+.radarSubtitle {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-bottom: 0.75rem;
+}
+
+.radarLegend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.radarLegendItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.76rem;
+}
+
+.radarLegendLabel {
+  color: #6b7280;
+}
+
+.radarLegendVal {
+  font-weight: 700;
+  color: #0ea5e9;
+}
+
+/* ── Shared chart SVG ── */
+.chartSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+.chartNote {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.chartNote strong {
+  color: #111827;
+}
+
+/* ── Behavioral stats row ── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.statCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.1rem 1.15rem;
+}
+
+.statIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.75rem;
+}
+
+.statLabel {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
+}
+
+.statValue {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.03em;
+  margin-bottom: 0.2rem;
+}
+
+.statHint {
+  font-size: 0.72rem;
+  color: #6b7280;
+}
+
+/* ── Insights panel ── */
+.insightsPanel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.insightsPanelTitle {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.insightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.insightItem {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.insightBar {
+  width: 4px;
+  border-radius: 999px;
+  flex-shrink: 0;
+  align-self: stretch;
+  min-height: 40px;
+}
+
+.insightBarPositive { background: #22c55e; }
+.insightBarNeutral  { background: #f59e0b; }
+.insightBarWarning  { background: #ef4444; }
+
+.insightBody {}
+
+.insightCategory {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.insightCategoryPositive { color: #22c55e; }
+.insightCategoryNeutral  { color: #f59e0b; }
+.insightCategoryWarning  { color: #ef4444; }
+
+.insightText {
+  font-size: 0.84rem;
+  color: #374151;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .mainRow {
+    grid-template-columns: 1fr;
+  }
+  .statsRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

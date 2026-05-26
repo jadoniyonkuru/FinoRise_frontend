@@ -10,6 +10,13 @@ import LearnerSimulationsPage from "@/learner/simulations/LearnerSimulationsPage
 import LearnerRewardsPage from "@/learner/rewards/LearnerRewardsPage";
 import AICoachPage from "@/learner/ai-coach/AICoachPage";
 import LearnerSettingsPage from "@/learner/settings/LearnerSettingsPage";
+import LearnerAnalyticsPage from "@/learner/analytics/LearnerAnalyticsPage";
+import LessonViewPage from "@/learner/lesson/LessonViewPage";
+import ModuleQuizPage from "@/learner/quiz/ModuleQuizPage";
+import SimulationRunnerPage from "@/learner/simulation-runner/SimulationRunnerPage";
+import BehavioralInsightsPage from "@/learner/behavioral-insights/BehavioralInsightsPage";
+import GamificationPage from "@/learner/gamification/GamificationPage";
+import RewardCatalogPage from "@/learner/reward-catalog/RewardCatalogPage";
 
 import AdminDashboard from "@/admin/dashboard/AdminDashboard";
 import AdminProfile from "@/admin/profile/AdminProfile";
@@ -43,6 +50,13 @@ export default function App() {
       <Route path="/learner/insights" element={<Navigate to="/learner/dashboard" replace />} />
       <Route path="/learner/profile" element={<LearnerProfile />} />
       <Route path="/learner/settings" element={<LearnerSettingsPage />} />
+      <Route path="/learner/analytics" element={<LearnerAnalyticsPage />} />
+      <Route path="/learner/lesson" element={<LessonViewPage />} />
+      <Route path="/learner/quiz" element={<ModuleQuizPage />} />
+      <Route path="/learner/simulation-runner" element={<SimulationRunnerPage />} />
+      <Route path="/learner/insights" element={<BehavioralInsightsPage />} />
+      <Route path="/learner/gamification" element={<GamificationPage />} />
+      <Route path="/learner/reward-catalog" element={<RewardCatalogPage />} />
 
       {/* Admin */}
       <Route path="/admin/dashboard" element={<AdminDashboard />} />
