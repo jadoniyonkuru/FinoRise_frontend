@@ -24,10 +24,13 @@ import PartnerProfile from "@/partner/profile/PartnerProfile";
 import PartnerProgramsPage from "@/partner/programs/PartnerProgramsPage";
 import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
 
-export default function App() {
+import LandingPage from "@/pages/LandingPage";
+
+function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/auth/login" replace />} />
+      {/* Landing page at the root route */}
+      <Route path="/" element={<LandingPage />} />
 
       {/* Auth */}
       <Route path="/auth/login" element={<LoginPage />} />
@@ -61,3 +64,5 @@ export default function App() {
     </Routes>
   );
 }
+
+export default App;
