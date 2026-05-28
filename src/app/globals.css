@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 0%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 0%;
+    --primary: 201 96% 50%; /* Vibrant Sky Blue */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 0%; /* Pure Black for high contrast */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 201 96% 50%;
+    --accent-foreground: 0 0% 0%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 201 96% 50%;
+    --radius: 1rem;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 201 96% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 0 0% 0%;
+    --sidebar-border: 240 5.9% 90%;
+    --sidebar-ring: 201 96% 50%;
+  }
+
+  .dark {
+    --background: 222 47% 2%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 4%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 3%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 201 96% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 201 96% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.text-gold {
+  color: #FFBF00;
+}
+
+.bg-gold {
+  background-color: #FFBF00;
+}
+
+.border-gold {
+  border-color: #FFBF00;
+}
+
+.glass {
+  @apply backdrop-blur-md border border-black/5 dark:border-white/5;
+}
+
+.white-card {
+  @apply bg-white dark:bg-card border border-black/5 shadow-md hover:shadow-xl transition-all duration-300;
+}
+
+.btn-fitts {
+  @apply h-16 px-10 text-sm uppercase tracking-widest font-bold transition-all duration-300;
+}
