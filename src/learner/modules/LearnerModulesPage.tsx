@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import LearnerLayout from "../LearnerLayout";
 import s from "./modules.module.css";
 
@@ -335,11 +336,11 @@ export default function LearnerModulesPage() {
                 </div>
 
                 {m.progress === 100 ? (
-                  <button type="button" className={s.reviewBtn}>Review</button>
+                  <Link to={`/learner/modules/${m.id}`} className={s.reviewBtn}>Review</Link>
                 ) : m.progress > 0 ? (
-                  <button type="button" className={s.resumeBtn}>Resume</button>
+                  <Link to={`/learner/modules/${m.id}`} className={s.resumeBtn}>Resume</Link>
                 ) : (
-                  <button type="button" className={s.startBtn}>Start</button>
+                  <Link to={`/learner/modules/${m.id}`} className={s.startBtn}>Start</Link>
                 )}
               </div>
             </div>

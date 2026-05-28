@@ -6,6 +6,7 @@ import ResetPasswordPage from "@/auth/reset-password/ResetPasswordPage";
 import LearnerDashboard from "@/learner/dashboard/LearnerDashboard";
 import LearnerProfile from "@/learner/profile/LearnerProfile";
 import LearnerModulesPage from "@/learner/modules/LearnerModulesPage";
+import ModuleDetailPage from "@/learner/modules/ModuleDetailPage";
 import LearnerSimulationsPage from "@/learner/simulations/LearnerSimulationsPage";
 import LearnerRewardsPage from "@/learner/rewards/LearnerRewardsPage";
 import AICoachPage from "@/learner/ai-coach/AICoachPage";
@@ -44,6 +45,7 @@ export default function App() {
       {/* Learner */}
       <Route path="/learner/dashboard" element={<LearnerDashboard />} />
       <Route path="/learner/modules" element={<LearnerModulesPage />} />
+      <Route path="/learner/modules/:moduleId" element={<ModuleDetailPage />} />
       <Route path="/learner/simulations" element={<LearnerSimulationsPage />} />
       <Route path="/learner/rewards" element={<LearnerRewardsPage />} />
       <Route path="/learner/ai-coach" element={<AICoachPage />} />
