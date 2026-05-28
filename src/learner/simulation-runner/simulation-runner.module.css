@@ -1,0 +1,586 @@
+/* ── Wrapper ── */
+.runnerWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding-bottom: 2rem;
+}
+
+/* ── Top bar ── */
+.topBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.topBarLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6366f1;
+  cursor: pointer;
+  padding: 0;
+  transition: opacity 0.15s;
+}
+
+.backLink:hover { opacity: 0.75; }
+
+.topBarSep { color: #d1d5db; }
+
+.topBarTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #374151;
+}
+
+.topBarRight {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.xpPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.75rem;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6366f1;
+}
+
+.stepCount {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+/* ── Progress bar ── */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* ── Body two-column ── */
+.body {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ── Left: context panel ── */
+.contextCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.5rem 1.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.contextTag {
+  display: inline-block;
+  padding: 0.2rem 0.65rem;
+  background: #eef2ff;
+  color: #6366f1;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+.contextTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.85rem;
+  letter-spacing: -0.02em;
+}
+
+.contextScenario {
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.7;
+  margin: 0 0 1.1rem;
+}
+
+.contextHint {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+  font-size: 0.82rem;
+  color: #2563eb;
+  line-height: 1.5;
+  flex-shrink: 0;
+}
+
+/* ── Debt snapshot ── */
+.snapshotCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+}
+
+.snapshotTitle {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  margin-bottom: 0.85rem;
+}
+
+.debtList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.debtRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.debtLabel {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  flex-shrink: 0;
+}
+
+.debtDetails {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.debtBalance {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.debtRate {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+}
+
+.debtMin {
+  font-size: 0.72rem;
+  color: #9ca3af;
+}
+
+.debtTotal {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid #f3f4f6;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.debtTotalValue {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+/* ── Right: decision panel ── */
+.decisionCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.5rem 1.6rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.decisionTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.3rem;
+}
+
+.decisionSubtitle {
+  font-size: 0.82rem;
+  color: #6b7280;
+  margin: 0 0 1.25rem;
+}
+
+/* Choice buttons */
+.choiceList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+.choiceBtn {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.choiceBtn:hover:not(:disabled) {
+  border-color: #c7d2fe;
+  background: #f5f3ff;
+}
+
+.choiceBtn:disabled { cursor: default; }
+
+.choiceBtnSelected {
+  border-color: #6366f1;
+  background: #eef2ff;
+}
+
+.choiceLetter {
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  border: 1.5px solid #d1d5db;
+  background: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #9ca3af;
+  transition: all 0.15s;
+}
+
+.choiceLetterSelected {
+  border-color: #6366f1;
+  background: #6366f1;
+  color: #fff;
+}
+
+.choiceText { flex: 1; min-width: 0; }
+
+.choiceLabel {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.2rem;
+}
+
+.choiceDesc {
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* Feedback box */
+.feedbackBox {
+  background: linear-gradient(135deg, #ecfdf5, #f0fdf4);
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.feedbackLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #16a34a;
+  margin-bottom: 0.45rem;
+}
+
+.feedbackText {
+  font-size: 0.84rem;
+  color: #166534;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Action row */
+.actionRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.confirmBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.35rem;
+  border: none;
+  border-radius: 9px;
+  background: #6366f1;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.confirmBtn:hover:not(:disabled) { opacity: 0.88; }
+
+.confirmBtnDisabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.nextBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.35rem;
+  border: none;
+  border-radius: 9px;
+  background: #0ea5e9;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.nextBtn:hover { opacity: 0.88; }
+
+/* ── Results ── */
+.resultsWrap {
+  display: flex;
+  justify-content: center;
+  padding: 0.5rem 0 2rem;
+}
+
+.resultsCard {
+  width: 100%;
+  max-width: 600px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 2.25rem 2.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.resultsBadge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+  color: #059669;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.resultsTitle {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.resultsSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0 0 1.75rem;
+  text-align: center;
+  max-width: 420px;
+}
+
+.resultsStats {
+  display: flex;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem 2rem;
+  width: 100%;
+  margin-bottom: 1.75rem;
+}
+
+.resultsStat { flex: 1; text-align: center; }
+
+.resultsStatValue {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.resultsXp { color: #6366f1; }
+
+.resultsStatLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.resultsDivider {
+  width: 1px;
+  height: 40px;
+  background: #e5e7eb;
+  flex-shrink: 0;
+  margin: 0 0.5rem;
+}
+
+.recapList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+  margin-bottom: 1.75rem;
+}
+
+.recapItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: #f9fafb;
+  border: 1px solid #f3f4f6;
+  border-radius: 10px;
+}
+
+.recapCheck {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #16a34a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.recapText { flex: 1; }
+
+.recapTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 0.2rem;
+}
+
+.recapChoice {
+  font-size: 0.78rem;
+  color: #6b7280;
+}
+
+.resultsActions {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.retryBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.retryBtn:hover { border-color: #6366f1; color: #6366f1; }
+
+.backBtn {
+  flex: 1;
+  padding: 0.7rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: #6366f1;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.backBtn:hover { opacity: 0.88; }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .body { grid-template-columns: 1fr; }
+  .decisionCard { position: static; }
+}

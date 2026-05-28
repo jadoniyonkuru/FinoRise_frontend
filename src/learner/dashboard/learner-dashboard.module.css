@@ -1,0 +1,395 @@
+/* ── Hero banner ── */
+.hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 45%, #ecfeff 100%);
+  border: 1px solid #bae6fd;
+}
+
+.heroContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.heroTitle {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.5rem;
+  letter-spacing: -0.03em;
+}
+
+.heroTitle span {
+  color: #0284c7;
+}
+
+.heroText {
+  font-size: 0.9rem;
+  color: #4b5563;
+  line-height: 1.55;
+  margin: 0 0 1.25rem;
+  max-width: 520px;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.btnPrimary,
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.15rem;
+  border-radius: 9px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  font-family: inherit;
+  text-decoration: none;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.btnPrimary {
+  background: #0ea5e9;
+  color: #fff;
+  border: none;
+}
+
+.btnPrimary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btnSecondary {
+  background: #fff;
+  color: #374151;
+  border: 1.5px solid #e5e7eb;
+}
+
+.btnSecondary:hover {
+  border-color: #0ea5e9;
+  color: #0284c7;
+}
+
+.streakPanel {
+  flex-shrink: 0;
+  text-align: right;
+  padding-top: 0.25rem;
+}
+
+.streakLabel {
+  display: block;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 0.4rem;
+}
+
+.streakValue {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0284c7;
+}
+
+/* ── Stats row ── */
+.statsRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.statCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.25rem 1.35rem;
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
+}
+
+.statLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.statIcon {
+  color: #9ca3af;
+  display: flex;
+}
+
+.statMain {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.statNumber {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.statDelta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #16a34a;
+}
+
+.statBadge {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #0284c7;
+}
+
+.progressBar {
+  height: 8px;
+  background: #111827;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.65rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  border-radius: 999px;
+}
+
+.statFooter {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.scoreBar {
+  display: flex;
+  gap: 3px;
+  height: 8px;
+  margin-bottom: 0.75rem;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.scoreSeg {
+  flex: 1;
+  border-radius: 2px;
+}
+
+.scoreSeg[data-tone="low"] { background: #fb923c; }
+.scoreSeg[data-tone="mid"] { background: #f97316; }
+.scoreSeg[data-tone="high"] { background: #1e40af; }
+.scoreSeg[data-tone="peak"] { background: #0f172a; }
+
+.statDesc {
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* AI insight card */
+.insightCard {
+  display: flex;
+  flex-direction: column;
+}
+
+.insightHead {
+  margin-bottom: 0.75rem;
+}
+
+.insightTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.2rem;
+}
+
+.insightSub {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.insightQuote {
+  flex: 1;
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem;
+  background: #e0f2fe;
+  border-radius: 10px;
+  border-left: 3px solid #0ea5e9;
+  font-size: 0.82rem;
+  color: #374151;
+  line-height: 1.5;
+  font-style: normal;
+}
+
+.insightBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0.55rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-decoration: none;
+  font-family: inherit;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.insightBtn:hover {
+  border-color: #0ea5e9;
+  color: #0284c7;
+}
+
+/* ── Recommended next ── */
+.recommended {
+  margin-bottom: 1rem;
+}
+
+.recommendedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.recommendedTitle {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.viewAll {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #0ea5e9;
+  text-decoration: none;
+}
+
+.viewAll:hover {
+  text-decoration: underline;
+}
+
+.moduleCard {
+  display: flex;
+  gap: 1rem;
+  max-width: 420px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s;
+}
+
+.moduleCard:hover {
+  box-shadow: 0 6px 20px rgba(14, 165, 233, 0.12);
+}
+
+.moduleThumb {
+  width: 120px;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #1e3a5f 0%, #1d4ed8 55%, #3b82f6 100%);
+  display: flex;
+  align-items: flex-start;
+  padding: 0.65rem;
+}
+
+.moduleTag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+}
+
+.moduleBody {
+  padding: 0.85rem 1rem 0.85rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.moduleLevel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+.moduleName {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+.moduleMeta {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.76rem;
+  color: #9ca3af;
+  margin-top: 0.15rem;
+}
+
+@media (max-width: 1100px) {
+  .statsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    flex-direction: column;
+    padding: 1.25rem;
+  }
+
+  .streakPanel {
+    text-align: left;
+  }
+
+  .streakValue {
+    justify-content: flex-start;
+  }
+
+  .moduleCard {
+    max-width: 100%;
+  }
+}

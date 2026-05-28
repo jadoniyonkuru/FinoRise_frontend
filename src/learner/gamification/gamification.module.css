@@ -1,0 +1,476 @@
+/* ── Page header ── */
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.pageTitle {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.35rem;
+  letter-spacing: -0.025em;
+}
+
+.pageSubtitle {
+  font-size: 0.875rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 480px;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.historyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.historyBtn:hover {
+  border-color: #6366f1;
+  color: #6366f1;
+}
+
+.catalogBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 9px;
+  background: #6366f1;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+
+.catalogBtn:hover { opacity: 0.88; }
+
+/* ── Two-column body ── */
+.body {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+/* ── Main column ── */
+.mainCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* ── Level card ── */
+.levelCard {
+  background: linear-gradient(135deg, #eef2ff 0%, #e0f2fe 100%);
+  border: 1px solid #c7d2fe;
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.levelRingSvg {
+  flex-shrink: 0;
+}
+
+.levelInfo {
+  flex: 1;
+  min-width: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.levelTitle {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.02em;
+}
+
+.levelHint {
+  font-size: 0.84rem;
+  color: #6b7280;
+  margin: 0 0 0.9rem;
+  line-height: 1.5;
+}
+
+.levelHint strong { color: #6366f1; }
+
+.xpBarRow {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.xpBar {
+  flex: 1;
+  height: 8px;
+  background: rgba(99,102,241,.18);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.xpFill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #818cf8);
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.xpLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6366f1;
+  white-space: nowrap;
+}
+
+.levelChips {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.25rem 0.65rem;
+  background: rgba(255,255,255,.7);
+  border: 1px solid rgba(99,102,241,.25);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #4f46e5;
+}
+
+/* Decorative background circle */
+.levelBg {
+  position: absolute;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: rgba(99,102,241,.07);
+  pointer-events: none;
+}
+
+/* ── Achievement Hall ── */
+.achieveSection {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.5rem 1.6rem;
+}
+
+.achieveHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.achieveTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.2rem;
+  letter-spacing: -0.01em;
+}
+
+.achieveSub {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.viewAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #6366f1;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: opacity 0.15s;
+}
+
+.viewAllBtn:hover { opacity: 0.75; }
+
+/* Badge grid */
+.badgeGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.85rem;
+}
+
+.badgeCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.1rem 0.75rem 0.9rem;
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  background: #fafafa;
+  gap: 0.5rem;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.badgeCard:hover:not(.badgeCardLocked) {
+  box-shadow: 0 4px 14px rgba(99,102,241,.12);
+  border-color: #c7d2fe;
+}
+
+.badgeCardLocked {
+  opacity: 0.55;
+}
+
+.badgeIconWrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.badgeName {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.badgeDesc {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  line-height: 1.4;
+}
+
+.lockedTag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #9ca3af;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Right sidebar ── */
+.sideCol {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  position: sticky;
+  top: 1rem;
+}
+
+/* Streak card */
+.streakCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.25rem 1.35rem;
+}
+
+.streakHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.streakFlame {
+  font-size: 1.15rem;
+}
+
+.streakTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.01em;
+}
+
+.streakDots {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.2rem;
+  margin-bottom: 0.85rem;
+}
+
+.streakDay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.streakCircle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+}
+
+.streakCircleActive {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  box-shadow: 0 2px 8px rgba(245,158,11,.3);
+}
+
+.streakDotFire {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.streakDayLabel {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+
+.streakMsg {
+  font-size: 0.78rem;
+  color: #6b7280;
+  line-height: 1.55;
+  margin: 0;
+  text-align: center;
+}
+
+/* Leaderboard */
+.leaderCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.leaderHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #111827;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.leaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 1.25rem;
+  border-bottom: 1px solid #f9fafb;
+  transition: background 0.15s;
+}
+
+.leaderRow:last-child { border-bottom: none; }
+.leaderRow:hover { background: #fafafa; }
+
+.leaderRowMe { background: #eef2ff; }
+
+.leaderRank {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #9ca3af;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.leaderRankTop { color: #f59e0b; }
+
+.leaderAvatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.leaderName {
+  flex: 1;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.leaderXp {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6366f1;
+  white-space: nowrap;
+}
+
+.leaderMedal {
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1100px) {
+  .body        { grid-template-columns: 1fr; }
+  .sideCol     { position: static; flex-direction: row; flex-wrap: wrap; }
+  .streakCard,
+  .leaderCard  { flex: 1; min-width: 260px; }
+  .badgeGrid   { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 640px) {
+  .badgeGrid   { grid-template-columns: repeat(2, 1fr); }
+}

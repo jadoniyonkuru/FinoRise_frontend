@@ -1,0 +1,285 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  background: #ffffff;
+  color: #101014;
+  font-family: "DM Sans", Inter, system-ui, sans-serif;
+  padding: 6.45rem 1.5rem 3rem;
+}
+
+.shell {
+  width: min(100%, 572px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.72rem;
+  margin-bottom: 2rem;
+}
+
+.logoMark {
+  width: 62px;
+  height: 62px;
+  display: block;
+  filter: drop-shadow(0 12px 16px rgba(25, 167, 224, 0.27));
+}
+
+.brandName {
+  color: #0d0d12;
+  font-size: 2.08rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.08em;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 2.65rem;
+}
+
+.hero h1 {
+  margin: 0 0 0.68rem;
+  color: #111116;
+  font-size: 1.89rem;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.hero p {
+  margin: 0;
+  color: #73737e;
+  font-size: 1.38rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.card {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid #eeeeef;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(19, 20, 25, 0.08);
+  padding: 1.94rem 1.94rem 1.9rem;
+}
+
+.cardHeader {
+  margin-bottom: 2.12rem;
+}
+
+.cardHeader h2 {
+  margin: 0 0 0.1rem;
+  color: #111116;
+  font-size: 1.62rem;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.04em;
+}
+
+.cardHeader p {
+  margin: 0;
+  color: #747681;
+  font-size: 1.12rem;
+  line-height: 1.55;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.76rem;
+  margin-bottom: 1.42rem;
+}
+
+.roleGroup {
+  border: 0;
+  margin: 0 0 1.42rem;
+  padding: 0;
+}
+
+.roleGroup legend {
+  color: #111116;
+  font-size: 1.06rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 0.76rem;
+  padding: 0;
+}
+
+.roleGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.roleOption {
+  min-height: 96px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.25rem;
+  border: 1px solid #ececef;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #17171d;
+  cursor: pointer;
+  padding: 0.9rem;
+  transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.roleOption input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.roleOption span {
+  color: #111116;
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.roleOption small {
+  color: #737681;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.roleOption:hover,
+.roleOption[data-active="true"] {
+  border-color: #19a7e0;
+  background: #e0f2fe;
+  box-shadow: 0 0 0 4px rgba(25, 167, 224, 0.1);
+}
+
+.roleOption[data-active="true"] span {
+  color: #0284c7;
+}
+
+.field label {
+  color: #111116;
+  font-size: 1.06rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.field input {
+  width: 100%;
+  height: 52px;
+  border: 1px solid #ececef;
+  border-radius: 12px;
+  background: #ffffff;
+  color: #17171d;
+  font: inherit;
+  font-size: 1.06rem;
+  line-height: 1.2;
+  outline: none;
+  padding: 0 1.02rem;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.field input::placeholder {
+  color: #737681;
+  opacity: 1;
+}
+
+.field input:focus {
+  border-color: #19a7e0;
+  box-shadow: 0 0 0 4px rgba(25, 167, 224, 0.12);
+}
+
+.submitBtn {
+  width: 100%;
+  min-height: 52px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 11px;
+  background: #1aa7df;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.06rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 0.48rem;
+  box-shadow: 0 11px 18px rgba(25, 167, 224, 0.22);
+  transition: background-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.submitBtn:hover {
+  background: #129bd3;
+  box-shadow: 0 13px 20px rgba(25, 167, 224, 0.27);
+  transform: translateY(-1px);
+}
+
+.submitBtn:active {
+  transform: translateY(0);
+}
+
+.footer {
+  margin: 1.42rem 0 0;
+  color: #7a7c85;
+  text-align: center;
+  font-size: 1.06rem;
+  line-height: 1.35;
+}
+
+.footer a {
+  color: #079ee0;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 3rem 1rem 2rem;
+  }
+
+  .brand {
+    margin-bottom: 1.55rem;
+  }
+
+  .logoMark {
+    width: 54px;
+    height: 54px;
+  }
+
+  .brandName {
+    font-size: 1.82rem;
+  }
+
+  .hero {
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 {
+    font-size: 1.62rem;
+  }
+
+  .hero p {
+    font-size: 1.06rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+
+  .cardHeader {
+    margin-bottom: 1.65rem;
+  }
+
+  .roleGrid {
+    grid-template-columns: 1fr;
+  }
+}
