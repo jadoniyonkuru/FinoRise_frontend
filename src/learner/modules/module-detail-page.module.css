@@ -1,0 +1,333 @@
+ .pageShell {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.heroCard {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  border: 1px solid #dfe8f7;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: 0 12px 30px rgba(14, 116, 144, 0.08);
+}
+
+.heroHeaderRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.heroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.kicker {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #0ea5e9;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #10213a;
+  letter-spacing: -0.03em;
+}
+
+.heroDescription {
+  margin: 0;
+  max-width: 720px;
+  color: #5b6883;
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+.heroActions {
+  display: flex;
+  align-items: center;
+}
+
+.topActionButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 112px;
+  padding: 0.68rem 1.1rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.topActionButton:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.heroMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.metaPill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0f766e;
+  padding: 0.28rem 0.56rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.metaPillDifficulty {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.rewardBadge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #0f172a, #1d4ed8);
+  color: #fff;
+  padding: 0.28rem 0.62rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.progressCard {
+  border-radius: 16px;
+  border: 1px solid #dce6f4;
+  background: #fff;
+  padding: 1rem 1.1rem;
+}
+
+.progressSummaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.progressLabel {
+  font-size: 0.73rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b7280;
+}
+
+.progressCount {
+  margin-top: 0.2rem;
+  color: #4b5563;
+  font-size: 0.85rem;
+}
+
+.progressPct {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.progressBar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #06b6d4, #0ea5e9 70%, #22c55e);
+}
+
+.lessonsSection {
+  background: #fff;
+  border: 1px solid #dfe8f7;
+  border-radius: 20px;
+  padding: 1.25rem;
+}
+
+.sectionHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.sectionEyebrow {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #0ea5e9;
+  margin-bottom: 0.25rem;
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #10213a;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.sectionMeta {
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.lessonList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.lessonRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.lessonLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.lessonIndex {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #0f172a;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.lessonInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.lessonTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+}
+
+.lessonTitle {
+  margin: 0;
+  color: #172033;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.completedTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.lessonMetaRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.typeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 999px;
+  padding: 0.18rem 0.48rem;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.64rem;
+  font-weight: 700;
+}
+
+.lessonDuration {
+  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.lessonAction {
+  display: flex;
+  align-items: center;
+}
+
+.lessonStartButton {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  background: #0ea5e9;
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.completedBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #15803d;
+  padding: 0.22rem 0.55rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+@media (max-width: 640px) {
+  .heroHeaderRow {
+    flex-direction: column;
+  }
+
+  .lessonRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
