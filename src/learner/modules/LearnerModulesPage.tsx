@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { modulesService } from "@/api";
+import type { Module as ApiModule } from "@/api";
 import LearnerLayout from "../LearnerLayout";
 import s from "./modules.module.css";
 
@@ -15,13 +17,6 @@ function SearchIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
-    </svg>
-  );
-}
-function ClockIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
     </svg>
   );
 }
@@ -89,147 +84,49 @@ function DebtIcon() {
   );
 }
 
-/* ── Types ── */
-type Difficulty = "Beginner" | "Intermediate" | "Advanced";
-type Category = "Essentials" | "Investing" | "Advanced";
+type FilterKey = "All" | "Completed" | string;
 
-type Module = {
-  id: number;
-  category: Category;
-  title: string;
-  description: string;
-  difficulty: Difficulty;
-  progress: number;
-  duration: string;
-  xp: number;
-  icon: React.ReactNode;
-};
-
-/* ── Data ── */
-const modules: Module[] = [
-  {
-    id: 1,
-    category: "Essentials",
-    title: "Budgeting 101",
-    description: "Master the 50/30/20 rule and learn how to track your spending without the headache.",
-    difficulty: "Beginner",
-    progress: 75,
-    duration: "45 mins",
-    xp: 500,
-    icon: <WalletIcon />,
-  },
-  {
-    id: 2,
-    category: "Investing",
-    title: "Stock Market Basics",
-    description: "Understand bulls, bears, and how to start your first portfolio with confidence.",
-    difficulty: "Intermediate",
-    progress: 0,
-    duration: "1.5 hours",
-    xp: 850,
-    icon: <TrendIcon />,
-  },
-  {
-    id: 3,
-    category: "Advanced",
-    title: "Tax Optimization",
-    description: "Advanced strategies for legally minimizing your tax burden through smart deductions.",
-    difficulty: "Advanced",
-    progress: 0,
-    duration: "2 hours",
-    xp: 1200,
-    icon: <ShieldIcon />,
-  },
-  {
-    id: 4,
-    category: "Essentials",
-    title: "Credit Score Mastery",
-    description: "The hidden algorithms behind credit scores and how to repair or boost your rating fast.",
-    difficulty: "Beginner",
-    progress: 100,
-    duration: "1 hour",
-    xp: 600,
-    icon: <CardIcon />,
-  },
-  {
-    id: 5,
-    category: "Investing",
-    title: "Retirement Planning",
-    description: "Comparing 401(k)s, IRAs, and why starting in your 20s is the ultimate cheat code.",
-    difficulty: "Intermediate",
-    progress: 15,
-    duration: "1.5 hours",
-    xp: 900,
-    icon: <GradCapIcon />,
-  },
-  {
-    id: 6,
-    category: "Advanced",
-    title: "Crypto Fundamentals",
-    description: "Beyond the hype: Understanding blockchain technology and risk management.",
-    difficulty: "Advanced",
-    progress: 0,
-    duration: "2 hours",
-    xp: 1100,
-    icon: <CryptoIcon />,
-  },
-  {
-    id: 7,
-    category: "Essentials",
-    title: "Emergency Fund Planning",
-    description: "Build a bulletproof safety net that keeps you out of debt when life gets unpredictable.",
-    difficulty: "Beginner",
-    progress: 100,
-    duration: "30 mins",
-    xp: 400,
-    icon: <HomeIcon />,
-  },
-  {
-    id: 8,
-    category: "Essentials",
-    title: "Debt Elimination Strategy",
-    description: "Avalanche vs. snowball — find the debt payoff method that actually works for your life.",
-    difficulty: "Intermediate",
-    progress: 0,
-    duration: "1 hour",
-    xp: 750,
-    icon: <DebtIcon />,
-  },
-  {
-    id: 9,
-    category: "Investing",
-    title: "Real Estate Investing",
-    description: "From house hacking to REITs — how to build wealth through property without millions.",
-    difficulty: "Advanced",
-    progress: 0,
-    duration: "2.5 hours",
-    xp: 1300,
-    icon: <HomeIcon />,
-  },
-];
-
-type FilterKey = "All" | Category | "Completed";
-
-const filters: FilterKey[] = ["All", "Essentials", "Investing", "Advanced", "Completed"];
-
-function badgeClass(d: Difficulty) {
-  if (d === "Beginner") return s.badgeBeginner;
-  if (d === "Intermediate") return s.badgeIntermediate;
+function difficultyClass(d: string) {
+  if (d?.toLowerCase() === "beginner") return s.badgeBeginner;
+  if (d?.toLowerCase() === "intermediate") return s.badgeIntermediate;
   return s.badgeAdvanced;
+}
+
+function categoryIcon(category: string): React.ReactNode {
+  const cat = category?.toLowerCase() ?? "";
+  if (cat.includes("budget")) return <WalletIcon />;
+  if (cat.includes("invest") || cat.includes("stock")) return <TrendIcon />;
+  if (cat.includes("tax") || cat.includes("security")) return <ShieldIcon />;
+  if (cat.includes("credit") || cat.includes("card")) return <CardIcon />;
+  if (cat.includes("retire") || cat.includes("education")) return <GradCapIcon />;
+  if (cat.includes("crypto")) return <CryptoIcon />;
+  if (cat.includes("real estate") || cat.includes("home")) return <HomeIcon />;
+  if (cat.includes("debt") || cat.includes("loan")) return <DebtIcon />;
+  return <WalletIcon />;
 }
 
 export default function LearnerModulesPage() {
   const [activeFilter, setActiveFilter] = useState<FilterKey>("All");
   const [search, setSearch] = useState("");
+  const [modules, setModules] = useState<ApiModule[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const completed = modules.filter((m) => m.progress === 100).length;
+  useEffect(() => {
+    modulesService.getAll()
+      .then(setModules)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const categories = Array.from(new Set(modules.map(m => m.category).filter(Boolean)));
+  const filters: FilterKey[] = ["All", ...categories, "Completed"];
 
   const visible = modules.filter((m) => {
     const matchFilter =
       activeFilter === "All"
         ? true
         : activeFilter === "Completed"
-        ? m.progress === 100
+        ? false
         : m.category === activeFilter;
 
     const matchSearch =
@@ -256,14 +153,8 @@ export default function LearnerModulesPage() {
         </div>
         <div className={s.headerStats}>
           <div className={s.headerStat}>
-            <div className={s.statLabel}>Completed</div>
-            <div className={s.statValue}>
-              {completed} / {modules.length}
-            </div>
-          </div>
-          <div className={s.headerStat}>
-            <div className={s.statLabel}>Skill Points</div>
-            <div className={`${s.statValue} ${s.statValueAccent}`}>2,450</div>
+            <div className={s.statLabel}>Available</div>
+            <div className={s.statValue}>{modules.length}</div>
           </div>
         </div>
       </div>
@@ -295,14 +186,16 @@ export default function LearnerModulesPage() {
 
       {/* Grid */}
       <div className={s.grid}>
-        {visible.length === 0 ? (
+        {loading ? (
+          <div className={s.empty}>Loading modules…</div>
+        ) : visible.length === 0 ? (
           <div className={s.empty}>No modules match your search.</div>
         ) : (
           visible.map((m) => (
             <div key={m.id} className={s.card}>
               <div className={s.cardTop}>
-                <div className={s.cardIcon}>{m.icon}</div>
-                <span className={`${s.badge} ${badgeClass(m.difficulty)}`}>
+                <div className={s.cardIcon}>{categoryIcon(m.category)}</div>
+                <span className={`${s.badge} ${difficultyClass(m.difficulty)}`}>
                   {m.difficulty}
                 </span>
               </div>
@@ -312,36 +205,14 @@ export default function LearnerModulesPage() {
                 <p className={s.cardDesc}>{m.description}</p>
               </div>
 
-              <div className={s.progressSection}>
-                <div className={s.progressLabelRow}>
-                  <span className={s.progressLabel}>Progress</span>
-                  <span className={s.progressPct}>{m.progress}%</span>
-                </div>
-                <div className={s.progressBar}>
-                  <div
-                    className={`${s.progressFill} ${m.progress === 100 ? s.progressFillGreen : ""}`}
-                    style={{ width: `${m.progress}%` }}
-                  />
-                </div>
-              </div>
-
               <div className={s.cardFooter}>
                 <div className={s.cardMeta}>
-                  <span className={s.metaItem}>
-                    <ClockIcon /> {m.duration}
-                  </span>
                   <span className={`${s.metaItem} ${s.metaItemXp}`}>
-                    <BoltIcon /> {m.xp} XP
+                    <BoltIcon /> {m.xp_reward} XP
                   </span>
+                  <span className={s.metaItem}>{m.category}</span>
                 </div>
-
-                {m.progress === 100 ? (
-                  <Link to={`/learner/modules/${m.id}`} className={s.reviewBtn}>Review</Link>
-                ) : m.progress > 0 ? (
-                  <Link to={`/learner/modules/${m.id}`} className={s.resumeBtn}>Resume</Link>
-                ) : (
-                  <Link to={`/learner/modules/${m.id}`} className={s.startBtn}>Start</Link>
-                )}
+                <Link to={`/learner/modules/${m.id}`} className={s.startBtn}>Start</Link>
               </div>
             </div>
           ))

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import styles from "./LearnerLayout.module.css";
 
 type Props = {
@@ -112,6 +113,12 @@ const navItems = [
 
 export default function LearnerLayout({ children, title, subtitle }: Props) {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    navigate("/auth/login");
+  }
 
   return (
     <div className={styles.shell}>
@@ -141,7 +148,7 @@ export default function LearnerLayout({ children, title, subtitle }: Props) {
           <button
             type="button"
             className={styles.logoutBtn}
-            onClick={() => navigate("/auth/login")}
+            onClick={handleLogout}
           >
             <IconLogOut />
             Log out
@@ -161,7 +168,7 @@ export default function LearnerLayout({ children, title, subtitle }: Props) {
             </label>
             <div className={styles.xpBadge}>
               <LightningIcon />
-              <span>1,240 XP</span>
+              <span>{user?.xp_total?.toLocaleString() ?? "0"} XP</span>
             </div>
           </header>
 
