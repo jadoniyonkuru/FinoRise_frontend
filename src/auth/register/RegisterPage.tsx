@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import styles from "./register.module.css";
 
 function FinoRiseLogo() {
@@ -33,11 +34,27 @@ const roles: { id: Role; label: string; description: string }[] = [
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { register } = useAuth();
   const [role, setRole] = useState<Role>("learner");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    navigate(`/${role}/dashboard`);
+    setError("");
+    const form = e.currentTarget;
+    const full_name = (form.elements.namedItem("name") as HTMLInputElement).value;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    setSubmitting(true);
+    try {
+      await register({ full_name, email, password });
+      navigate("/auth/login");
+    } catch {
+      setError("Registration failed. Email may already be in use.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -93,8 +110,12 @@ export default function RegisterPage() {
             <input id="password" name="password" type="password" required />
           </div>
 
-          <button type="submit" className={styles.submitBtn}>
-            Create Account
+          {error && (
+            <p style={{ color: "#ef4444", fontSize: "0.85rem", margin: "0" }}>{error}</p>
+          )}
+
+          <button type="submit" className={styles.submitBtn} disabled={submitting}>
+            {submitting ? "Creating account…" : "Create Account"}
           </button>
 
           <p className={styles.footer}>

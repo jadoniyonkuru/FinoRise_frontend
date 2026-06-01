@@ -1,23 +1,37 @@
+import { useEffect, useState } from "react";
+import { modulesService } from "@/api";
+import type { Module } from "@/api";
 import AdminLayout from "@/admin/AdminLayout";
 import AdminModuleContent from "@/admin/components/AdminModuleContent";
 
-const stats = [
-  { label: "Published modules", value: "18", hint: "Live on platform" },
-  { label: "Draft modules", value: "3", hint: "In review" },
-  { label: "Archived", value: "6", hint: "Hidden from learners" },
-  { label: "Lessons total", value: "142", hint: "Across modules" },
-];
-
-const modules = [
-  { title: "Budgeting basics", meta: "Published · 8 lessons" },
-  { title: "Investing 101", meta: "Published · 12 lessons" },
-  { title: "Credit & debt", meta: "Draft · 6 lessons" },
-];
-
 export default function ModuleManagerPage() {
+  const [modules, setModules] = useState<Module[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    modulesService.getAll()
+      .then(setModules)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const stats = [
+    { label: "Total modules", value: String(modules.length), hint: "On platform" },
+    { label: "Categories", value: String(new Set(modules.map(m => m.category).filter(Boolean)).size), hint: "Distinct categories" },
+  ];
+
+  const items = modules.map(m => ({
+    title: m.title,
+    meta: `${m.difficulty ?? "—"} · ${m.xp_reward} XP · ${m.category ?? "—"}`,
+  }));
+
   return (
-    <AdminLayout title="Module manager" subtitle="Create, manage">
-      <AdminModuleContent stats={stats} panelTitle="Modules" items={modules} />
+    <AdminLayout title="Module manager" subtitle="Create and manage learning modules">
+      {loading ? (
+        <p style={{ color: "#6b7280" }}>Loading modules…</p>
+      ) : (
+        <AdminModuleContent stats={stats} panelTitle="All modules" items={items} />
+      )}
     </AdminLayout>
   );
 }

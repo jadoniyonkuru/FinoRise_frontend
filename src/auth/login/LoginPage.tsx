@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 import PublicNavbar from "@/components/PublicNavbar";
 import styles from "./login.module.css";
 
@@ -101,13 +102,28 @@ const avatars = [
 /* ── Component ── */
 export default function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [role, setRole] = useState<Role>("learner");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
-    navigate(`/${role}/dashboard`);
+    setError("");
+    const form = e.currentTarget;
+    const email = (form.elements.namedItem("email") as HTMLInputElement).value;
+    const password = (form.elements.namedItem("password") as HTMLInputElement).value;
+    setSubmitting(true);
+    try {
+      const user = await login(email, password);
+      navigate(`/${user.role}/dashboard`);
+    } catch {
+      setError("Invalid email or password. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -185,12 +201,13 @@ export default function LoginPage() {
 
             <form className={styles.form} onSubmit={handleSubmit}>
               <div className={styles.field}>
-                <label htmlFor="email">Email or Phone Number</label>
+                <label htmlFor="email">Email</label>
                 <div className={styles.inputWrap}>
                   <span className={styles.inputIcon}><MailIcon /></span>
                   <input
                     id="email"
-                    type="text"
+                    name="email"
+                    type="email"
                     placeholder="name@example.com"
                     required
                   />
@@ -208,6 +225,7 @@ export default function LoginPage() {
                   <span className={styles.inputIcon}><LockIcon /></span>
                   <input
                     id="password"
+                    name="password"
                     type={showPassword ? "text" : "password"}
                     placeholder="••••••••"
                     required
@@ -255,8 +273,12 @@ export default function LoginPage() {
                 <span>Keep me logged in for 30 days</span>
               </label>
 
-              <button type="submit" className={styles.submitBtn}>
-                Log In <span className={styles.arrow}>→</span>
+              {error && (
+                <p style={{ color: "#ef4444", fontSize: "0.85rem", margin: "0" }}>{error}</p>
+              )}
+
+              <button type="submit" className={styles.submitBtn} disabled={submitting}>
+                {submitting ? "Logging in…" : <>Log In <span className={styles.arrow}>→</span></>}
               </button>
             </form>
 
