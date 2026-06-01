@@ -1,7 +1,10 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import LoginPage from "@/auth/login/LoginPage";
 import RegisterPage from "@/auth/register/RegisterPage";
 import ResetPasswordPage from "@/auth/reset-password/ResetPasswordPage";
+import LandingPage from "@/landing/LandingPage";   // ✅ single import
+
+// rest of imports...
 
 import LearnerDashboard from "@/learner/dashboard/LearnerDashboard";
 import LearnerProfile from "@/learner/profile/LearnerProfile";
@@ -34,7 +37,7 @@ import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/auth/login" replace />} />
+      <Route path="/" element={<LandingPage />} />
 
       {/* Auth */}
       <Route path="/auth/login" element={<LoginPage />} />
@@ -47,7 +50,6 @@ export default function App() {
       <Route path="/learner/simulations" element={<LearnerSimulationsPage />} />
       <Route path="/learner/rewards" element={<LearnerRewardsPage />} />
       <Route path="/learner/ai-coach" element={<AICoachPage />} />
-      <Route path="/learner/insights" element={<Navigate to="/learner/dashboard" replace />} />
       <Route path="/learner/profile" element={<LearnerProfile />} />
       <Route path="/learner/settings" element={<LearnerSettingsPage />} />
       <Route path="/learner/analytics" element={<LearnerAnalyticsPage />} />
