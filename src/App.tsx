@@ -34,11 +34,15 @@ import PartnerProfile from "@/partner/profile/PartnerProfile";
 import PartnerProgramsPage from "@/partner/programs/PartnerProgramsPage";
 import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
 
+function roleDashboard(user: { role?: string } | null): string {
+  return user?.role ? `/${user.role}/dashboard` : "/auth/login";
+}
+
 function RequireAuth({ children, role }: { children: React.ReactNode; role?: string }) {
   const { user, loading } = useAuth();
   if (loading) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>Loading…</div>;
   if (!user) return <Navigate to="/auth/login" replace />;
-  if (role && user.role !== role) return <Navigate to={`/${user.role}/dashboard`} replace />;
+  if (role && user.role !== role) return <Navigate to={roleDashboard(user)} replace />;
   return <>{children}</>;
 }
 
@@ -51,11 +55,11 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={user ? `/${user.role}/dashboard` : "/auth/login"} replace />} />
+      <Route path="/" element={<Navigate to={roleDashboard(user)} replace />} />
 
       {/* Auth */}
-      <Route path="/auth/login" element={user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <LoginPage />} />
-      <Route path="/auth/register" element={user ? <Navigate to={`/${user.role}/dashboard`} replace /> : <RegisterPage />} />
+      <Route path="/auth/login" element={user?.role ? <Navigate to={roleDashboard(user)} replace /> : <LoginPage />} />
+      <Route path="/auth/register" element={user?.role ? <Navigate to={roleDashboard(user)} replace /> : <RegisterPage />} />
       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
       {/* Learner */}
@@ -89,6 +93,9 @@ export default function App() {
       <Route path="/partner/programs" element={<RequireAuth role="partner"><PartnerProgramsPage /></RequireAuth>} />
       <Route path="/partner/impact" element={<RequireAuth role="partner"><PartnerImpactPage /></RequireAuth>} />
       <Route path="/partner/profile" element={<RequireAuth role="partner"><PartnerProfile /></RequireAuth>} />
+
+      {/* Catch-all: redirect any unknown path */}
+      <Route path="*" element={<Navigate to={roleDashboard(user)} replace />} />
     </Routes>
   );
 }
