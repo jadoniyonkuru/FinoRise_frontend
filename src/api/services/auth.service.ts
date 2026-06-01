@@ -19,13 +19,13 @@ export const authService = {
   },
 
   async getProfile(): Promise<User> {
-    const res = await apiClient.get<User>('/api/auth/profile');
-    return res.data;
+    const res = await apiClient.get<{ user: User }>('/api/auth/profile');
+    return res.data.user;
   },
 
   async updateProfile(data: { full_name?: string; phone?: string }): Promise<User> {
-    const res = await apiClient.put<User>('/api/auth/profile', data);
-    return res.data;
+    const res = await apiClient.put<{ message: string; user: User }>('/api/auth/profile', data);
+    return res.data.user;
   },
 
   logout(): void {
