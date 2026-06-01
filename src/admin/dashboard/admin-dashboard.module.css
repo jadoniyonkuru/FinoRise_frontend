@@ -5,6 +5,92 @@
   gap: 1.25rem;
 }
 
+/* ── Admin tools hub ── */
+.toolsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.toolsHeading {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.toolsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.toolCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.15rem 1.2rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+}
+
+.toolCard:hover {
+  border-color: var(--admin);
+  box-shadow: 0 4px 20px rgba(245, 158, 11, 0.12);
+  transform: translateY(-2px);
+}
+
+.toolCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.toolIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toolArrow {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+.toolTitle {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.toolDesc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0;
+  flex: 1;
+}
+
+.toolStat {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--admin);
+  margin-top: 0.25rem;
+}
+
 /* ── Tabs ── */
 .tabBar {
   display: flex;
@@ -35,7 +121,7 @@
 .tabBtn[data-active="true"] {
   background: var(--admin);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.35);
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);
 }
 
 /* ── Stat cards grid ── */

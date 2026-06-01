@@ -1,140 +1,218 @@
+/* ── Page shell ── */
 .page {
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
-  background: #f8f9ff;
-  color: #0f172a;
-  --surface: #ffffff;
-  --surface-elevated: #f8fafc;
-  --border: #e4e7f3;
-  --text: #0f172a;
-  --text-muted: #64748b;
-  --radius: 14px;
-  --shadow: 0 12px 26px rgba(15, 23, 42, 0.07);
+  background: var(--bg);
+  color: var(--text);
 }
 
+/* ════════════════════════════════════════════════════════
+   SIDEBAR  —  always dark (both themes), accent per role
+════════════════════════════════════════════════════════ */
 .sidebar {
-  background: #ffffff;
-  border-right: 1px solid var(--border);
-  padding: 1.5rem;
+  background: var(--sidebar-bg, #111827);
+  padding: 1.5rem 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
+/* ── Brand ── */
 .brand {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--sidebar-divider, rgba(255, 255, 255, 0.08));
 }
 
 .logo {
-  font-weight: 700;
-  font-size: 1.25rem;
+  font-weight: 800;
+  font-size: 1.15rem;
   letter-spacing: -0.02em;
-  color: #0f172a;
+  color: var(--sidebar-logo, #ffffff);
 }
 
 .roleBadge {
   display: inline-block;
   width: fit-content;
-  padding: 0.2rem 0.6rem;
+  padding: 0.18rem 0.6rem;
   border-radius: 999px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  background: #e0f2fe;
-  color: #0284c7;
-  border: 1px solid #7dd3fc;
+  background: var(--sidebar-badge-bg,  rgba(255, 255, 255, 0.08));
+  color:      var(--sidebar-badge-text, rgba(255, 255, 255, 0.6));
+  border: 1px solid var(--sidebar-badge-border, rgba(255, 255, 255, 0.1));
 }
 
+/* ── Nav ── */
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.2rem;
   flex: 1;
 }
 
-.navLink,
-.navActive {
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
-  display: block;
-}
-
 .navLink {
-  color: var(--text-muted);
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  display: block;
+  color: var(--sidebar-nav-text, rgba(255, 255, 255, 0.5));
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
 }
 
 .navLink:hover {
-  color: #0f172a;
-  background: #f8fafc;
+  color:      var(--sidebar-nav-hover-text, #ffffff);
+  background: var(--sidebar-nav-hover-bg,  rgba(255, 255, 255, 0.07));
 }
 
+/* Active item uses the per-role --accent colour */
 .navActive {
-  background: #e0f2fe;
-  color: #0284c7;
+  background: var(--accent, #0ea5e9);
+  color: #ffffff;
   font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 8px;
+  text-decoration: none;
+  display: block;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
 }
 
 .navItemMuted {
-  padding: 0.55rem 0.75rem;
-  color: var(--text-muted);
-  font-size: 0.9rem;
+  padding: 0.6rem 0.85rem;
+  color: var(--sidebar-nav-text);
+  font-size: 0.875rem;
 }
 
+/* ── Logout ── */
 .logout {
-  margin-top: auto;
   padding: 0.6rem 1rem;
-  border: 1px solid var(--border);
+  border: 1px solid var(--sidebar-logout-border, rgba(255, 255, 255, 0.1));
   border-radius: 8px;
   background: transparent;
-  color: var(--text-muted);
+  color: var(--sidebar-logout-text, rgba(255, 255, 255, 0.38));
   cursor: pointer;
+  font-size: 0.85rem;
+  text-align: left;
+  transition: border-color 0.15s, color 0.15s;
 }
 
 .logout:hover {
-  color: #0284c7;
-  border-color: #7dd3fc;
+  border-color: rgba(255, 255, 255, 0.28);
+  color: rgba(255, 255, 255, 0.75);
 }
 
+/* ════════════════════════════════════════════════════════
+   MAIN COLUMN  —  light or dark depending on theme
+════════════════════════════════════════════════════════ */
 .main {
-  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
   overflow: auto;
 }
 
+/* ── Sticky header bar ── */
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
+  align-items: center;
+  padding: 1.1rem 2.5rem;
+  background: var(--topbar-bg, var(--surface));
+  border-bottom: 1px solid var(--topbar-border, var(--border));
+  position: sticky;
+  top: 0;
+  z-index: 10;
   gap: 1rem;
+  box-shadow: var(--shadow);
 }
 
 .header h1 {
-  margin: 0 0 0.25rem;
-  font-size: 1.75rem;
+  margin: 0 0 0.18rem;
+  font-size: 1.4rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .header p {
   margin: 0;
   color: var(--text-muted);
+  font-size: 0.82rem;
 }
 
-.switchRole {
-  font-size: 0.875rem;
-  color: var(--text-muted);
-  padding: 0.5rem 0.75rem;
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+/* ── Light/Dark toggle button ── */
+.themeBtn {
+  width: 34px;
+  height: 34px;
   border: 1px solid var(--border);
   border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
 }
 
-.switchRole:hover {
-  color: #0284c7;
-  border-color: #7dd3fc;
+.themeBtn:hover {
+  border-color: var(--accent, #0ea5e9);
+  color: var(--accent, #0ea5e9);
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ── "Switch role" → portal label style ── */
+.portalLabel {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.38rem 0.75rem;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.portalLabel:hover {
+  color: var(--accent, #0ea5e9);
+  border-color: var(--accent, #0ea5e9);
+}
+
+/* ── Page content (below header) ── */
+.content {
+  flex: 1;
+  padding: 2rem 2.5rem;
+}
+
+/* ════════════════════════════════════════════════════════
+   RESPONSIVE
+════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .page {
+    grid-template-columns: 200px 1fr;
+  }
 }
 
 @media (max-width: 768px) {
@@ -143,18 +221,39 @@
   }
 
   .sidebar {
+    position: relative;
+    height: auto;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 1rem;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+  }
+
+  .brand {
+    padding-bottom: 0;
+    border-bottom: none;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
   }
 
   .nav {
     flex-direction: row;
     flex: unset;
+    flex-wrap: wrap;
   }
 
   .logout {
     margin-top: 0;
+  }
+
+  .header {
+    padding: 0.9rem 1.25rem;
+    position: relative;
+  }
+
+  .content {
+    padding: 1.25rem;
   }
 }

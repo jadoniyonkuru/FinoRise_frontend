@@ -11,14 +11,14 @@
 .pageTitle {
   font-size: 2rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.3rem;
   letter-spacing: -0.03em;
 }
 
 .pageSubtitle {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -33,7 +33,7 @@
 .periodLabel {
   font-size: 0.88rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-muted);
 }
 
 .downloadBtn {
@@ -41,7 +41,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0.6rem 1.35rem;
-  background: #0ea5e9;
+  background: var(--learner);
   color: #fff;
   border: none;
   border-radius: 999px;
@@ -68,11 +68,12 @@
 
 /* ── Financial Growth Score card ── */
 .scoreCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.5rem 1.75rem 1rem;
   overflow: hidden;
+  transition: background 0.2s;
 }
 
 .scoreCardTop {
@@ -87,13 +88,13 @@
 .scoreTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 0.2rem;
 }
 
 .scoreDesc {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .scoreRight {
@@ -103,7 +104,7 @@
 .scoreNumber {
   font-size: 2.8rem;
   font-weight: 800;
-  color: #0ea5e9;
+  color: var(--learner);
   line-height: 1;
   letter-spacing: -0.04em;
 }
@@ -121,22 +122,23 @@
 
 /* ── Radar / Risk Profile card ── */
 .radarCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.5rem 1.25rem 1rem;
+  transition: background 0.2s;
 }
 
 .radarTitle {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 0.2rem;
 }
 
 .radarSubtitle {
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -155,12 +157,12 @@
 }
 
 .radarLegendLabel {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .radarLegendVal {
   font-weight: 700;
-  color: #0ea5e9;
+  color: var(--learner);
 }
 
 /* ── Shared chart SVG ── */
@@ -173,14 +175,14 @@
 
 .chartNote {
   font-size: 0.78rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-top: 0.5rem;
   padding-top: 0.75rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border);
 }
 
 .chartNote strong {
-  color: #111827;
+  color: var(--text);
 }
 
 /* ── Behavioral stats row ── */
@@ -192,10 +194,11 @@
 }
 
 .statCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.1rem 1.15rem;
+  transition: background 0.2s;
 }
 
 .statIcon {
@@ -211,7 +214,7 @@
 .statLabel {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.3rem;
@@ -220,28 +223,29 @@
 .statValue {
   font-size: 1.45rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.03em;
   margin-bottom: 0.2rem;
 }
 
 .statHint {
   font-size: 0.72rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* ── Insights panel ── */
 .insightsPanel {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.5rem;
+  transition: background 0.2s;
 }
 
 .insightsPanelTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 1rem;
 }
 
@@ -285,7 +289,7 @@
 
 .insightText {
   font-size: 0.84rem;
-  color: #374151;
+  color: var(--text);
   line-height: 1.55;
   margin: 0;
 }

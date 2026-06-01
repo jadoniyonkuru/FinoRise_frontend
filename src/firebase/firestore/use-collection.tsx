@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { 
-  Query, 
-  onSnapshot, 
-  DocumentData, 
-  QuerySnapshot, 
-  query 
+import {
+  Query,
+  onSnapshot,
+  DocumentData,
+  QuerySnapshot,
 } from 'firebase/firestore';
 import { errorEmitter } from '../error-emitter';
 import { FirestorePermissionError } from '../errors';

@@ -2,17 +2,15 @@
 
 import { useState, use } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { 
   ChevronLeft, 
   BookOpen, 
-  CheckCircle2, 
   ArrowRight, 
   Zap,
-  PlayCircle,
   Lightbulb
 } from "lucide-react"
 import Link from "next/link"

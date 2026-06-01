@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import AdminLayout from "@/admin/AdminLayout";
 import styles from "./admin-dashboard.module.css";
 
@@ -271,13 +272,88 @@ const partnerContrib = [
   { name: "BPR Bank Rwanda",         funded: "RWF 1.2M", learners: 46, pct: 28 },
 ];
 
+const adminTools = [
+  {
+    title: "User management",
+    description: "Manage learners, admins, and partners. Add, edit, or deactivate accounts.",
+    path: "/admin/user-management",
+    stat: "12 users",
+    iconBg: "rgba(34,197,94,0.12)",
+    iconColor: "#22c55e",
+    icon: <IconUsers />,
+  },
+  {
+    title: "Learning modules",
+    description: "Create and publish learning content. Upload materials and set lesson counts.",
+    path: "/admin/module-manager",
+    stat: "7 modules",
+    iconBg: "rgba(59,130,246,0.12)",
+    iconColor: "#3b82f6",
+    icon: <IconBook />,
+  },
+  {
+    title: "Simulation setup",
+    description: "Configure market simulations and scenarios for learner practice.",
+    path: "/admin/simulation-manager",
+    stat: "9 simulations",
+    iconBg: "rgba(14,165,233,0.12)",
+    iconColor: "#0ea5e9",
+    icon: <IconCpu />,
+  },
+  {
+    title: "Reward configuration",
+    description: "Set up badges, XP bonuses, and partner scholarship eligibility rules.",
+    path: "/admin/rewards-manager",
+    stat: "14 rewards",
+    iconBg: "rgba(251,191,36,0.12)",
+    iconColor: "#fbbf24",
+    icon: <IconAward />,
+  },
+  {
+    title: "Analytics dashboard",
+    description: "Track learner engagement, activity logs, and platform insights.",
+    path: "/admin/analytics",
+    stat: "342 DAU",
+    iconBg: "rgba(139,92,246,0.12)",
+    iconColor: "#8b5cf6",
+    icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" />
+      </svg>
+    ),
+  },
+];
+
 /* ─── Component ─── */
 export default function AdminDashboard() {
   const [tab, setTab] = useState<"overview" | "analysis">("overview");
 
   return (
-    <AdminLayout title="Overview" subtitle="Monitor your platform performance and analytics.">
+    <AdminLayout title="Admin dashboard" subtitle="Manage users, content, simulations, rewards, and analytics.">
       <div className={styles.root}>
+        {/* Admin tools */}
+        <section className={styles.toolsSection}>
+          <h2 className={styles.toolsHeading}>Admin controls</h2>
+          <div className={styles.toolsGrid}>
+            {adminTools.map((tool) => (
+              <Link key={tool.path} to={tool.path} className={styles.toolCard}>
+                <div className={styles.toolCardTop}>
+                  <div
+                    className={styles.toolIcon}
+                    style={{ background: tool.iconBg, color: tool.iconColor }}
+                  >
+                    {tool.icon}
+                  </div>
+                  <span className={styles.toolArrow} aria-hidden>→</span>
+                </div>
+                <h3 className={styles.toolTitle}>{tool.title}</h3>
+                <p className={styles.toolDesc}>{tool.description}</p>
+                <span className={styles.toolStat}>{tool.stat}</span>
+              </Link>
+            ))}
+          </div>
+        </section>
+
         {/* Tab bar */}
         <div className={styles.tabBar}>
           <button

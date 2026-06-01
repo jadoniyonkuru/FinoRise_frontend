@@ -48,7 +48,7 @@ export default function SignupPage() {
 
       const docRef = doc(db, "users", user.uid)
       setDoc(docRef, userProfile)
-        .catch(async (error) => {
+        .catch(() => {
           const permissionError = new FirestorePermissionError({
             path: docRef.path,
             operation: "create",
@@ -58,11 +58,12 @@ export default function SignupPage() {
         })
 
       router.push("/dashboard")
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Please try again."
       toast({
         variant: "destructive",
         title: "Signup Failed",
-        description: error.message
+        description: message
       })
     } finally {
       setLoading(false)

@@ -83,11 +83,12 @@ function ShieldCheckIcon() {
   );
 }
 
-type Role = "learner" | "partner";
+type Role = "learner" | "partner" | "admin";
 
 const roles: { id: Role; label: string; description: string }[] = [
   { id: "learner", label: "Learner", description: "Learn & earn XP" },
   { id: "partner", label: "Partner", description: "Track impact" },
+  { id: "admin",   label: "Admin",   description: "Manage platform" },
 ];
 
 /* ── Data ── */
@@ -231,6 +232,7 @@ export default function LoginPage() {
                       key={item.id}
                       className={styles.roleOption}
                       data-active={String(role === item.id)}
+                      data-role={item.id}
                     >
                       <input
                         type="radio"
@@ -252,7 +254,7 @@ export default function LoginPage() {
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
                 />
-                <span>Keep me logged in for 30 days</span>
+                <span>Remember me for 30 days</span>
               </label>
 
               <button type="submit" className={styles.submitBtn}>
@@ -274,15 +276,8 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className={styles.footer}>
-        <div className={styles.footerLeft}>
-          <FinoRiseLogo />
-          <span>© 2024 FinoRise AI. Gamifying financial freedom.</span>
-        </div>
-        <div className={styles.footerRight}>
-          <Link to="/auth/login">Privacy Policy</Link>
-          <Link to="/auth/login">Terms of Service</Link>
-          <Link to="/auth/login">Help Center</Link>
-        </div>
+        <FinoRiseLogo />
+        <span>© 2024 FinoRise AI. Gamifying financial freedom.</span>
       </footer>
     </div>
   );

@@ -2,7 +2,6 @@
 "use client"
 
 import { useState, use } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -57,7 +56,6 @@ const REWARDS_DATA: Record<string, any> = {
 
 export default function RewardRedeemPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
-  const router = useRouter()
   const reward = REWARDS_DATA[id] || REWARDS_DATA["1"]
   
   const [isRedeeming, setIsRedeeming] = useState(false)

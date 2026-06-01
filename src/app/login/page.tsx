@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Zap, Github, Mail } from "lucide-react"
+import { Zap, Code2, Mail } from "lucide-react"
 
 export default function LoginPage() {
   const [loading, setLoading] = useState(false)
@@ -48,7 +48,7 @@ export default function LoginPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <Button variant="outline" className="glass border-white/10" type="button">
-                  <Github className="mr-2 h-4 w-4" />
+                  <Code2 className="mr-2 h-4 w-4" />
                   Github
                 </Button>
                 <Button variant="outline" className="glass border-white/10" type="button">

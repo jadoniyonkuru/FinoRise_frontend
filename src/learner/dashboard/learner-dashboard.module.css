@@ -7,8 +7,13 @@
   padding: 1.75rem 2rem;
   margin-bottom: 1.5rem;
   border-radius: 16px;
-  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 45%, #ecfeff 100%);
-  border: 1px solid #bae6fd;
+  background: linear-gradient(
+    135deg,
+    var(--learner-hero-from) 0%,
+    var(--learner-hero-mid) 45%,
+    var(--learner-hero-to) 100%
+  );
+  border: 1px solid var(--learner-hero-border);
 }
 
 .heroContent {
@@ -19,18 +24,18 @@
 .heroTitle {
   font-size: 1.65rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.5rem;
   letter-spacing: -0.03em;
 }
 
 .heroTitle span {
-  color: #0284c7;
+  color: var(--learner-dim);
 }
 
 .heroText {
   font-size: 0.9rem;
-  color: #4b5563;
+  color: var(--text-muted);
   line-height: 1.55;
   margin: 0 0 1.25rem;
   max-width: 520px;
@@ -57,7 +62,7 @@
 }
 
 .btnPrimary {
-  background: #0ea5e9;
+  background: var(--learner);
   color: #fff;
   border: none;
 }
@@ -68,14 +73,14 @@
 }
 
 .btnSecondary {
-  background: #fff;
-  color: #374151;
-  border: 1.5px solid #e5e7eb;
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--border);
 }
 
 .btnSecondary:hover {
-  border-color: #0ea5e9;
-  color: #0284c7;
+  border-color: var(--learner);
+  color: var(--learner-dim);
 }
 
 .streakPanel {
@@ -90,7 +95,7 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 0.4rem;
 }
 
@@ -101,7 +106,7 @@
   gap: 0.35rem;
   font-size: 1.35rem;
   font-weight: 800;
-  color: #0284c7;
+  color: var(--learner-dim);
 }
 
 /* ── Stats row ── */
@@ -113,8 +118,8 @@
 }
 
 .statCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem 1.35rem;
 }
@@ -131,11 +136,11 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .statIcon {
-  color: #9ca3af;
+  color: var(--text-muted);
   display: flex;
 }
 
@@ -149,7 +154,7 @@
 .statNumber {
   font-size: 2rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.03em;
   line-height: 1;
 }
@@ -157,18 +162,18 @@
 .statDelta {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #16a34a;
+  color: #22c55e;
 }
 
 .statBadge {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #0284c7;
+  color: var(--learner-dim);
 }
 
 .progressBar {
   height: 8px;
-  background: #111827;
+  background: var(--surface-elevated);
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 0.65rem;
@@ -176,7 +181,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+  background: var(--learner);
   border-radius: 999px;
 }
 
@@ -185,7 +190,7 @@
   justify-content: space-between;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .scoreBar {
@@ -209,7 +214,7 @@
 
 .statDesc {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.45;
   margin: 0;
 }
@@ -227,13 +232,13 @@
 .insightTitle {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.2rem;
 }
 
 .insightSub {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -241,11 +246,11 @@
   flex: 1;
   margin: 0 0 1rem;
   padding: 0.85rem 1rem;
-  background: #e0f2fe;
+  background: var(--learner-quote-bg);
   border-radius: 10px;
-  border-left: 3px solid #0ea5e9;
+  border-left: 3px solid var(--learner);
   font-size: 0.82rem;
-  color: #374151;
+  color: var(--text);
   line-height: 1.5;
   font-style: normal;
 }
@@ -256,10 +261,10 @@
   justify-content: center;
   width: 100%;
   padding: 0.55rem;
-  border: 1.5px solid #e5e7eb;
+  border: 1.5px solid var(--border);
   border-radius: 9px;
-  background: #fff;
-  color: #374151;
+  background: var(--surface);
+  color: var(--text);
   font-size: 0.84rem;
   font-weight: 600;
   text-decoration: none;
@@ -268,8 +273,8 @@
 }
 
 .insightBtn:hover {
-  border-color: #0ea5e9;
-  color: #0284c7;
+  border-color: var(--learner);
+  color: var(--learner-dim);
 }
 
 /* ── Recommended next ── */
@@ -287,14 +292,14 @@
 .recommendedTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
 }
 
 .viewAll {
   font-size: 0.84rem;
   font-weight: 600;
-  color: #0ea5e9;
+  color: var(--learner);
   text-decoration: none;
 }
 
@@ -306,8 +311,8 @@
   display: flex;
   gap: 1rem;
   max-width: 420px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   text-decoration: none;
@@ -349,14 +354,14 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .moduleName {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
 }
 
@@ -365,7 +370,7 @@
   align-items: center;
   gap: 0.3rem;
   font-size: 0.76rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-top: 0.15rem;
 }
 

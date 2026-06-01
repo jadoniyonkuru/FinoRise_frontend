@@ -1,21 +1,117 @@
-:root {
-  --bg: #0f1117;
-  --surface: #1a1d27;
-  --surface-elevated: #232735;
-  --border: #2e3344;
-  --text: #f0f2f8;
-  --text-muted: #9aa3b8;
-  --learner: #0ea5e9;
+/* ─────────────────────────────────────────────────────────
+   LIGHT THEME  (default)
+───────────────────────────────────────────────────────── */
+:root,
+[data-theme="light"] {
+  /* Page backgrounds */
+  --bg:               #f5f7fa;
+  --surface:          #ffffff;
+  --surface-elevated: #f8fafc;
+
+  /* Borders & shadows */
+  --border:  #e5e7eb;
+  --shadow:  0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.05);
+  --radius:  12px;
+
+  /* Text */
+  --text:       #111827;
+  --text-muted: #6b7280;
+
+  /* Sidebar (always dark, even in light mode) */
+  --sidebar-bg:              #111827;
+  --sidebar-logo:            #ffffff;
+  --sidebar-nav-text:        rgba(255, 255, 255, 0.50);
+  --sidebar-nav-hover-bg:    rgba(255, 255, 255, 0.07);
+  --sidebar-nav-hover-text:  #ffffff;
+  --sidebar-divider:         rgba(255, 255, 255, 0.08);
+  --sidebar-badge-bg:        rgba(255, 255, 255, 0.08);
+  --sidebar-badge-text:      rgba(255, 255, 255, 0.60);
+  --sidebar-badge-border:    rgba(255, 255, 255, 0.10);
+  --sidebar-logout-border:   rgba(255, 255, 255, 0.10);
+  --sidebar-logout-text:     rgba(255, 255, 255, 0.38);
+
+  /* Topbar / page header */
+  --topbar-bg:     #ffffff;
+  --topbar-border: #e5e7eb;
+
+  /* Inputs */
+  --input-bg: #f9fafb;
+
+  /* Learner dashboard accents */
+  --learner-hero-from: #e0f2fe;
+  --learner-hero-mid:  #f0f9ff;
+  --learner-hero-to:   #ecfeff;
+  --learner-hero-border: #bae6fd;
+  --learner-quote-bg: #e0f2fe;
+
+  /* Per-portal accent colours */
+  --learner:     #0ea5e9;
   --learner-dim: #0284c7;
-  --admin: #0ea5e9;
-  --admin-dim: #0284c7;
-  --partner: #0ea5e9;
-  --partner-dim: #0284c7;
-  --auth: #0ea5e9;
-  --radius: 12px;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  --admin:       #f59e0b;
+  --admin-dim:   #d97706;
+  --partner:     #10b981;
+  --partner-dim: #059669;
+  --auth:        #0ea5e9;
 }
 
+/* ─────────────────────────────────────────────────────────
+   DARK THEME
+───────────────────────────────────────────────────────── */
+[data-theme="dark"] {
+  /* Page backgrounds */
+  --bg:               #0d1117;
+  --surface:          #161b22;
+  --surface-elevated: #21262d;
+
+  /* Borders & shadows */
+  --border:  #30363d;
+  --shadow:  0 1px 3px rgba(0, 0, 0, 0.30), 0 4px 16px rgba(0, 0, 0, 0.20);
+  --radius:  12px;
+
+  /* Text */
+  --text:       #e6edf3;
+  --text-muted: #8b949e;
+
+  /* Sidebar (even darker in dark mode) */
+  --sidebar-bg:              #090d12;
+  --sidebar-logo:            #e6edf3;
+  --sidebar-nav-text:        rgba(255, 255, 255, 0.42);
+  --sidebar-nav-hover-bg:    rgba(255, 255, 255, 0.06);
+  --sidebar-nav-hover-text:  #e6edf3;
+  --sidebar-divider:         rgba(255, 255, 255, 0.06);
+  --sidebar-badge-bg:        rgba(255, 255, 255, 0.06);
+  --sidebar-badge-text:      rgba(255, 255, 255, 0.50);
+  --sidebar-badge-border:    rgba(255, 255, 255, 0.08);
+  --sidebar-logout-border:   rgba(255, 255, 255, 0.08);
+  --sidebar-logout-text:     rgba(255, 255, 255, 0.32);
+
+  /* Topbar / page header */
+  --topbar-bg:     #161b22;
+  --topbar-border: #30363d;
+
+  /* Inputs */
+  --input-bg: #21262d;
+
+  /* Learner dashboard accents */
+  --learner-hero-from: #0b2230;
+  --learner-hero-mid:  #0b1a25;
+  --learner-hero-to:   #0a141c;
+  --learner-hero-border: #173244;
+  --learner-quote-bg: #0b2433;
+
+  /* Per-portal accent colours (slightly brighter in dark) */
+  --learner:     #38bdf8;
+  --learner-dim: #0ea5e9;
+  --admin:       #fbbf24;
+  --admin-dim:   #f59e0b;
+  --partner:     #34d399;
+  --partner-dim: #10b981;
+  --auth:        #38bdf8;
+}
+
+/* ─────────────────────────────────────────────────────────
+   GLOBAL RESET & BASE
+───────────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -29,6 +125,7 @@ body {
   color: var(--text);
   line-height: 1.5;
   min-height: 100vh;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 a {
@@ -38,6 +135,7 @@ a {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }

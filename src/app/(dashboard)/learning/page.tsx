@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Play, CheckCircle2, Clock, Award, BookOpen } from "lucide-react"
+import { CheckCircle2, Clock, BookOpen } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { PlaceHolderImages } from "@/lib/placeholder-images"
