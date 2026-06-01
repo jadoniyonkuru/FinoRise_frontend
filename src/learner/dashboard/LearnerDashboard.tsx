@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { gamificationService } from "@/api";
 import LearnerLayout from "../LearnerLayout";
 import s from "./learner-dashboard.module.css";
 
@@ -47,13 +50,22 @@ const recommendedModule = {
 };
 
 export default function LearnerDashboard() {
+  const { user } = useAuth();
+  const [streakDays, setStreakDays] = useState<number | null>(null);
+
+  useEffect(() => {
+    gamificationService.getStreak().then(s => setStreakDays(s.streak_days)).catch(() => {});
+  }, []);
+
+  const firstName = user?.full_name?.split(" ")[0] ?? "there";
+
   return (
     <LearnerLayout>
       {/* Welcome hero */}
       <section className={s.hero}>
         <div className={s.heroContent}>
           <h1 className={s.heroTitle}>
-            Welcome back, <span>Alex</span>
+            Welcome back, <span>{firstName}</span>
           </h1>
           <p className={s.heroText}>
             You&apos;re currently in the top 15% of users this week. Complete your
@@ -72,7 +84,7 @@ export default function LearnerDashboard() {
           <span className={s.streakLabel}>Daily Streak</span>
           <div className={s.streakValue}>
             <LightningIcon size={22} />
-            <span>7 Days</span>
+            <span>{streakDays !== null ? `${streakDays} Days` : "—"}</span>
           </div>
         </div>
       </section>

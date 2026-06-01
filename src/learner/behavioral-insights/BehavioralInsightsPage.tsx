@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { behavioralService } from "@/api";
+import type { Insight } from "@/api";
 import LearnerLayout from "../LearnerLayout";
 import s from "./behavioral-insights.module.css";
 
@@ -73,151 +75,46 @@ function smoothPath(pts: { x: number; y: number }[]): string {
   return d;
 }
 
-function LineMini({ values, color = "#6366f1" }: { values: number[]; color?: string }) {
-  const w = 200; const h = 72;
-  const max = Math.max(...values);
-  const min = Math.min(...values);
-  const range = max - min || 1;
-  const pts = values.map((v, i) => ({
-    x: (i / (values.length - 1)) * w,
-    y: h - 8 - ((v - min) / range) * (h - 16),
-  }));
-  const line = smoothPath(pts);
-  const area = `${line} L ${pts[pts.length - 1].x},${h} L ${pts[0].x},${h} Z`;
-  const gradId = `lg${color.replace("#", "")}`;
-  return (
-    <svg viewBox={`0 0 ${w} ${h}`} className={s.miniChart}>
-      <defs>
-        <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor={color} stopOpacity="0.2" />
-          <stop offset="100%" stopColor={color} stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <path d={area} fill={`url(#${gradId})`} />
-      <path d={line} fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="4" fill={color} />
-      <circle cx={pts[pts.length - 1].x} cy={pts[pts.length - 1].y} r="2" fill="#fff" />
-    </svg>
-  );
-}
 
-/* ─── Insight data ─── */
-type InsightCategory = "All Insights" | "Risk Profile" | "Spending" | "Investing" | "Psychology";
-type StatusType = "Positive" | "Neutral" | "Action Required";
-
-type Insight = {
-  id: number;
-  category: Exclude<InsightCategory, "All Insights">;
-  title: string;
-  description: string;
-  chartType: "bar" | "line";
-  chartValues: number[];
-  status: StatusType;
-};
-
-const insights: Insight[] = [
-  {
-    id: 1,
-    category: "Risk Profile",
-    title: "Aggressive Risk Appetite",
-    description: "You consistently favor high-volatility assets in simulations. This suggests a high tolerance for short-term losses in pursuit of higher long-term gains. Monitor this in bear markets.",
-    chartType: "bar",
-    chartValues: [30, 48, 42, 72, 60, 88],
-    status: "Neutral",
-  },
-  {
-    id: 2,
-    category: "Spending",
-    title: "Impulse Spending Pattern",
-    description: "AI detected a pattern of 'reward spending' immediately after earning XP. You tend to allocate 15% more to luxury items in the week following a financial win.",
-    chartType: "line",
-    chartValues: [40, 55, 45, 70, 50, 80, 60, 75],
-    status: "Action Required",
-  },
-  {
-    id: 3,
-    category: "Investing",
-    title: "Emergency Fund Discipline",
-    description: "Outstanding! You prioritize 6 months of liquidity before any high-risk investment. This behavioral trait significantly lowers your vulnerability to financial shocks.",
-    chartType: "line",
-    chartValues: [30, 38, 50, 55, 65, 72, 85, 92],
-    status: "Positive",
-  },
-  {
-    id: 4,
-    category: "Psychology",
-    title: "Loss Aversion Bias",
-    description: "You are 2.5x more likely to sell a winning stock early to avoid a potential dip than to hold for maximum profit. This is a common bias that limits compounding gains.",
-    chartType: "bar",
-    chartValues: [70, 55, 80, 40, 65, 35],
-    status: "Action Required",
-  },
-  {
-    id: 5,
-    category: "Psychology",
-    title: "Compound Interest Patience",
-    description: "Your simulation choices show you understand the value of time. You deferred gratification in 80% of scenarios requiring a long-term savings commitment of 5+ years.",
-    chartType: "line",
-    chartValues: [20, 28, 35, 45, 58, 72, 88, 98],
-    status: "Positive",
-  },
-  {
-    id: 6,
-    category: "Spending",
-    title: "Budget Allocation Accuracy",
-    description: "Your estimated vs. actual expenses in the 'Living Alone' simulation were within 5%. You demonstrate high financial self-awareness when planning monthly budgets.",
-    chartType: "line",
-    chartValues: [60, 65, 62, 70, 68, 74, 72, 78],
-    status: "Positive",
-  },
-  {
-    id: 7,
-    category: "Risk Profile",
-    title: "Diversification Tendency",
-    description: "You naturally spread investments across 4+ asset classes in 90% of portfolio simulations, reducing concentration risk and demonstrating sound diversification instincts.",
-    chartType: "bar",
-    chartValues: [20, 45, 35, 60, 55, 80],
-    status: "Positive",
-  },
-  {
-    id: 8,
-    category: "Investing",
-    title: "Market Timing Attempts",
-    description: "You attempted to time the market in 3 of 5 simulations, which historically underperforms dollar-cost averaging by 1.5% annually. Consider a consistent DCA strategy.",
-    chartType: "line",
-    chartValues: [80, 60, 75, 50, 65, 40, 55, 45],
-    status: "Neutral",
-  },
-  {
-    id: 9,
-    category: "Psychology",
-    title: "Overconfidence in Bull Markets",
-    description: "During simulated bull markets, you over-allocated to equities by an average of 22%, exceeding your stated risk profile. Awareness of this bias is your first line of defense.",
-    chartType: "bar",
-    chartValues: [35, 50, 60, 75, 85, 70],
-    status: "Action Required",
-  },
-];
-
-const tabs: InsightCategory[] = ["All Insights", "Risk Profile", "Spending", "Investing", "Psychology"];
-
-const categoryColors: Record<string, { bg: string; color: string }> = {
-  "Risk Profile": { bg: "#eff6ff", color: "#2563eb" },
-  "Spending":     { bg: "#fff7ed", color: "#ea580c" },
-  "Investing":    { bg: "#f0fdf4", color: "#16a34a" },
-  "Psychology":   { bg: "#fdf4ff", color: "#9333ea" },
+const insightTypeColors: Record<string, { bg: string; color: string }> = {
+  spending:         { bg: "#fff7ed", color: "#ea580c" },
+  risk:             { bg: "#eff6ff", color: "#2563eb" },
+  consistency:      { bg: "#f0fdf4", color: "#16a34a" },
+  decision_pattern: { bg: "#fdf4ff", color: "#9333ea" },
+  improvement:      { bg: "#ecfdf5", color: "#059669" },
 };
 
 /* ─── Component ─── */
 export default function BehavioralInsightsPage() {
-  const [activeTab, setActiveTab] = useState<InsightCategory>("All Insights");
+  const [insights, setInsights] = useState<Insight[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [activeTab, setActiveTab] = useState("All Insights");
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    behavioralService.getInsights()
+      .then(setInsights)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  async function handleAnalyze() {
+    setAnalyzing(true);
+    try {
+      const newInsights = await behavioralService.analyze();
+      setInsights(newInsights);
+    } catch {}
+    setAnalyzing(false);
+  }
+
+  const tabs = ["All Insights", ...Array.from(new Set(insights.map(i => i.insight_type)))];
+
   const visible = insights.filter(ins => {
-    const matchTab = activeTab === "All Insights" || ins.category === activeTab;
+    const matchTab = activeTab === "All Insights" || ins.insight_type === activeTab;
     const matchSearch = search.trim() === "" ||
-      ins.title.toLowerCase().includes(search.toLowerCase()) ||
-      ins.category.toLowerCase().includes(search.toLowerCase());
+      ins.insight_text.toLowerCase().includes(search.toLowerCase()) ||
+      ins.insight_type.toLowerCase().includes(search.toLowerCase());
     return matchTab && matchSearch;
   });
 
@@ -266,16 +163,32 @@ export default function BehavioralInsightsPage() {
         </div>
       </div>
 
+      {/* ── Generate button ── */}
+      <div style={{ marginBottom: "1rem" }}>
+        <button
+          type="button"
+          onClick={handleAnalyze}
+          disabled={analyzing}
+          style={{ padding: "0.5rem 1.25rem", background: "#6366f1", color: "#fff", border: "none", borderRadius: "8px", cursor: "pointer", fontSize: "0.875rem", fontWeight: 600 }}
+        >
+          {analyzing ? "Analyzing…" : "Generate New Insights"}
+        </button>
+      </div>
+
       {/* ── Cards grid ── */}
       <div className={s.grid}>
-        {visible.map(ins => {
-          const catColor = categoryColors[ins.category] || { bg: "#f3f4f6", color: "#6b7280" };
+        {loading ? (
+          <div className={s.empty}>Loading insights…</div>
+        ) : visible.length === 0 ? (
+          <div className={s.empty}>No insights yet. Click "Generate New Insights" to analyze your behavior.</div>
+        ) : visible.map(ins => {
+          const typeColor = insightTypeColors[ins.insight_type] || { bg: "#f3f4f6", color: "#6b7280" };
           return (
             <div key={ins.id} className={s.card}>
               {/* Card top */}
               <div className={s.cardTop}>
-                <span className={s.catTag} style={{ background: catColor.bg, color: catColor.color }}>
-                  {ins.category}
+                <span className={s.catTag} style={{ background: typeColor.bg, color: typeColor.color }}>
+                  {ins.insight_type.replace("_", " ")}
                 </span>
                 <span className={s.aiTag}>
                   <IconAI /> AI ANALYSIS
@@ -284,37 +197,30 @@ export default function BehavioralInsightsPage() {
 
               {/* Card content */}
               <div className={s.cardContent}>
-                <h3 className={s.cardTitle}>{ins.title}</h3>
-                <p className={s.cardDesc}>{ins.description}</p>
+                <p className={s.cardDesc}>{ins.insight_text}</p>
               </div>
 
-              {/* Mini chart */}
+              {/* Mini chart placeholder */}
               <div className={s.chartWrap}>
-                {ins.chartType === "bar"
-                  ? <BarMini values={ins.chartValues} color="#6366f1" />
-                  : <LineMini values={ins.chartValues} color="#6366f1" />
-                }
+                <BarMini values={[30, 50, 40, 70, 60, 80]} color="#6366f1" />
               </div>
 
               {/* Card footer */}
               <div className={s.cardFooter}>
-                <span className={`${s.statusBadge} ${
-                  ins.status === "Positive" ? s.statusPos :
-                  ins.status === "Action Required" ? s.statusAction : s.statusNeutral
-                }`}>
-                  {ins.status}
+                <span className={`${s.statusBadge} ${ins.is_read ? s.statusNeutral : s.statusPos}`}>
+                  {ins.is_read ? "Read" : "New"}
                 </span>
-                <button type="button" className={s.fullReportBtn}>
-                  Full Report <IconChevRight />
+                <button
+                  type="button"
+                  className={s.fullReportBtn}
+                  onClick={() => behavioralService.markInsightRead(ins.id).catch(() => {})}
+                >
+                  Mark as Read <IconChevRight />
                 </button>
               </div>
             </div>
           );
         })}
-
-        {visible.length === 0 && (
-          <div className={s.empty}>No insights match your search.</div>
-        )}
       </div>
     </LearnerLayout>
   );
