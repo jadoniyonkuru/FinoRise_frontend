@@ -1,83 +1,59 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import { rewardsService } from "@/api";
+import type { Reward } from "@/api";
 import LearnerLayout from "../LearnerLayout";
 import styles from "./rewards.module.css";
 
-const XP_BALANCE = 2340;
+type FilterCategory = "all" | "airtime" | "voucher" | "offer";
 
-type Category = "all" | "airtime" | "voucher" | "offer";
-
-type Reward = {
-  id: number;
-  name: string;
-  partner: string;
-  description: string;
-  category: Category;
-  cost: number;
-};
-
-const rewards: Reward[] = [
-  {
-    id: 1,
-    name: "Airtime Top-up",
-    partner: "MTN Rwanda",
-    description: "RWF 500 mobile airtime credit",
-    category: "airtime",
-    cost: 200,
-  },
-  {
-    id: 2,
-    name: "Learning Voucher",
-    partner: "Coursera",
-    description: "1-month premium course access",
-    category: "voucher",
-    cost: 500,
-  },
-  {
-    id: 3,
-    name: "Partner Discount",
-    partner: "Bank of Kigali",
-    description: "10% off account opening fees",
-    category: "offer",
-    cost: 300,
-  },
-  {
-    id: 4,
-    name: "Certificate of Achievement",
-    partner: "FinoRise",
-    description: "Official digital certificate",
-    category: "voucher",
-    cost: 800,
-  },
-  {
-    id: 5,
-    name: "Mentorship Session",
-    partner: "FinoRise",
-    description: "1-hour financial advisor session",
-    category: "offer",
-    cost: 1000,
-  },
-  {
-    id: 6,
-    name: "Airtime Bundle",
-    partner: "Airtel Rwanda",
-    description: "RWF 1,000 airtime + 1 GB data",
-    category: "airtime",
-    cost: 400,
-  },
-];
-
-const filters: { id: Category; label: string }[] = [
+const filters: { id: FilterCategory; label: string }[] = [
   { id: "all", label: "All rewards" },
   { id: "airtime", label: "Airtime" },
   { id: "voucher", label: "Vouchers" },
   { id: "offer", label: "Partner offers" },
 ];
 
-export default function LearnerRewardsPage() {
-  const [filter, setFilter] = useState<Category>("all");
+function rewardTypeToFilter(reward_type: string): FilterCategory {
+  if (reward_type === "airtime") return "airtime";
+  if (reward_type === "voucher" || reward_type === "discount") return "voucher";
+  return "offer";
+}
 
-  const visible =
-    filter === "all" ? rewards : rewards.filter((r) => r.category === filter);
+export default function LearnerRewardsPage() {
+  const { user, refreshUser } = useAuth();
+  const [filter, setFilter] = useState<FilterCategory>("all");
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [redeeming, setRedeeming] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ id: string; text: string } | null>(null);
+
+  const xpBalance = user?.xp_total ?? 0;
+
+  useEffect(() => {
+    rewardsService.getAll()
+      .then(setRewards)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const visible = filter === "all"
+    ? rewards
+    : rewards.filter(r => rewardTypeToFilter(r.reward_type) === filter);
+
+  async function handleRedeem(reward: Reward) {
+    setRedeeming(reward.id);
+    setMessage(null);
+    try {
+      const result = await rewardsService.redeem(reward.id);
+      setMessage({ id: reward.id, text: `Redeemed! Code: ${result.redemption_code}` });
+      await refreshUser();
+    } catch {
+      setMessage({ id: reward.id, text: "Redemption failed. Please try again." });
+    } finally {
+      setRedeeming(null);
+    }
+  }
 
   return (
     <LearnerLayout title="Rewards" subtitle="Redeem your XP for real-world rewards">
@@ -85,14 +61,12 @@ export default function LearnerRewardsPage() {
         {/* XP wallet */}
         <div className={styles.xpWallet}>
           <div>
-            <div className={styles.xpAmount}>{XP_BALANCE.toLocaleString()}</div>
+            <div className={styles.xpAmount}>{xpBalance.toLocaleString()}</div>
             <div className={styles.xpLabel}>XP available to redeem</div>
           </div>
           <div className={styles.xpDivider} />
           <div>
-            <div className={styles.levelAmount}>
-              Lv 7
-            </div>
+            <div className={styles.levelAmount}>Lv {user?.level ?? "—"}</div>
             <div className={styles.xpLabel}>Current level</div>
           </div>
         </div>
@@ -113,26 +87,37 @@ export default function LearnerRewardsPage() {
         </div>
 
         {/* Reward cards */}
-        <div className={styles.rewardGrid}>
-          {visible.map((r) => {
-            const affordable = XP_BALANCE >= r.cost;
-            return (
-              <div key={r.id} className={styles.rewardCard}>
-                <div className={styles.rewardName}>{r.name}</div>
-                <div className={styles.rewardPartner}>{r.partner}</div>
-                <div className={styles.rewardDesc}>{r.description}</div>
-                <div className={styles.rewardCost}>{r.cost} XP</div>
-                <button
-                  type="button"
-                  className={styles.redeemBtn}
-                  disabled={!affordable}
-                >
-                  {affordable ? "Redeem" : `Need ${r.cost - XP_BALANCE} more XP`}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        {loading ? (
+          <p style={{ color: "#6b7280" }}>Loading rewards…</p>
+        ) : (
+          <div className={styles.rewardGrid}>
+            {visible.map((r) => {
+              const affordable = xpBalance >= r.xp_cost;
+              const isRedeeming = redeeming === r.id;
+              const msg = message?.id === r.id ? message.text : null;
+              return (
+                <div key={r.id} className={styles.rewardCard}>
+                  <div className={styles.rewardName}>{r.title}</div>
+                  <div className={styles.rewardPartner}>{r.reward_type}</div>
+                  <div className={styles.rewardDesc}>{r.description}</div>
+                  <div className={styles.rewardCost}>{r.xp_cost.toLocaleString()} XP</div>
+                  {msg && <div style={{ fontSize: "0.8rem", color: msg.startsWith("Redeemed") ? "#16a34a" : "#ef4444", marginBottom: "0.5rem" }}>{msg}</div>}
+                  <button
+                    type="button"
+                    className={styles.redeemBtn}
+                    disabled={!affordable || isRedeeming}
+                    onClick={() => handleRedeem(r)}
+                  >
+                    {isRedeeming ? "Redeeming…" : affordable ? "Redeem" : `Need ${(r.xp_cost - xpBalance).toLocaleString()} more XP`}
+                  </button>
+                </div>
+              );
+            })}
+            {visible.length === 0 && (
+              <p style={{ color: "#6b7280" }}>No rewards in this category.</p>
+            )}
+          </div>
+        )}
       </div>
     </LearnerLayout>
   );
