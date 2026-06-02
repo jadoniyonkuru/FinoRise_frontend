@@ -1,4 +1,7 @@
+import { useEffect, useState } from "react";
 import LearnerLayout from "../LearnerLayout";
+import { analyticsService } from "@/api";
+import type { LearnerAnalytics } from "@/api";
 import s from "./analytics.module.css";
 
 /* ─── Smooth bezier path helper ─── */
@@ -160,41 +163,72 @@ function RadarChart() {
   );
 }
 
-/* ─── Behavioral insight data ─── */
+/* ─── Behavioral insight helpers ─── */
 type Level = "positive" | "neutral" | "warning";
-const insights: { category: string; level: Level; text: string }[] = [
-  {
-    category: "Spending discipline",
-    level: "positive",
-    text: "You stayed within budget for 5 consecutive weeks. Your discretionary spending is 18% below the platform average — a strong indicator of long-term financial stability.",
-  },
-  {
-    category: "Savings consistency",
-    level: "positive",
-    text: "Your simulated savings rate improved from 12% to 27% over 6 months. Compound Interest Mastery module directly contributed to this behavioral shift.",
-  },
-  {
-    category: "Investment confidence",
-    level: "neutral",
-    text: "Simulation scores in investment scenarios improved by 49 points. Consider the Advanced Portfolio module to strengthen risk-adjusted decision-making.",
-  },
-  {
-    category: "Debt management",
-    level: "warning",
-    text: "Credit & Debt module completion is at 59%. Learners who complete this module reduce simulated debt payoff time by an average of 22%. Recommended: resume this week.",
-  },
-];
 
-/* ─── Stat cards ─── */
-const statCards = [
-  { label: "Financial Growth Score", value: "840",  hint: "+12.4% this month", color: "#0ea5e9", bg: "rgba(14,165,233,0.1)" },
-  { label: "Behavioral Score",       value: "72%",  hint: "+8% vs last month",  color: "#22c55e", bg: "rgba(34,197,94,0.1)"  },
-  { label: "Risk Tolerance",         value: "Mod.", hint: "Well-calibrated",     color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
-  { label: "Learning Velocity",      value: "4.2×", hint: "Above average",       color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
-];
+function insightLevel(type: string): Level {
+  if (type === "risk") return "warning";
+  if (type === "decision_pattern") return "neutral";
+  return "positive";
+}
+
+function insightCategory(type: string): string {
+  const map: Record<string, string> = {
+    spending: "Spending discipline",
+    risk: "Risk management",
+    consistency: "Savings consistency",
+    decision_pattern: "Decision pattern",
+    improvement: "Investment confidence",
+  };
+  return map[type] ?? type.replace(/_/g, " ");
+}
 
 /* ─── Component ─── */
 export default function LearnerAnalyticsPage() {
+  const [data, setData] = useState<LearnerAnalytics | null>(null);
+
+  useEffect(() => {
+    analyticsService.getLearnerAnalytics().then(setData).catch(() => {});
+  }, []);
+
+  const statCards = data
+    ? [
+        {
+          label: "Total XP",
+          value: data.overview.xp_total.toLocaleString(),
+          hint: `Level ${data.overview.level}`,
+          color: "#0ea5e9", bg: "rgba(14,165,233,0.1)",
+        },
+        {
+          label: "Modules Completed",
+          value: `${data.modules.completed} / ${data.modules.total_available}`,
+          hint: `${Math.round(data.modules.completion_rate)}% completion rate`,
+          color: "#22c55e", bg: "rgba(34,197,94,0.1)",
+        },
+        {
+          label: "Avg Quiz Score",
+          value: data.modules.average_quiz_score != null
+            ? `${Math.round(data.modules.average_quiz_score)}%`
+            : "—",
+          hint: "Across all quizzes",
+          color: "#8b5cf6", bg: "rgba(139,92,246,0.1)",
+        },
+        {
+          label: "Current Streak",
+          value: `${data.overview.streak_days}d`,
+          hint: data.overview.streak_days > 0 ? "Keep it up!" : "Start a streak today",
+          color: "#f59e0b", bg: "rgba(245,158,11,0.1)",
+        },
+      ]
+    : [
+        { label: "Total XP",           value: "—", hint: "", color: "#0ea5e9", bg: "rgba(14,165,233,0.1)" },
+        { label: "Modules Completed",  value: "—", hint: "", color: "#22c55e", bg: "rgba(34,197,94,0.1)" },
+        { label: "Avg Quiz Score",     value: "—", hint: "", color: "#8b5cf6", bg: "rgba(139,92,246,0.1)" },
+        { label: "Current Streak",     value: "—", hint: "", color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
+      ];
+
+  const insights = data?.insights ?? [];
+
   return (
     <LearnerLayout>
       {/* Page header */}
@@ -219,23 +253,25 @@ export default function LearnerAnalyticsPage() {
         <div className={s.scoreCard}>
           <div className={s.scoreCardTop}>
             <div className={s.scoreMeta}>
-              <div className={s.scoreTitle}>Financial Growth Score</div>
+              <div className={s.scoreTitle}>Total XP</div>
               <div className={s.scoreDesc}>Composite score based on learning &amp; simulations</div>
             </div>
             <div className={s.scoreRight}>
-              <div className={s.scoreNumber}>840</div>
+              <div className={s.scoreNumber}>
+                {data ? data.overview.xp_total.toLocaleString() : "—"}
+              </div>
               <div className={s.scoreTrend}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
                   <polyline points="16 7 22 7 22 13" />
                 </svg>
-                +12.4%
+                Level {data?.overview.level ?? "—"}
               </div>
             </div>
           </div>
           <GrowthChart />
           <div className={s.chartNote}>
-            Score range: <strong>600–1000</strong> · Next milestone: <strong>900</strong> (Expert tier)
+            Modules completed: <strong>{data?.modules.completed ?? "—"} / {data?.modules.total_available ?? "—"}</strong> · Streak: <strong>{data?.overview.streak_days ?? "—"} days</strong>
           </div>
         </div>
 
@@ -275,25 +311,35 @@ export default function LearnerAnalyticsPage() {
       <div className={s.insightsPanel}>
         <div className={s.insightsPanelTitle}>Behavioral Insights</div>
         <div className={s.insightsList}>
-          {insights.map((item) => (
-            <div key={item.category} className={s.insightItem}>
-              <div className={`${s.insightBar} ${
-                item.level === "positive" ? s.insightBarPositive
-                : item.level === "warning" ? s.insightBarWarning
-                : s.insightBarNeutral
-              }`} />
-              <div className={s.insightBody}>
-                <div className={`${s.insightCategory} ${
-                  item.level === "positive" ? s.insightCategoryPositive
-                  : item.level === "warning" ? s.insightCategoryWarning
-                  : s.insightCategoryNeutral
-                }`}>
-                  {item.category}
+          {insights.length === 0 ? (
+            <p style={{ color: "#6b7280", fontSize: "0.875rem", padding: "1rem 0" }}>
+              {data ? "No insights yet. Complete more modules to unlock personalized insights." : "Loading insights…"}
+            </p>
+          ) : (
+            insights.map((item) => {
+              const level = insightLevel(item.insight_type);
+              const category = insightCategory(item.insight_type);
+              return (
+                <div key={item.id} className={s.insightItem}>
+                  <div className={`${s.insightBar} ${
+                    level === "positive" ? s.insightBarPositive
+                    : level === "warning" ? s.insightBarWarning
+                    : s.insightBarNeutral
+                  }`} />
+                  <div className={s.insightBody}>
+                    <div className={`${s.insightCategory} ${
+                      level === "positive" ? s.insightCategoryPositive
+                      : level === "warning" ? s.insightCategoryWarning
+                      : s.insightCategoryNeutral
+                    }`}>
+                      {category}
+                    </div>
+                    <p className={s.insightText}>{item.insight_text}</p>
+                  </div>
                 </div>
-                <p className={s.insightText}>{item.text}</p>
-              </div>
-            </div>
-          ))}
+              );
+            })
+          )}
         </div>
       </div>
     </LearnerLayout>
