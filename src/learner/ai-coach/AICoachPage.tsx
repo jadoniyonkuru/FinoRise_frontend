@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { aiService } from "@/api";
 import LearnerLayout from "../LearnerLayout";
 import s from "./ai-coach.module.css";
 
@@ -32,27 +33,8 @@ const quickTopics = [
   { label: "Debt Management",     desc: "Avalanche vs snowball",      color: "#f59e0b", bg: "rgba(245,158,11,0.1)" },
 ];
 
-/* ─── AI response logic ─── */
+/* ─── Types ─── */
 type Message = { id: number; role: "user" | "ai"; text: string };
-
-function getResponse(input: string): string {
-  const q = input.toLowerCase();
-  if (q.includes("budget") || q.includes("50/30/20") || q.includes("50 30 20"))
-    return "The 50/30/20 rule divides your after-tax income into: 50% for needs (rent, groceries, utilities), 30% for wants (dining, entertainment), and 20% for savings and debt. It's a flexible starting framework — adjust percentages as your financial situation changes.";
-  if (q.includes("save") || q.includes("saving") || q.includes("how much") || q.includes("emergency"))
-    return "Start with a 3–6 month emergency fund in a high-yield savings account before investing. Aim for at least 20% of income saved. Even 5% saved consistently is better than nothing — the habit matters more than the amount early on.";
-  if (q.includes("invest") || q.includes("index") || q.includes("etf") || q.includes("dca"))
-    return "For beginners, broad market index funds (like S&P 500 ETFs) are ideal — low cost, diversified, historically strong. Use dollar-cost averaging: invest a fixed amount monthly regardless of market conditions. Never invest money you'll need within 3–5 years.";
-  if (q.includes("debt") || q.includes("loan") || q.includes("pay off") || q.includes("avalanche") || q.includes("snowball"))
-    return "Two proven strategies: **Avalanche** — pay minimums on all debts, then put extra money toward the highest-interest debt (saves the most money). **Snowball** — pay off the smallest balance first for psychological wins. Both work — choose whichever keeps you motivated.";
-  if (q.includes("credit") || q.includes("score"))
-    return "Credit score factors: payment history (35%), credit utilization (30%), credit history length (15%), new credit (10%), credit mix (10%). The two biggest wins: never miss a payment, and keep your credit card balance below 30% of the limit.";
-  if (q.includes("compound") || q.includes("interest"))
-    return "Compound interest means you earn returns on your returns. At 8% annual return: RWF 100,000 becomes ~RWF 215,000 in 10 years, ~RWF 466,000 in 20 years. Starting early makes a dramatic difference — 10 extra years nearly doubles the result.";
-  if (q.includes("risk") || q.includes("diversif"))
-    return "Diversification spreads risk across different assets (stocks, bonds, real estate). A simple portfolio: 80% broad equity index funds + 20% bonds for moderate risk. As you near a financial goal, shift toward bonds to protect against volatility.";
-  return "Great question! Based on your current progress (Level 12, 81% on Compound Interest Mastery), I recommend exploring the Credit & Debt Management module next. It directly builds on the savings habits you've been developing. What specific financial topic would you like to understand better?";
-}
 
 const initialMessages: Message[] = [
   {
@@ -72,15 +54,19 @@ export default function AICoachPage() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, thinking]);
 
-  function send(text: string) {
+  async function send(text: string) {
     if (!text.trim() || thinking) return;
     setMessages(prev => [...prev, { id: Date.now(), role: "user", text: text.trim() }]);
     setInput("");
     setThinking(true);
-    setTimeout(() => {
-      setMessages(prev => [...prev, { id: Date.now() + 1, role: "ai", text: getResponse(text) }]);
+    try {
+      const reply = await aiService.ask(text.trim());
+      setMessages(prev => [...prev, { id: Date.now() + 1, role: "ai", text: reply }]);
+    } catch {
+      setMessages(prev => [...prev, { id: Date.now() + 1, role: "ai", text: "Sorry, I couldn't reach the AI service. Please try again." }]);
+    } finally {
       setThinking(false);
-    }, 900);
+    }
   }
 
   return (

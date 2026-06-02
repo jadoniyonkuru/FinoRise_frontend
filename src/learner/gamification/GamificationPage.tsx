@@ -1,4 +1,8 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
+import { gamificationService } from "@/api";
+import type { Badge as ApiBadge, LeaderboardEntry } from "@/api";
 import LearnerLayout from "../LearnerLayout";
 import s from "./gamification.module.css";
 
@@ -52,65 +56,27 @@ function IconTrophy() {
   );
 }
 
-/* Badge icon components */
-function BadgeClock()  { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>; }
-function BadgeWallet() { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M16 13a1 1 0 1 0 0-2 1 1 0 0 0 0 2z" fill="currentColor"/></svg>; }
-function BadgeArrow()  { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>; }
+/* Badge icon component */
 function BadgeSparkle(){ return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>; }
-function BadgeShield() { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>; }
-function BadgeCrown()  { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="2 4 7 14 12 6 17 14 22 4"/><line x1="2" y1="20" x2="22" y2="20"/></svg>; }
-function BadgeTarget() { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>; }
-function BadgeStar()   { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>; }
 
-/* ─── Data ─── */
-const XP_CURRENT = 2450;
-const XP_NEXT    = 3000;
-const LEVEL      = 12;
-
-type Badge = {
-  id: number;
-  icon: React.ReactNode;
-  name: string;
-  desc: string;
-  earned: boolean;
-  gradient: string;
-  iconColor: string;
-};
-
-const badges: Badge[] = [
-  { id: 1, icon: <BadgeClock />,   name: "Early Bird",    desc: "Login 5 days in a row before 8 AM",    earned: true,  gradient: "linear-gradient(135deg,#0d9488,#34d399)", iconColor: "#fff" },
-  { id: 2, icon: <BadgeWallet />,  name: "Budget Master", desc: "Complete the Basic Budgeting module",   earned: true,  gradient: "linear-gradient(135deg,#4f46e5,#818cf8)", iconColor: "#fff" },
-  { id: 3, icon: <BadgeArrow />,   name: "Risk Taker",    desc: "Complete a high-risk simulation",       earned: true,  gradient: "linear-gradient(135deg,#db2777,#f472b6)", iconColor: "#fff" },
-  { id: 4, icon: <BadgeSparkle />, name: "Wealth Builder",desc: "Save over RWF 10,000 in simulations",   earned: true,  gradient: "linear-gradient(135deg,#7c3aed,#a78bfa)", iconColor: "#fff" },
-  { id: 5, icon: <BadgeShield />,  name: "Security Pro",  desc: "Ace the Fraud Prevention quiz",         earned: false, gradient: "", iconColor: "#9ca3af" },
-  { id: 6, icon: <BadgeCrown />,   name: "Compound King", desc: "Use compound interest for 10 simulated years", earned: false, gradient: "", iconColor: "#9ca3af" },
-  { id: 7, icon: <BadgeTarget />,  name: "Goal Setter",   desc: "Reach your first financial goal",       earned: false, gradient: "", iconColor: "#9ca3af" },
-  { id: 8, icon: <BadgeStar />,    name: "Smart Spender", desc: "Keep expenses under 30% for 3 months", earned: false, gradient: "", iconColor: "#9ca3af" },
+const BADGE_GRADIENTS = [
+  "linear-gradient(135deg,#0d9488,#34d399)",
+  "linear-gradient(135deg,#4f46e5,#818cf8)",
+  "linear-gradient(135deg,#db2777,#f472b6)",
+  "linear-gradient(135deg,#7c3aed,#a78bfa)",
+  "linear-gradient(135deg,#0ea5e9,#38bdf8)",
+  "linear-gradient(135deg,#f59e0b,#fcd34d)",
 ];
 
-const leaderboard = [
-  { rank: 1, name: "Alex Rivera",  xp: "15,400", initials: "AR", bg: "#f59e0b" },
-  { rank: 2, name: "Sarah Chen",   xp: "12,250", initials: "SC", bg: "#6366f1" },
-  { rank: 3, name: "Marcus Bell",  xp: "9,870",  initials: "MB", bg: "#0ea5e9" },
-  { rank: 4, name: "Amina T.",     xp: "7,450",  initials: "AT", bg: "#22c55e" },
-  { rank: 5, name: "You",          xp: "2,450",  initials: "AL", bg: "#ec4899", isMe: true },
-];
+const AVATAR_COLORS = ["#f59e0b","#6366f1","#0ea5e9","#22c55e","#ec4899","#8b5cf6"];
 
-const streakDays = [
-  { label: "MON", active: true },
-  { label: "TUE", active: true },
-  { label: "WED", active: true },
-  { label: "THU", active: true },
-  { label: "FRI", active: true },
-  { label: "SAT", active: false },
-  { label: "SUN", active: false },
-];
+const DAY_LABELS = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
 
 /* ─── Level Ring SVG ─── */
-function LevelRing() {
+function LevelRing({ level, xpCurrent, xpNext }: { level: number; xpCurrent: number; xpNext: number }) {
   const r = 52;
   const circ = 2 * Math.PI * r;
-  const fill = circ * (XP_CURRENT / XP_NEXT);
+  const fill = circ * Math.min(xpCurrent / Math.max(xpNext, 1), 1);
   return (
     <svg width="130" height="130" viewBox="0 0 130 130" className={s.levelRingSvg}>
       <circle cx="65" cy="65" r={r} fill="none" stroke="#e5e7eb" strokeWidth="9" />
@@ -127,7 +93,7 @@ function LevelRing() {
           <stop offset="100%" stopColor="#818cf8" />
         </linearGradient>
       </defs>
-      <text x="65" y="57" textAnchor="middle" style={{ fill: "#111827", fontSize: 28, fontWeight: 800, fontFamily: "inherit" }}>{LEVEL}</text>
+      <text x="65" y="57" textAnchor="middle" style={{ fill: "#111827", fontSize: 28, fontWeight: 800, fontFamily: "inherit" }}>{level}</text>
       <text x="65" y="72" textAnchor="middle" style={{ fill: "#9ca3af", fontSize: 8.5, fontWeight: 700, fontFamily: "inherit", letterSpacing: 1 }}>CURRENT LEVEL</text>
     </svg>
   );
@@ -136,7 +102,23 @@ function LevelRing() {
 /* ─── Component ─── */
 export default function GamificationPage() {
   const navigate = useNavigate();
-  const xpPct = Math.round((XP_CURRENT / XP_NEXT) * 100);
+  const { user } = useAuth();
+  const [badges, setBadges] = useState<ApiBadge[]>([]);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [streak, setStreak] = useState(0);
+
+  const xpCurrent = user?.xp_total ?? 0;
+  const level = user?.level ?? 1;
+  const xpNext = level * 1000;
+  const xpPct = Math.round((xpCurrent / Math.max(xpNext, 1)) * 100);
+
+  useEffect(() => {
+    gamificationService.getBadges().then(setBadges).catch(() => {});
+    gamificationService.getLeaderboard().then(setLeaderboard).catch(() => {});
+    gamificationService.getStreak().then(s => setStreak(s.streak_days)).catch(() => {});
+  }, []);
+
+  const streakDays = DAY_LABELS.map((label, i) => ({ label, active: i < streak }));
 
   return (
     <LearnerLayout>
@@ -163,15 +145,15 @@ export default function GamificationPage() {
 
           {/* Level card */}
           <div className={s.levelCard}>
-            <LevelRing />
+            <LevelRing level={level} xpCurrent={xpCurrent} xpNext={xpNext} />
             <div className={s.levelInfo}>
-              <h2 className={s.levelTitle}>Financial Voyager</h2>
-              <p className={s.levelHint}>Keep going! You're only <strong>{(XP_NEXT - XP_CURRENT).toLocaleString()} XP</strong> away from Level {LEVEL + 1}.</p>
+              <h2 className={s.levelTitle}>Level {level}</h2>
+              <p className={s.levelHint}>Keep going! You're only <strong>{(xpNext - xpCurrent).toLocaleString()} XP</strong> away from Level {level + 1}.</p>
               <div className={s.xpBarRow}>
                 <div className={s.xpBar}>
                   <div className={s.xpFill} style={{ width: `${xpPct}%` }} />
                 </div>
-                <span className={s.xpLabel}>{XP_CURRENT.toLocaleString()} / {XP_NEXT.toLocaleString()} XP</span>
+                <span className={s.xpLabel}>{xpCurrent.toLocaleString()} / {xpNext.toLocaleString()} XP</span>
               </div>
               <div className={s.levelChips}>
                 <span className={s.chip}><IconMultiplier /> 1.2x Multiplier Active</span>
@@ -193,17 +175,18 @@ export default function GamificationPage() {
               </button>
             </div>
             <div className={s.badgeGrid}>
-              {badges.map(b => (
-                <div key={b.id} className={`${s.badgeCard} ${!b.earned ? s.badgeCardLocked : ""}`}>
+              {badges.length === 0 ? (
+                <p style={{ color: "#6b7280", fontSize: "0.875rem" }}>No badges earned yet. Complete modules and simulations to earn badges.</p>
+              ) : badges.map((b, i) => (
+                <div key={b.id} className={s.badgeCard}>
                   <div
                     className={s.badgeIconWrap}
-                    style={b.earned ? { background: b.gradient } : { background: "#f3f4f6" }}
+                    style={{ background: BADGE_GRADIENTS[i % BADGE_GRADIENTS.length] }}
                   >
-                    <span style={{ color: b.iconColor, display: "flex" }}>{b.icon}</span>
+                    <BadgeSparkle />
                   </div>
-                  <div className={s.badgeName}>{b.name}</div>
-                  <div className={s.badgeDesc}>{b.desc}</div>
-                  {!b.earned && <div className={s.lockedTag}>Locked</div>}
+                  <div className={s.badgeName}>{b.badge_name}</div>
+                  <div className={s.badgeDesc}>{b.badge_type}</div>
                 </div>
               ))}
             </div>
@@ -216,7 +199,7 @@ export default function GamificationPage() {
           <div className={s.streakCard}>
             <div className={s.streakHeader}>
               <span className={s.streakFlame}>🔥</span>
-              <span className={s.streakTitle}>5 Day Streak</span>
+              <span className={s.streakTitle}>{streak} Day Streak</span>
             </div>
             <div className={s.streakDots}>
               {streakDays.map((d, i) => (
@@ -236,15 +219,22 @@ export default function GamificationPage() {
             <div className={s.leaderHeader}>
               <IconTrophy /> Leaderboard
             </div>
-            {leaderboard.map(l => (
-              <div key={l.rank} className={`${s.leaderRow} ${l.isMe ? s.leaderRowMe : ""}`}>
-                <span className={`${s.leaderRank} ${l.rank <= 3 ? s.leaderRankTop : ""}`}>{l.rank}</span>
-                <div className={s.leaderAvatar} style={{ background: l.bg }}>{l.initials}</div>
-                <span className={s.leaderName}>{l.name}</span>
-                <span className={s.leaderXp}>{l.xp} XP</span>
-                {l.rank <= 3 && <span className={s.leaderMedal}>{l.rank === 1 ? "🥇" : l.rank === 2 ? "🥈" : "🥉"}</span>}
-              </div>
-            ))}
+            {leaderboard.length === 0 ? (
+              <p style={{ color: "#6b7280", fontSize: "0.85rem", padding: "0.5rem 0" }}>Leaderboard loading…</p>
+            ) : leaderboard.map((l, i) => {
+              const rank = i + 1;
+              const initials = l.full_name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
+              const isMe = l.id === user?.id;
+              return (
+                <div key={l.id} className={`${s.leaderRow} ${isMe ? s.leaderRowMe : ""}`}>
+                  <span className={`${s.leaderRank} ${rank <= 3 ? s.leaderRankTop : ""}`}>{rank}</span>
+                  <div className={s.leaderAvatar} style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}>{initials}</div>
+                  <span className={s.leaderName}>{isMe ? "You" : l.full_name}</span>
+                  <span className={s.leaderXp}>{l.xp_total.toLocaleString()} XP</span>
+                  {rank <= 3 && <span className={s.leaderMedal}>{rank === 1 ? "🥇" : rank === 2 ? "🥈" : "🥉"}</span>}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
