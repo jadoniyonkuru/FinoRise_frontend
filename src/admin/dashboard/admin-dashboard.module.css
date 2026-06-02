@@ -78,7 +78,7 @@
 }
 
 .statCard strong {
-  color: #0f172a;
+  color: var(--text);
   font-size: 1.75rem;
   line-height: 1;
   letter-spacing: 0;
@@ -98,7 +98,7 @@
 
 .panel h2 {
   margin: 0 0 1.25rem;
-  color: #1f2937;
+  color: var(--text);
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -154,7 +154,7 @@
 }
 
 .legend strong {
-  color: #111827;
+  color: var(--text);
 }
 
 .legendDot {

@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/admin/AdminLayout";
 import cardStyles from "@/components/StatCard.module.css";
 import styles from "./rewards-manager.module.css";
+import { rewardsService } from "@/api/services/rewards.service";
+import type { RewardType } from "@/api/types";
 
 function SearchIcon() {
   return (
@@ -39,149 +41,119 @@ function AlertIcon() {
   );
 }
 
-type RewardStatus = "Active" | "Draft" | "Pending review";
-type RewardType = "badge" | "bonus" | "scholarship" | "certificate";
-type EligibilityRule =
-  | "lessons_100"
-  | "active_learners"
-  | "top_10"
-  | "streak_7"
-  | "simulation_complete"
-  | "module_progress";
+type RewardStatus = "Active" | "Inactive";
 
-type Reward = {
+type UIReward = {
   id: string;
   title: string;
   rewardType: RewardType;
-  eligibility: EligibilityRule;
+  xpCost: number;
   status: RewardStatus;
   accentColor: string;
 };
 
 const typeLabels: Record<RewardType, string> = {
-  badge: "Badge",
-  bonus: "Bonus",
-  scholarship: "Scholarship",
-  certificate: "Certificate",
+  airtime:       "Airtime",
+  discount:      "Discount",
+  voucher:       "Voucher",
+  partner_offer: "Partner Offer",
 };
 
-const eligibilityOptions: { value: EligibilityRule; label: string; description: string }[] = [
-  { value: "lessons_100", label: "100% lessons", description: "Award when all lessons in the module are complete" },
-  { value: "active_learners", label: "Active learners", description: "Learners with activity in the last 7 days" },
-  { value: "top_10", label: "Top 10%", description: "Highest performers in the current cycle" },
-  { value: "streak_7", label: "7-day streak", description: "Consecutive days of learning activity" },
-  { value: "simulation_complete", label: "Simulation completed", description: "Finish all scenarios in a simulation" },
-  { value: "module_progress", label: "50% module progress", description: "Mid-module milestone reward" },
-];
+const REWARD_TYPES: RewardType[] = ["airtime", "discount", "voucher", "partner_offer"];
 
-const INITIAL_REWARDS: Reward[] = [
-  { id: "1", title: "Completion badge – Module 1", rewardType: "badge", eligibility: "lessons_100", status: "Active", accentColor: "#0ea5e9" },
-  { id: "2", title: "Streak bonus – 7 days", rewardType: "bonus", eligibility: "streak_7", status: "Active", accentColor: "#22c55e" },
-  { id: "3", title: "Partner scholarship slot", rewardType: "scholarship", eligibility: "top_10", status: "Active", accentColor: "#8b5cf6" },
-  { id: "4", title: "Budget master certificate", rewardType: "certificate", eligibility: "lessons_100", status: "Active", accentColor: "#f59e0b" },
-  { id: "5", title: "Simulation champion badge", rewardType: "badge", eligibility: "simulation_complete", status: "Active", accentColor: "#06b6d4" },
-  { id: "6", title: "Early bird bonus", rewardType: "bonus", eligibility: "active_learners", status: "Pending review", accentColor: "#ec4899" },
-  { id: "7", title: "Savings streak reward", rewardType: "bonus", eligibility: "streak_7", status: "Active", accentColor: "#10b981" },
-  { id: "8", title: "Investing fundamentals badge", rewardType: "badge", eligibility: "module_progress", status: "Draft", accentColor: "#6366f1" },
-  { id: "9", title: "Community top performer", rewardType: "scholarship", eligibility: "top_10", status: "Pending review", accentColor: "#f97316" },
-  { id: "10", title: "Financial literacy certificate", rewardType: "certificate", eligibility: "lessons_100", status: "Active", accentColor: "#14b8a6" },
-  { id: "11", title: "Weekly engagement bonus", rewardType: "bonus", eligibility: "active_learners", status: "Active", accentColor: "#a855f7" },
-  { id: "12", title: "Module 2 completion badge", rewardType: "badge", eligibility: "lessons_100", status: "Pending review", accentColor: "#0ea5e9" },
-  { id: "13", title: "Partner referral reward", rewardType: "bonus", eligibility: "top_10", status: "Draft", accentColor: "#64748b" },
-  { id: "14", title: "Debt-free milestone", rewardType: "certificate", eligibility: "simulation_complete", status: "Pending review", accentColor: "#ef4444" },
-];
+const ACCENT_COLORS = ["#0ea5e9","#22c55e","#8b5cf6","#f59e0b","#06b6d4","#ec4899","#10b981","#6366f1"];
 
-type FilterType = "All" | "Active" | "Pending review" | "Draft";
+function fromApiReward(r: { id: string; title: string; reward_type: RewardType; xp_cost: number; is_active: boolean }, idx: number): UIReward {
+  return {
+    id: r.id,
+    title: r.title,
+    rewardType: r.reward_type,
+    xpCost: r.xp_cost,
+    status: r.is_active ? "Active" : "Inactive",
+    accentColor: ACCENT_COLORS[idx % ACCENT_COLORS.length],
+  };
+}
+
+type FilterType = "All" | "Active" | "Inactive";
 
 function statusClass(status: RewardStatus) {
-  if (status === "Active") return styles.statusActive;
-  if (status === "Pending review") return styles.statusPending;
-  return styles.statusDraft;
+  return status === "Active" ? styles.statusActive : styles.statusDraft;
 }
 
 export default function RewardsManagerPage() {
-  const [rewards, setRewards] = useState<Reward[]>(INITIAL_REWARDS);
+  const [rewards, setRewards] = useState<UIReward[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("All");
 
-  const [editTarget, setEditTarget] = useState<Reward | null>(null);
-  const [editForm, setEditForm] = useState({
-    title: "",
-    rewardType: "badge" as RewardType,
-    eligibility: "lessons_100" as EligibilityRule,
-    status: "Active" as RewardStatus,
-  });
+  const [editTarget, setEditTarget] = useState<UIReward | null>(null);
 
-  const [deleteTarget, setDeleteTarget] = useState<Reward | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UIReward | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState({
-    title: "",
-    rewardType: "badge" as RewardType,
-    eligibility: "lessons_100" as EligibilityRule,
-  });
+  const [addForm, setAddForm] = useState({ title: "", rewardType: "airtime" as RewardType, xpCost: 100, description: "" });
+  const [adding, setAdding] = useState(false);
+
+  useEffect(() => {
+    rewardsService.getAll()
+      .then((data) => {
+        setRewards(data.map((r, i) => fromApiReward(r, i)));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const visible = rewards.filter((reward) => {
     const matchFilter = filter === "All" || reward.status === filter;
     const q = search.toLowerCase();
     const matchSearch =
       reward.title.toLowerCase().includes(q) ||
-      typeLabels[reward.rewardType].toLowerCase().includes(q) ||
-      eligibilityOptions.find((e) => e.value === reward.eligibility)?.label.toLowerCase().includes(q);
+      typeLabels[reward.rewardType].toLowerCase().includes(q);
     return matchFilter && matchSearch;
   });
 
   const activeCount = rewards.filter((r) => r.status === "Active").length;
-  const pendingCount = rewards.filter((r) => r.status === "Pending review").length;
 
   const stats = [
-    { label: "Active rewards", value: String(activeCount), hint: "Open reward programs" },
-    { label: "Eligible learners", value: "856", hint: "This cycle" },
-    { label: "Redeemed (30d)", value: "124", hint: "Certificates and badges" },
-    { label: "Pending review", value: String(pendingCount), hint: "Eligibility checks" },
+    { label: "Active rewards",   value: String(activeCount),      hint: "Open reward programs" },
+    { label: "Total rewards",    value: String(rewards.length),   hint: "All configured" },
+    { label: "Redeemed (30d)",   value: "—",                      hint: "Across all programs" },
+    { label: "Inactive",         value: String(rewards.length - activeCount), hint: "Disabled rewards" },
   ];
 
-  function openEdit(reward: Reward) {
-    setEditTarget(reward);
-    setEditForm({
-      title: reward.title,
-      rewardType: reward.rewardType,
-      eligibility: reward.eligibility,
-      status: reward.status,
-    });
-  }
-
-  function saveEdit() {
-    if (!editTarget) return;
-    setRewards((prev) =>
-      prev.map((r) => (r.id === editTarget.id ? { ...r, ...editForm } : r))
-    );
-    setEditTarget(null);
-  }
-
-  function confirmDelete() {
+  async function confirmDelete() {
     if (!deleteTarget) return;
-    setRewards((prev) => prev.filter((r) => r.id !== deleteTarget.id));
-    setDeleteTarget(null);
+    setDeleting(true);
+    try {
+      await rewardsService.remove(deleteTarget.id);
+      setRewards((prev) => prev.filter((r) => r.id !== deleteTarget.id));
+    } catch { /* silent */ } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   }
 
-  function handleEligibilityChange(rewardId: string, eligibility: EligibilityRule) {
-    setRewards((prev) => prev.map((r) => (r.id === rewardId ? { ...r, eligibility } : r)));
+  function handleEditLocal(id: string, changes: Partial<UIReward>) {
+    setRewards(prev => prev.map(r => r.id === id ? { ...r, ...changes } : r));
   }
 
-  function saveAdd() {
+  async function saveAdd() {
     if (!addForm.title.trim()) return;
-    const colors = ["#0ea5e9", "#8b5cf6", "#22c55e", "#f59e0b", "#f97316", "#ec4899", "#06b6d4", "#10b981"];
-    const newReward: Reward = {
-      id: String(Date.now()),
-      title: addForm.title,
-      rewardType: addForm.rewardType,
-      eligibility: addForm.eligibility,
-      status: "Draft",
-      accentColor: colors[rewards.length % colors.length],
-    };
-    setRewards((prev) => [...prev, newReward]);
-    setShowAdd(false);
-    setAddForm({ title: "", rewardType: "badge", eligibility: "lessons_100" });
+    setAdding(true);
+    try {
+      const created = await rewardsService.create({
+        title: addForm.title,
+        reward_type: addForm.rewardType,
+        xp_cost: addForm.xpCost,
+        description: addForm.description,
+      });
+      setRewards((prev) => [fromApiReward(created, prev.length), ...prev]);
+      setShowAdd(false);
+      setAddForm({ title: "", rewardType: "airtime", xpCost: 100, description: "" });
+    } catch { /* silent */ } finally {
+      setAdding(false);
+    }
   }
 
   function filterCount(f: FilterType) {
@@ -202,7 +174,7 @@ export default function RewardsManagerPage() {
           <input
             className={styles.searchInput}
             type="search"
-            placeholder="Search reward, type or eligibility…"
+            placeholder="Search reward or type…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -236,7 +208,7 @@ export default function RewardsManagerPage() {
         </div>
 
         <div className={styles.filterRow}>
-          {(["All", "Active", "Pending review", "Draft"] as FilterType[]).map((f) => (
+          {(["All", "Active", "Inactive"] as FilterType[]).map((f) => (
             <button
               key={f}
               type="button"
@@ -250,58 +222,50 @@ export default function RewardsManagerPage() {
         </div>
 
         <div className={styles.rewardTable}>
-          {visible.length === 0 && <div className={styles.empty}>No rewards match your search.</div>}
-          {visible.map((reward) => {
-            const currentEligibility = eligibilityOptions.find((e) => e.value === reward.eligibility);
-            return (
-              <article key={reward.id} className={styles.rewardRow}>
-                <div className={styles.rewardIdentity}>
-                  <span
-                    className={styles.avatar}
-                    style={{ background: `${reward.accentColor}20`, color: reward.accentColor }}
-                  >
-                    {typeLabels[reward.rewardType][0]}
-                  </span>
-                  <div>
-                    <strong>{reward.title}</strong>
-                    <span>{typeLabels[reward.rewardType]} · Eligibility: {currentEligibility?.label}</span>
-                  </div>
+          {loading && <div className={styles.empty}>Loading rewards…</div>}
+          {!loading && visible.length === 0 && <div className={styles.empty}>No rewards match your search.</div>}
+          {visible.map((reward) => (
+            <article key={reward.id} className={styles.rewardRow}>
+              <div className={styles.rewardIdentity}>
+                <span
+                  className={styles.avatar}
+                  style={{ background: `${reward.accentColor}20`, color: reward.accentColor }}
+                >
+                  {typeLabels[reward.rewardType][0]}
+                </span>
+                <div>
+                  <strong>{reward.title}</strong>
+                  <span>{typeLabels[reward.rewardType]} · {reward.xpCost} XP</span>
                 </div>
+              </div>
 
-                <div className={styles.configDetails}>
-                  <label htmlFor={`eligibility-${reward.id}`}>Eligibility rule</label>
-                  <select
-                    id={`eligibility-${reward.id}`}
-                    value={reward.eligibility}
-                    onChange={(e) =>
-                      handleEligibilityChange(reward.id, e.target.value as EligibilityRule)
-                    }
-                  >
-                    {eligibilityOptions.map((e) => (
-                      <option key={e.value} value={e.value}>
-                        {e.label}
-                      </option>
-                    ))}
-                  </select>
-                  <span>{currentEligibility?.description}</span>
-                </div>
+              <div className={styles.configDetails}>
+                <label>Type</label>
+                <select
+                  value={reward.rewardType}
+                  onChange={(e) => handleEditLocal(reward.id, { rewardType: e.target.value as RewardType })}
+                >
+                  {REWARD_TYPES.map(t => <option key={t} value={t}>{typeLabels[t]}</option>)}
+                </select>
+                <span>{reward.xpCost} XP required to redeem</span>
+              </div>
 
-                <span className={statusClass(reward.status)}>{reward.status}</span>
+              <span className={statusClass(reward.status)}>{reward.status}</span>
 
-                <div className={styles.actions}>
-                  <button type="button" className={styles.btnEdit} onClick={() => openEdit(reward)}>
-                    <EditIcon /> Edit
-                  </button>
-                  <button type="button" className={styles.btnDelete} onClick={() => setDeleteTarget(reward)}>
-                    <TrashIcon /> Delete
-                  </button>
-                </div>
-              </article>
-            );
-          })}
+              <div className={styles.actions}>
+                <button type="button" className={styles.btnEdit} onClick={() => setEditTarget(reward)}>
+                  <EditIcon /> Edit
+                </button>
+                <button type="button" className={styles.btnDelete} onClick={() => setDeleteTarget(reward)}>
+                  <TrashIcon /> Delete
+                </button>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
+      {/* ── Edit Modal (local-only) ── */}
       {editTarget && (
         <div className={styles.overlay} onClick={() => setEditTarget(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
@@ -311,8 +275,8 @@ export default function RewardsManagerPage() {
               <label>Title</label>
               <input
                 className={styles.modalInput}
-                value={editForm.title}
-                onChange={(e) => setEditForm((f) => ({ ...f, title: e.target.value }))}
+                value={editTarget.title}
+                onChange={(e) => setEditTarget(t => t ? { ...t, title: e.target.value } : t)}
                 placeholder="Reward title"
               />
             </div>
@@ -321,52 +285,32 @@ export default function RewardsManagerPage() {
               <label>Reward type</label>
               <select
                 className={styles.modalSelect}
-                value={editForm.rewardType}
-                onChange={(e) => setEditForm((f) => ({ ...f, rewardType: e.target.value as RewardType }))}
+                value={editTarget.rewardType}
+                onChange={(e) => setEditTarget(t => t ? { ...t, rewardType: e.target.value as RewardType } : t)}
               >
-                {(Object.keys(typeLabels) as RewardType[]).map((t) => (
-                  <option key={t} value={t}>
-                    {typeLabels[t]}
-                  </option>
-                ))}
+                {REWARD_TYPES.map(t => <option key={t} value={t}>{typeLabels[t]}</option>)}
               </select>
             </div>
 
             <div className={styles.modalField}>
-              <label>Eligibility rule</label>
-              <select
-                className={styles.modalSelect}
-                value={editForm.eligibility}
-                onChange={(e) =>
-                  setEditForm((f) => ({ ...f, eligibility: e.target.value as EligibilityRule }))
-                }
-              >
-                {eligibilityOptions.map((e) => (
-                  <option key={e.value} value={e.value}>
-                    {e.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Status</label>
-              <select
-                className={styles.modalSelect}
-                value={editForm.status}
-                onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value as RewardStatus }))}
-              >
-                <option value="Active">Active</option>
-                <option value="Pending review">Pending review</option>
-                <option value="Draft">Draft</option>
-              </select>
+              <label>XP cost</label>
+              <input
+                className={styles.modalInput}
+                type="number"
+                min={0}
+                value={editTarget.xpCost}
+                onChange={(e) => setEditTarget(t => t ? { ...t, xpCost: Number(e.target.value) } : t)}
+              />
             </div>
 
             <div className={styles.modalActions}>
               <button type="button" className={styles.btnCancel} onClick={() => setEditTarget(null)}>
                 Cancel
               </button>
-              <button type="button" className={styles.btnSave} onClick={saveEdit}>
+              <button type="button" className={styles.btnSave} onClick={() => {
+                handleEditLocal(editTarget.id, { title: editTarget.title, rewardType: editTarget.rewardType, xpCost: editTarget.xpCost });
+                setEditTarget(null);
+              }}>
                 Save changes
               </button>
             </div>
@@ -374,8 +318,9 @@ export default function RewardsManagerPage() {
         </div>
       )}
 
+      {/* ── Delete Confirm Modal ── */}
       {deleteTarget && (
-        <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
+        <div className={styles.overlay} onClick={() => !deleting && setDeleteTarget(null)}>
           <div className={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.deleteIconWrap}>
               <AlertIcon />
@@ -386,19 +331,20 @@ export default function RewardsManagerPage() {
               to earn or redeem this reward.
             </p>
             <div className={styles.modalActions}>
-              <button type="button" className={styles.btnCancel} onClick={() => setDeleteTarget(null)}>
+              <button type="button" className={styles.btnCancel} onClick={() => setDeleteTarget(null)} disabled={deleting}>
                 Cancel
               </button>
-              <button type="button" className={styles.btnDeleteConfirm} onClick={confirmDelete}>
-                Yes, delete
+              <button type="button" className={styles.btnDeleteConfirm} onClick={confirmDelete} disabled={deleting}>
+                {deleting ? "Deleting…" : "Yes, delete"}
               </button>
             </div>
           </div>
         </div>
       )}
 
+      {/* ── Add Reward Modal ── */}
       {showAdd && (
-        <div className={styles.overlay} onClick={() => setShowAdd(false)}>
+        <div className={styles.overlay} onClick={() => !adding && setShowAdd(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Add reward</h3>
 
@@ -408,7 +354,17 @@ export default function RewardsManagerPage() {
                 className={styles.modalInput}
                 value={addForm.title}
                 onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="e.g. Completion badge – Module 1"
+                placeholder="e.g. Airtime – Top Learner"
+              />
+            </div>
+
+            <div className={styles.modalField}>
+              <label>Description</label>
+              <input
+                className={styles.modalInput}
+                value={addForm.description}
+                onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="Brief description (optional)"
               />
             </div>
 
@@ -419,35 +375,27 @@ export default function RewardsManagerPage() {
                 value={addForm.rewardType}
                 onChange={(e) => setAddForm((f) => ({ ...f, rewardType: e.target.value as RewardType }))}
               >
-                {(Object.keys(typeLabels) as RewardType[]).map((t) => (
-                  <option key={t} value={t}>
-                    {typeLabels[t]}
-                  </option>
-                ))}
+                {REWARD_TYPES.map(t => <option key={t} value={t}>{typeLabels[t]}</option>)}
               </select>
             </div>
 
             <div className={styles.modalField}>
-              <label>Eligibility rule</label>
-              <select
-                className={styles.modalSelect}
-                value={addForm.eligibility}
-                onChange={(e) => setAddForm((f) => ({ ...f, eligibility: e.target.value as EligibilityRule }))}
-              >
-                {eligibilityOptions.map((e) => (
-                  <option key={e.value} value={e.value}>
-                    {e.label}
-                  </option>
-                ))}
-              </select>
+              <label>XP cost</label>
+              <input
+                className={styles.modalInput}
+                type="number"
+                min={0}
+                value={addForm.xpCost}
+                onChange={(e) => setAddForm((f) => ({ ...f, xpCost: Number(e.target.value) }))}
+              />
             </div>
 
             <div className={styles.modalActions}>
-              <button type="button" className={styles.btnCancel} onClick={() => setShowAdd(false)}>
+              <button type="button" className={styles.btnCancel} onClick={() => setShowAdd(false)} disabled={adding}>
                 Cancel
               </button>
-              <button type="button" className={styles.btnSave} onClick={saveAdd}>
-                Add reward
+              <button type="button" className={styles.btnSave} onClick={saveAdd} disabled={adding}>
+                {adding ? "Creating…" : "Add reward"}
               </button>
             </div>
           </div>

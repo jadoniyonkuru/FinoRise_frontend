@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import PortalLayout from "@/portal/PortalLayout";
 import ThemeToggle from "@/components/ThemeToggle";
 import { learnerNavItems } from "./learnerNav";
+import { useAuth } from "@/context/AuthContext";
 import styles from "./LearnerLayout.module.css";
 
 type Props = {
@@ -19,6 +20,7 @@ function LightningIcon() {
 }
 
 export default function LearnerLayout({ children, title, subtitle }: Props) {
+  const { user } = useAuth();
   const topSlot = (
     <header className={styles.topbar}>
       <label className={styles.searchWrap}>
@@ -35,7 +37,7 @@ export default function LearnerLayout({ children, title, subtitle }: Props) {
       <ThemeToggle />
       <div className={styles.xpBadge}>
         <LightningIcon />
-        <span>1,240 XP</span>
+        <span>{(user?.xp_total ?? 0).toLocaleString()} XP</span>
       </div>
     </header>
   );

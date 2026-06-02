@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import LearnerLayout from "../LearnerLayout";
+import { analyticsService, modulesService } from "@/api";
+import { useAuth } from "@/context/AuthContext";
+import type { LearnerAnalytics, ModuleProgress } from "@/api";
 import s from "./learner-dashboard.module.css";
 
 /* ── Icons ── */
@@ -37,29 +40,32 @@ function ClockIcon() {
   );
 }
 
-/* ── Chart helpers ── */
+/* ── Chart config ── */
 const months = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
 const W = 380, H_C = 110, yBase = 135, bW = 28;
 const sp = (W - months.length * bW) / (months.length + 1);
 
-const donutData = [
-  { label: "Modules",     value: 8,  color: "#0ea5e9" },
-  { label: "Simulations", value: 14, color: "#8b5cf6" },
-  { label: "AI Sessions", value: 23, color: "#f59e0b" },
-  { label: "Quizzes",     value: 11, color: "#1e40af" },
-];
+const CATEGORY_COLORS: Record<string, string> = {
+  budgeting: "#0ea5e9",
+  investing: "#8b5cf6",
+  emergency: "#f59e0b",
+  debt:      "#1e40af",
+  loan:      "#10b981",
+  general:   "#6b7280",
+};
 
-function DonutChart() {
+/* ── Dynamic Donut chart ── */
+function DonutChart({ data }: { data: { label: string; value: number; color: string }[] }) {
   const r = 55, cx = 80, cy = 80, sw = 18;
   const C = 2 * Math.PI * r;
   const gap = 3;
-  const total = donutData.reduce((s, d) => s + d.value, 0);
-  const drawable = C - gap * donutData.length;
+  const total = data.reduce((sum, d) => sum + d.value, 0);
+  const drawable = C - gap * Math.max(data.length, 1);
   let offset = C / 4;
   return (
     <svg viewBox="0 0 160 160" className={s.chartSvg} style={{ width: 130, height: 130, flexShrink: 0 }}>
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e5e7eb" strokeWidth={sw} />
-      {donutData.map((d) => {
+      {total > 0 && data.map((d) => {
         const len = (d.value / total) * drawable;
         const da = `${len} ${C - len}`;
         const co = offset;
@@ -71,15 +77,16 @@ function DonutChart() {
         );
       })}
       <text x={cx} y={cy - 5} textAnchor="middle" fontSize="16" fontWeight="700" fill="#111827">{total}</text>
-      <text x={cx} y={cy + 12} textAnchor="middle" fontSize="9" fill="#6b7280">activities</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fontSize="9" fill="#6b7280">completed</text>
     </svg>
   );
 }
 
+/* ── Decorative bar chart (XP trend) ── */
 const xpValues = [1200, 1450, 980, 1680, 1920, 2100, 2340];
-
-function XpBarChart() {
-  const max = Math.max(...xpValues);
+function XpBarChart({ currentXp }: { currentXp: number }) {
+  const displayValues = [...xpValues.slice(0, 6), currentXp || xpValues[6]];
+  const max = Math.max(...displayValues);
   return (
     <svg viewBox={`0 0 ${W} 155`} className={s.chartSvg}>
       <defs>
@@ -88,14 +95,14 @@ function XpBarChart() {
           <stop offset="100%" stopColor="#7dd3fc" stopOpacity="0.4" />
         </linearGradient>
       </defs>
-      {xpValues.map((v, i) => {
+      {displayValues.map((v, i) => {
         const bh = (v / max) * H_C;
         const x = sp + i * (bW + sp);
         const y = yBase - bh;
         return (
           <g key={months[i]}>
             <rect x={x} y={y} width={bW} height={bh} rx={4}
-              fill="url(#xpGrad)" opacity={i === xpValues.length - 1 ? 1 : 0.65} />
+              fill="url(#xpGrad)" opacity={i === displayValues.length - 1 ? 1 : 0.65} />
             <text x={x + bW / 2} y={y - 4} textAnchor="middle" fontSize="7.5" fontWeight="600" fill="#6b7280">
               {v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}
             </text>
@@ -107,11 +114,12 @@ function XpBarChart() {
   );
 }
 
-const scoreValues = [720, 740, 750, 770, 790, 820, 840];
-
-function ScoreLineChart() {
-  const max = 900, min = 650;
-  const pts = scoreValues.map((v, i) => ({
+/* ── Decorative line chart (quiz score trend) ── */
+const scoreValues = [62, 65, 70, 72, 78, 82, 87];
+function ScoreLineChart({ currentScore }: { currentScore: number }) {
+  const displayValues = [...scoreValues.slice(0, 6), currentScore || scoreValues[6]];
+  const max = 100, min = 40;
+  const pts = displayValues.map((v, i) => ({
     x: sp + i * (bW + sp) + bW / 2,
     y: yBase - ((v - min) / (max - min)) * H_C,
   }));
@@ -139,36 +147,83 @@ function ScoreLineChart() {
   );
 }
 
-/* ── Data ── */
-const recommendedModule = {
-  tag: "INVESTING BASICS",
-  level: "INTERMEDIATE",
-  title: "Understanding Market Volatility",
-  duration: "15 mins",
-  to: "/learner/modules",
-};
-
-type Stat = { label: string; value: string; trend: string; dir: "up" | "down" | "neutral"; iconBg: string; iconColor: string; icon: React.ReactNode };
-
-const analysisStats: Stat[] = [
-  { label: "XP This Month",       value: "2,340",  trend: "+18%",  dir: "up",      iconBg: "rgba(14,165,233,0.1)",  iconColor: "#0ea5e9", icon: <LightningIcon size={17} /> },
-  { label: "Modules Completed",   value: "8 / 12", trend: "+1",    dir: "up",      iconBg: "rgba(139,92,246,0.1)",  iconColor: "#8b5cf6", icon: <TrendUpIcon /> },
-  { label: "Simulations Run",     value: "14",     trend: "+2",    dir: "up",      iconBg: "rgba(30,64,175,0.1)",   iconColor: "#1d4ed8", icon: <TargetIcon /> },
-  { label: "Financial Score",     value: "840",    trend: "+20",   dir: "up",      iconBg: "rgba(251,191,36,0.1)",  iconColor: "#f59e0b", icon: <TargetIcon /> },
-  { label: "Quiz Average",        value: "87%",    trend: "+3%",   dir: "up",      iconBg: "rgba(14,165,233,0.1)",  iconColor: "#0ea5e9", icon: <TrendUpIcon /> },
-  { label: "Daily Streak",        value: "7 days", trend: "active",dir: "neutral", iconBg: "rgba(249,115,22,0.1)",  iconColor: "#f97316", icon: <LightningIcon size={17} /> },
-];
-
-const metaStats = [
-  { label: "Avg session duration", value: "32 min",    hint: "+4 min vs last month" },
-  { label: "Completion rate",      value: "72%",       hint: "8 of 12 modules done"  },
-  { label: "Quiz pass rate",       value: "87%",       hint: "Above platform avg"     },
-  { label: "Top subject",          value: "Investing", hint: "Most time spent"        },
-];
-
 /* ── Component ── */
 export default function LearnerDashboard() {
+  const { user } = useAuth();
   const [tab, setTab] = useState<"overview" | "analysis">("overview");
+  const [analytics, setAnalytics] = useState<LearnerAnalytics | null>(null);
+  const [moduleProgress, setModuleProgress] = useState<ModuleProgress[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([
+      analyticsService.getLearnerAnalytics(),
+      modulesService.getMyProgress(),
+    ])
+      .then(([a, mp]) => { setAnalytics(a); setModuleProgress(mp); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  /* ── Derived values ── */
+  const firstName = (user?.full_name ?? "").split(" ")[0] || "Learner";
+  const streakDays = analytics?.overview.streak_days ?? user?.streak_days ?? 0;
+  const xpTotal = analytics?.overview.xp_total ?? user?.xp_total ?? 0;
+  const completedCount = analytics?.modules.completed ?? 0;
+  const totalCount = analytics?.modules.total_available ?? 0;
+  const completionRate = analytics ? Math.round(analytics.modules.completion_rate) : 0;
+  const quizAvg = analytics?.modules.average_quiz_score;
+  const latestInsight = analytics?.insights[0]?.insight_text;
+  const nextModule = moduleProgress.find(m => !m.completed);
+
+  const categoryBreakdown = analytics?.modules.category_breakdown ?? {};
+  const donutData = Object.entries(categoryBreakdown)
+    .filter(([, v]) => v > 0)
+    .map(([label, value]) => ({
+      label: label.charAt(0).toUpperCase() + label.slice(1),
+      value,
+      color: CATEGORY_COLORS[label] ?? "#6b7280",
+    }));
+
+  const simCount = analytics?.recent_activity.filter(
+    e => e.event_type === "simulation_decision"
+  ).length ?? 0;
+
+  const topCategory = Object.entries(categoryBreakdown).sort(([, a], [, b]) => b - a)[0]?.[0];
+  const topCategoryLabel = topCategory
+    ? topCategory.charAt(0).toUpperCase() + topCategory.slice(1)
+    : "—";
+
+  const quizRating = quizAvg == null ? "—"
+    : quizAvg >= 86 ? "Excellent"
+    : quizAvg >= 70 ? "Good"
+    : quizAvg >= 50 ? "Fair"
+    : "Needs work";
+
+  const scoreTone = quizAvg == null ? "low"
+    : quizAvg >= 86 ? "peak"
+    : quizAvg >= 70 ? "high"
+    : quizAvg >= 50 ? "mid"
+    : "low";
+
+  type StatDir = "up" | "down" | "neutral";
+  type Stat = { label: string; value: string; trend: string; dir: StatDir; iconBg: string; iconColor: string; icon: React.ReactNode };
+
+  const analysisStats: Stat[] = [
+    { label: "Total XP",           value: xpTotal.toLocaleString(), trend: `Level ${analytics?.overview.level ?? user?.level ?? 1}`, dir: "up", iconBg: "rgba(14,165,233,0.1)", iconColor: "#0ea5e9", icon: <LightningIcon size={17} /> },
+    { label: "Modules Completed",  value: `${completedCount} / ${totalCount}`, trend: `${completionRate}%`, dir: "up", iconBg: "rgba(139,92,246,0.1)", iconColor: "#8b5cf6", icon: <TrendUpIcon /> },
+    { label: "Simulations Run",    value: String(simCount),          trend: simCount > 0 ? "recent" : "start now", dir: "neutral", iconBg: "rgba(30,64,175,0.1)",  iconColor: "#1d4ed8", icon: <TargetIcon /> },
+    { label: "Quiz Average",       value: quizAvg != null ? `${Math.round(quizAvg)}%` : "—", trend: quizRating, dir: "up", iconBg: "rgba(251,191,36,0.1)", iconColor: "#f59e0b", icon: <TargetIcon /> },
+    { label: "Insights",           value: String(analytics?.insights.length ?? 0), trend: "AI generated", dir: "neutral", iconBg: "rgba(14,165,233,0.1)", iconColor: "#0ea5e9", icon: <TrendUpIcon /> },
+    { label: "Daily Streak",       value: `${streakDays} day${streakDays !== 1 ? "s" : ""}`, trend: "active", dir: "neutral", iconBg: "rgba(249,115,22,0.1)", iconColor: "#f97316", icon: <LightningIcon size={17} /> },
+  ];
+
+  const metaStats = [
+    { label: "Completion rate",  value: `${completionRate}%`,                       hint: `${completedCount} of ${totalCount} modules done` },
+    { label: "Quiz average",     value: quizAvg != null ? `${Math.round(quizAvg)}%` : "—", hint: quizRating },
+    { label: "Active insights",  value: String(analytics?.insights.length ?? 0),    hint: "From AI behavioral analysis" },
+    { label: "Top subject",      value: topCategoryLabel,                            hint: "Most modules completed" },
+  ];
 
   return (
     <LearnerLayout>
@@ -183,18 +238,25 @@ export default function LearnerDashboard() {
         <>
           <section className={s.hero}>
             <div className={s.heroContent}>
-              <h1 className={s.heroTitle}>Welcome back, <span>Alex</span></h1>
+              <h1 className={s.heroTitle}>Welcome back, <span>{firstName}</span></h1>
               <p className={s.heroText}>
-                You&apos;re currently in the top 15% of users this week. Complete your next simulation to maintain your streak!
+                {completionRate >= 70
+                  ? `You're in great shape — ${completionRate}% completion rate. Keep up the momentum!`
+                  : completedCount === 0
+                  ? "Start your first module to begin earning XP and building your financial knowledge."
+                  : `You've completed ${completedCount} module${completedCount !== 1 ? "s" : ""}. Keep going to reach the next level!`}
               </p>
               <div className={s.heroActions}>
-                <Link to="/learner/simulations" className={s.btnPrimary}>Continue Simulation</Link>
-                <Link to="/learner/analytics"   className={s.btnSecondary}>View Progress</Link>
+                <Link to="/learner/simulations" className={s.btnPrimary}>Run a Simulation</Link>
+                <Link to="/learner/analytics" className={s.btnSecondary}>View Progress</Link>
               </div>
             </div>
             <div className={s.streakPanel}>
               <span className={s.streakLabel}>Daily Streak</span>
-              <div className={s.streakValue}><LightningIcon size={22} /><span>7 Days</span></div>
+              <div className={s.streakValue}>
+                <LightningIcon size={22} />
+                <span>{streakDays} Day{streakDays !== 1 ? "s" : ""}</span>
+              </div>
             </div>
           </section>
 
@@ -204,67 +266,97 @@ export default function LearnerDashboard() {
                 <span className={s.statLabel}>Learning Progress</span>
                 <span className={s.statIcon}><TrendUpIcon /></span>
               </div>
-              <div className={s.statMain}>
-                <span className={s.statNumber}>72%</span>
-                <span className={s.statDelta}>+5% from last week</span>
-              </div>
-              <div className={s.progressBar}><div className={s.progressFill} style={{ width: "72%" }} /></div>
-              <div className={s.statFooter}><span>8 / 12 Modules</span><span>4 lessons left</span></div>
+              {loading ? (
+                <div className={s.statMain}><span className={s.statNumber}>—</span></div>
+              ) : (
+                <>
+                  <div className={s.statMain}>
+                    <span className={s.statNumber}>{completionRate}%</span>
+                  </div>
+                  <div className={s.progressBar}>
+                    <div className={s.progressFill} style={{ width: `${completionRate}%` }} />
+                  </div>
+                  <div className={s.statFooter}>
+                    <span>{completedCount} / {totalCount} Modules</span>
+                    <span>{totalCount - completedCount} left</span>
+                  </div>
+                </>
+              )}
             </article>
 
             <article className={s.statCard}>
               <div className={s.statHeader}>
-                <span className={s.statLabel}>Financial Score</span>
+                <span className={s.statLabel}>Quiz Performance</span>
                 <span className={s.statIcon}><TargetIcon /></span>
               </div>
-              <div className={s.statMain}>
-                <span className={s.statNumber}>840</span>
-                <span className={s.statBadge}>Excellent</span>
-              </div>
-              <div className={s.scoreBar}>
-                <span className={s.scoreSeg} data-tone="low" />
-                <span className={s.scoreSeg} data-tone="mid" />
-                <span className={s.scoreSeg} data-tone="high" />
-                <span className={s.scoreSeg} data-tone="peak" />
-              </div>
-              <p className={s.statDesc}>Your behavioral score shows high risk awareness in budgeting simulations.</p>
+              {loading ? (
+                <div className={s.statMain}><span className={s.statNumber}>—</span></div>
+              ) : (
+                <>
+                  <div className={s.statMain}>
+                    <span className={s.statNumber}>
+                      {quizAvg != null ? `${Math.round(quizAvg)}%` : "—"}
+                    </span>
+                    {quizAvg != null && <span className={s.statBadge}>{quizRating}</span>}
+                  </div>
+                  <div className={s.scoreBar}>
+                    <span className={s.scoreSeg} data-tone="low"    data-active={String(scoreTone === "low")} />
+                    <span className={s.scoreSeg} data-tone="mid"    data-active={String(scoreTone === "mid")} />
+                    <span className={s.scoreSeg} data-tone="high"   data-active={String(scoreTone === "high")} />
+                    <span className={s.scoreSeg} data-tone="peak"   data-active={String(scoreTone === "peak")} />
+                  </div>
+                  <p className={s.statDesc}>
+                    {quizAvg != null
+                      ? `Average score across ${completedCount} completed module${completedCount !== 1 ? "s" : ""}.`
+                      : "Complete your first quiz to see your performance score."}
+                  </p>
+                </>
+              )}
             </article>
 
             <article className={`${s.statCard} ${s.insightCard}`}>
               <div className={s.insightHead}>
                 <h2 className={s.insightTitle}>AI Behavioral Insights</h2>
-                <p className={s.insightSub}>Based on your last simulation</p>
+                <p className={s.insightSub}>
+                  {loading ? "Loading…" : latestInsight ? "Latest insight for you" : "No insights yet"}
+                </p>
               </div>
               <blockquote className={s.insightQuote}>
-                You showed strong resilience during the market dip scenario. Consider diversifying your simulated portfolio to reduce volatility exposure.
+                {loading
+                  ? "Loading your insights…"
+                  : latestInsight
+                  ?? "Complete modules and simulations to generate personalized AI insights about your financial behavior."}
               </blockquote>
               <Link to="/learner/ai-coach" className={s.insightBtn}>Talk to AI Coach</Link>
             </article>
           </div>
 
-          <section className={s.recommended}>
-            <div className={s.recommendedHeader}>
-              <h2 className={s.recommendedTitle}>Recommended Next</h2>
-              <Link to="/learner/modules" className={s.viewAll}>View All Modules</Link>
-            </div>
-            <Link to={recommendedModule.to} className={s.moduleCard}>
-              <div className={s.moduleThumb}>
-                <span className={s.moduleTag}>{recommendedModule.tag}</span>
+          {nextModule && (
+            <section className={s.recommended}>
+              <div className={s.recommendedHeader}>
+                <h2 className={s.recommendedTitle}>Recommended Next</h2>
+                <Link to="/learner/modules" className={s.viewAll}>View All Modules</Link>
               </div>
-              <div className={s.moduleBody}>
-                <span className={s.moduleLevel}>{recommendedModule.level}</span>
-                <h3 className={s.moduleName}>{recommendedModule.title}</h3>
-                <span className={s.moduleMeta}><ClockIcon /> {recommendedModule.duration}</span>
-              </div>
-            </Link>
-          </section>
+              <Link to={`/learner/modules/${nextModule.module_id}`} className={s.moduleCard}>
+                <div className={s.moduleThumb}>
+                  <span className={s.moduleTag}>{nextModule.category.toUpperCase()}</span>
+                </div>
+                <div className={s.moduleBody}>
+                  <span className={s.moduleLevel}>{nextModule.difficulty.toUpperCase()}</span>
+                  <h3 className={s.moduleName}>{nextModule.title}</h3>
+                  <span className={s.moduleMeta}>
+                    <ClockIcon /> +{nextModule.xp_reward} XP on completion
+                  </span>
+                </div>
+              </Link>
+            </section>
+          )}
         </>
       )}
 
       {/* ── Analysis ── */}
       {tab === "analysis" && (
         <>
-          {/* Stat cards */}
           <div className={s.analysisGrid}>
             {analysisStats.map((st) => (
               <div key={st.label} className={s.aStatCard}>
@@ -278,45 +370,48 @@ export default function LearnerDashboard() {
             ))}
           </div>
 
-          {/* Charts row */}
           <div className={s.chartsRow}>
-            {/* Donut */}
             <div className={s.chartPanel}>
-              <div className={s.chartTitle}>Activity breakdown</div>
+              <div className={s.chartTitle}>Modules by category</div>
               <div className={s.donutWrap}>
-                <DonutChart />
+                <DonutChart data={donutData.length > 0 ? donutData : [{ label: "No data", value: 1, color: "#e5e7eb" }]} />
                 <ul className={s.legend}>
-                  {donutData.map((d) => (
+                  {donutData.length > 0 ? donutData.map((d) => (
                     <li key={d.label} className={s.legendItem}>
                       <span className={s.legendDot} style={{ background: d.color }} />
                       <span className={s.legendLabel}>{d.label}</span>
                       <span className={s.legendVal}>{d.value}</span>
                     </li>
-                  ))}
-                  <li className={s.legendTotal}>
-                    <span>Total</span>
-                    <span>{donutData.reduce((a, d) => a + d.value, 0)}</span>
-                  </li>
+                  )) : (
+                    <li className={s.legendItem} style={{ color: "#9ca3af", fontSize: "0.8rem" }}>
+                      Complete modules to see breakdown
+                    </li>
+                  )}
+                  {donutData.length > 0 && (
+                    <li className={s.legendTotal}>
+                      <span>Total</span>
+                      <span>{completedCount}</span>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
 
-            {/* Bar */}
             <div className={s.chartPanel}>
-              <div className={s.chartTitle}>Monthly XP earned</div>
-              <XpBarChart />
-              <div className={s.chartNote}>Current month: <strong>2,340 XP</strong></div>
+              <div className={s.chartTitle}>XP earned (trend)</div>
+              <XpBarChart currentXp={xpTotal} />
+              <div className={s.chartNote}>Total XP: <strong>{xpTotal.toLocaleString()}</strong></div>
             </div>
 
-            {/* Line */}
             <div className={s.chartPanel}>
-              <div className={s.chartTitle}>Financial score trend</div>
-              <ScoreLineChart />
-              <div className={s.chartNote}>Current score: <strong>840 — Excellent</strong></div>
+              <div className={s.chartTitle}>Quiz score trend</div>
+              <ScoreLineChart currentScore={Math.round(quizAvg ?? 0)} />
+              <div className={s.chartNote}>
+                Current avg: <strong>{quizAvg != null ? `${Math.round(quizAvg)}% — ${quizRating}` : "No quizzes yet"}</strong>
+              </div>
             </div>
           </div>
 
-          {/* Meta stats */}
           <div className={s.metaGrid}>
             {metaStats.map((m) => (
               <div key={m.label} className={s.metaCard}>

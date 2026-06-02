@@ -11,14 +11,14 @@
 .pageTitle {
   font-size: 1.6rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.35rem;
   letter-spacing: -0.025em;
 }
 
 .pageSubtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
   max-width: 480px;
@@ -38,11 +38,11 @@
   padding: 0.55rem 1rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 9px;
-  background: #fff;
+  background: var(--surface);
   font-family: inherit;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-muted);
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
   white-space: nowrap;
@@ -114,14 +114,14 @@
 .levelTitle {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.3rem;
   letter-spacing: -0.02em;
 }
 
 .levelHint {
   font-size: 0.84rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 0.9rem;
   line-height: 1.5;
 }
@@ -190,8 +190,8 @@
 
 /* ── Achievement Hall ── */
 .achieveSection {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.5rem 1.6rem;
 }
@@ -207,14 +207,14 @@
 .achieveTitle {
   font-size: 1.05rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.2rem;
   letter-spacing: -0.01em;
 }
 
 .achieveSub {
   font-size: 0.78rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -279,20 +279,20 @@
 .badgeName {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   line-height: 1.2;
 }
 
 .badgeDesc {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   line-height: 1.4;
 }
 
 .lockedTag {
   font-size: 0.65rem;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--text-muted);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -308,8 +308,8 @@
 
 /* Streak card */
 .streakCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 1.25rem 1.35rem;
 }
@@ -328,7 +328,7 @@
 .streakTitle {
   font-size: 1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.01em;
 }
 
@@ -371,13 +371,13 @@
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .streakMsg {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.55;
   margin: 0;
   text-align: center;
@@ -385,8 +385,8 @@
 
 /* Leaderboard */
 .leaderCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
 }
@@ -397,7 +397,7 @@
   gap: 0.45rem;
   font-size: 0.9rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   padding: 1rem 1.25rem;
   border-bottom: 1px solid #f3f4f6;
 }
@@ -419,7 +419,7 @@
 .leaderRank {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #9ca3af;
+  color: var(--text-muted);
   width: 18px;
   text-align: center;
   flex-shrink: 0;
@@ -444,7 +444,7 @@
   flex: 1;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-muted);
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
