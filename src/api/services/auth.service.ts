@@ -28,6 +28,10 @@ export const authService = {
     return res.data.user;
   },
 
+  async changePassword(data: { current_password: string; new_password: string }): Promise<void> {
+    await apiClient.put('/api/auth/password', data);
+  },
+
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
   },

@@ -1,23 +1,47 @@
+import { useEffect, useState } from "react";
 import AdminLayout from "@/admin/AdminLayout";
 import AdminModuleContent from "@/admin/components/AdminModuleContent";
-
-const stats = [
-  { label: "Total users", value: "1,284", hint: "All roles" },
-  { label: "Learners", value: "1,102", hint: "86%" },
-  { label: "Admins", value: "8", hint: "System staff" },
-  { label: "Partners", value: "12", hint: "Verified" },
-];
-
-const users = [
-  { title: "Marie Uwase", meta: "Learner · Active" },
-  { title: "Jean Paul N.", meta: "Admin · Active" },
-  { title: "Kigali Savings Co.", meta: "Partner · Active" },
-];
+import { adminService } from "@/api";
+import type { User, AdminAnalytics } from "@/api";
 
 export default function UserManagementPage() {
+  const [users, setUsers] = useState<User[]>([]);
+  const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    Promise.all([adminService.getUsers(), adminService.getAnalytics()])
+      .then(([u, a]) => { setUsers(u); setAnalytics(a); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const partners = analytics
+    ? analytics.total_users - analytics.total_learners - analytics.total_admins
+    : 0;
+
+  const stats = [
+    { label: "Total users", value: analytics ? analytics.total_users.toLocaleString() : "—", hint: "All roles" },
+    { label: "Learners", value: analytics ? analytics.total_learners.toLocaleString() : "—", hint: analytics ? `${Math.round((analytics.total_learners / (analytics.total_users || 1)) * 100)}%` : "" },
+    { label: "Admins", value: analytics ? analytics.total_admins.toString() : "—", hint: "System staff" },
+    { label: "Partners", value: analytics ? partners.toString() : "—", hint: "Verified" },
+  ];
+
+  const items = users.map((u) => ({
+    title: u.full_name,
+    meta: `${u.role.charAt(0).toUpperCase() + u.role.slice(1)} · Level ${u.level}`,
+  }));
+
+  if (loading) {
+    return (
+      <AdminLayout title="User management" subtitle="Users, roles">
+        <p>Loading…</p>
+      </AdminLayout>
+    );
+  }
+
   return (
     <AdminLayout title="User management" subtitle="Users, roles">
-      <AdminModuleContent stats={stats} panelTitle="Recent users" items={users} />
+      <AdminModuleContent stats={stats} panelTitle="All users" items={items} />
     </AdminLayout>
   );
 }
