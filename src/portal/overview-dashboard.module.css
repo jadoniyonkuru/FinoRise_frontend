@@ -1,0 +1,219 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.statCard,
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.statCard {
+  min-height: 150px;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.statTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.trend {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.22rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.trend::before {
+  content: "↗";
+  margin-right: 0.25rem;
+}
+
+.trend[data-type="up"],
+.trend[data-type="neutral"] {
+  background: var(--dash-trend-up-bg);
+  color: var(--dash-trend-up-text);
+}
+
+.trend[data-type="down"] {
+  background: #feecec;
+  color: #dc2626;
+}
+
+.trend[data-type="down"]::before {
+  content: "↘";
+}
+
+.statCard p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.statCard strong {
+  color: var(--text);
+  font-size: 1.75rem;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.analyticsGrid {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.82fr) minmax(360px, 1.25fr) minmax(360px, 1.25fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.panel {
+  min-height: 274px;
+  padding: 1.35rem;
+}
+
+.panel h2 {
+  margin: 0 0 1.25rem;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.donutArea {
+  display: grid;
+  grid-template-columns: 180px 1fr;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.donutSvg {
+  width: 180px;
+  height: 180px;
+  transform: rotate(-90deg);
+}
+
+.donutTotal,
+.donutLabel {
+  transform: rotate(90deg);
+  transform-origin: 90px 90px;
+  fill: var(--text);
+}
+
+.donutTotal {
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+
+.donutLabel {
+  font-size: 0.75rem;
+  fill: var(--text-muted);
+}
+
+.legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.legend li {
+  display: grid;
+  grid-template-columns: 10px 1fr auto;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--text-muted);
+  font-size: 0.84rem;
+}
+
+.legend strong {
+  color: var(--text);
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+}
+
+.chartSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chartValue {
+  fill: #526071;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.axisLabel {
+  fill: #9aa3af;
+  font-size: 0.76rem;
+}
+
+.panelNote {
+  margin: 0.75rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.panelNote strong {
+  color: var(--text);
+}
+
+@media (max-width: 1280px) {
+  .statsGrid {
+    grid-template-columns: repeat(3, minmax(170px, 1fr));
+  }
+
+  .analyticsGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .analyticsGrid > :first-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .statsGrid,
+  .analyticsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .donutArea {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+}
