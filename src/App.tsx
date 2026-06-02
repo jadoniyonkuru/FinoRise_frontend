@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-
 import LoginPage from "@/auth/login/LoginPage";
+import AdminLoginPage from "@/auth/admin-login/AdminLoginPage";
 import RegisterPage from "@/auth/register/RegisterPage";
 import ResetPasswordPage from "@/auth/reset-password/ResetPasswordPage";
 
@@ -34,68 +33,54 @@ import PartnerProfile from "@/partner/profile/PartnerProfile";
 import PartnerProgramsPage from "@/partner/programs/PartnerProgramsPage";
 import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
 
-function roleDashboard(user: { role?: string } | null): string {
-  return user?.role ? `/${user.role}/dashboard` : "/auth/login";
-}
-
-function RequireAuth({ children, role }: { children: React.ReactNode; role?: string }) {
-  const { user, loading } = useAuth();
-  if (loading) return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>Loading…</div>;
-  if (!user) return <Navigate to="/auth/login" replace />;
-  if (role && user.role !== role) return <Navigate to={roleDashboard(user)} replace />;
-  return <>{children}</>;
-}
+import PlatformDashboard from "@/portal/PlatformDashboard";
 
 export default function App() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh" }}>Loading…</div>;
-  }
-
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={roleDashboard(user)} replace />} />
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/dashboard" element={<PlatformDashboard />} />
 
       {/* Auth */}
-      <Route path="/auth/login" element={user?.role ? <Navigate to={roleDashboard(user)} replace /> : <LoginPage />} />
-      <Route path="/auth/register" element={user?.role ? <Navigate to={roleDashboard(user)} replace /> : <RegisterPage />} />
+      <Route path="/auth/login" element={<LoginPage />} />
+      <Route path="/auth/admin-login" element={<AdminLoginPage />} />
+      <Route path="/auth/register" element={<RegisterPage />} />
       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
 
       {/* Learner */}
-      <Route path="/learner/dashboard" element={<RequireAuth role="learner"><LearnerDashboard /></RequireAuth>} />
-      <Route path="/learner/modules" element={<RequireAuth role="learner"><LearnerModulesPage /></RequireAuth>} />
-      <Route path="/learner/modules/:moduleId" element={<RequireAuth role="learner"><ModuleDetailPage /></RequireAuth>} />
-      <Route path="/learner/simulations" element={<RequireAuth role="learner"><LearnerSimulationsPage /></RequireAuth>} />
-      <Route path="/learner/rewards" element={<RequireAuth role="learner"><LearnerRewardsPage /></RequireAuth>} />
-      <Route path="/learner/ai-coach" element={<RequireAuth role="learner"><AICoachPage /></RequireAuth>} />
-      <Route path="/learner/profile" element={<RequireAuth role="learner"><LearnerProfile /></RequireAuth>} />
-      <Route path="/learner/settings" element={<RequireAuth role="learner"><LearnerSettingsPage /></RequireAuth>} />
-      <Route path="/learner/analytics" element={<RequireAuth role="learner"><LearnerAnalyticsPage /></RequireAuth>} />
-      <Route path="/learner/lesson" element={<RequireAuth role="learner"><LessonViewPage /></RequireAuth>} />
-      <Route path="/learner/quiz" element={<RequireAuth role="learner"><ModuleQuizPage /></RequireAuth>} />
-      <Route path="/learner/simulation-runner" element={<RequireAuth role="learner"><SimulationRunnerPage /></RequireAuth>} />
-      <Route path="/learner/insights" element={<RequireAuth role="learner"><BehavioralInsightsPage /></RequireAuth>} />
-      <Route path="/learner/gamification" element={<RequireAuth role="learner"><GamificationPage /></RequireAuth>} />
-      <Route path="/learner/reward-catalog" element={<RequireAuth role="learner"><RewardCatalogPage /></RequireAuth>} />
+      <Route path="/learner/dashboard" element={<LearnerDashboard />} />
+      <Route path="/learner/modules" element={<LearnerModulesPage />} />
+      <Route path="/learner/modules/:moduleId" element={<ModuleDetailPage />} />
+      <Route path="/learner/simulations" element={<LearnerSimulationsPage />} />
+      <Route path="/learner/rewards" element={<LearnerRewardsPage />} />
+      <Route path="/learner/ai-coach" element={<AICoachPage />} />
+      <Route path="/learner/profile" element={<LearnerProfile />} />
+      <Route path="/learner/settings" element={<LearnerSettingsPage />} />
+      <Route path="/learner/analytics" element={<LearnerAnalyticsPage />} />
+      <Route path="/learner/lesson" element={<LessonViewPage />} />
+      <Route path="/learner/quiz" element={<ModuleQuizPage />} />
+      <Route path="/learner/simulation-runner" element={<SimulationRunnerPage />} />
+      <Route path="/learner/insights" element={<BehavioralInsightsPage />} />
+      <Route path="/learner/gamification" element={<GamificationPage />} />
+      <Route path="/learner/reward-catalog" element={<RewardCatalogPage />} />
 
       {/* Admin */}
-      <Route path="/admin/dashboard" element={<RequireAuth role="admin"><AdminDashboard /></RequireAuth>} />
-      <Route path="/admin/user-management" element={<RequireAuth role="admin"><UserManagementPage /></RequireAuth>} />
-      <Route path="/admin/module-manager" element={<RequireAuth role="admin"><ModuleManagerPage /></RequireAuth>} />
-      <Route path="/admin/simulation-manager" element={<RequireAuth role="admin"><SimulationManagerPage /></RequireAuth>} />
-      <Route path="/admin/rewards-manager" element={<RequireAuth role="admin"><RewardsManagerPage /></RequireAuth>} />
-      <Route path="/admin/analytics" element={<RequireAuth role="admin"><AnalyticsPage /></RequireAuth>} />
-      <Route path="/admin/profile" element={<RequireAuth role="admin"><AdminProfile /></RequireAuth>} />
+      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route path="/admin/user-management" element={<UserManagementPage />} />
+      <Route path="/admin/module-manager" element={<ModuleManagerPage />} />
+      <Route path="/admin/simulation-manager" element={<SimulationManagerPage />} />
+      <Route path="/admin/rewards-manager" element={<RewardsManagerPage />} />
+      <Route path="/admin/analytics" element={<AnalyticsPage />} />
+      <Route path="/admin/profile" element={<AdminProfile />} />
 
       {/* Partner */}
-      <Route path="/partner/dashboard" element={<RequireAuth role="partner"><PartnerDashboard /></RequireAuth>} />
-      <Route path="/partner/programs" element={<RequireAuth role="partner"><PartnerProgramsPage /></RequireAuth>} />
-      <Route path="/partner/impact" element={<RequireAuth role="partner"><PartnerImpactPage /></RequireAuth>} />
-      <Route path="/partner/profile" element={<RequireAuth role="partner"><PartnerProfile /></RequireAuth>} />
+      <Route path="/partner/dashboard" element={<PartnerDashboard />} />
+      <Route path="/partner/programs" element={<PartnerProgramsPage />} />
+      <Route path="/partner/impact" element={<PartnerImpactPage />} />
+      <Route path="/partner/profile" element={<PartnerProfile />} />
 
-      {/* Catch-all: redirect any unknown path */}
-      <Route path="*" element={<Navigate to={roleDashboard(user)} replace />} />
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
   );
 }

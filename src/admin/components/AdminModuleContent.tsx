@@ -7,9 +7,11 @@ type Props = {
   stats: Stat[];
   panelTitle: string;
   items: ListItem[];
+  onEdit?: (item: ListItem) => void;
+  onDelete?: (item: ListItem) => void;
 };
 
-export default function AdminModuleContent({ stats, panelTitle, items }: Props) {
+export default function AdminModuleContent({ stats, panelTitle, items, onEdit, onDelete }: Props) {
   return (
     <>
       <div className={styles.grid}>
@@ -33,6 +35,14 @@ export default function AdminModuleContent({ stats, panelTitle, items }: Props) 
             <li key={item.title}>
               <span>{item.title}</span>
               <span>{item.meta}</span>
+              <div className={styles.row}>
+                <button type="button" className={styles.action} onClick={() => onEdit?.(item)}>
+                  Edit
+                </button>
+                <button type="button" className={styles.actionDanger} onClick={() => onDelete?.(item)}>
+                  Delete
+                </button>
+              </div>
             </li>
           ))}
         </ul>
