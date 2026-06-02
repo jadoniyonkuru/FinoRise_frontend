@@ -7,3 +7,6 @@ export { rewardsService } from './services/rewards.service';
 export { behavioralService } from './services/behavioral.service';
 export { aiService } from './services/ai.service';
 export { partnerService } from './services/partner.service';
+export { simulationsService } from './services/simulations.service';
+export { adminService } from './services/admin.service';
+export { analyticsService } from './services/analytics.service';

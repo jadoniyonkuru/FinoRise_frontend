@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LearnerLayout from "../LearnerLayout";
+import { modulesService } from "@/api";
+import type { Lesson } from "@/api";
 import s from "./lesson-view.module.css";
 
 /* ─── Icons ─── */
@@ -42,28 +45,20 @@ function IconMaximize() {
     </svg>
   );
 }
-function IconCheck() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="11" fill="#0d9488" />
-      <polyline points="6 12 10 16 18 8" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-function IconLock() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" />
-      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-    </svg>
-  );
-}
 function IconCircle({ active }: { active?: boolean }) {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="10" fill="none"
         stroke={active ? "#6366f1" : "#d1d5db"} strokeWidth="2" />
       {active && <circle cx="12" cy="12" r="5" fill="#6366f1" />}
+    </svg>
+  );
+}
+function IconCheckCircle() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" fill="#dcfce7" stroke="#16a34a" strokeWidth="2" />
+      <polyline points="7 12 10 15 17 9" stroke="#16a34a" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -88,55 +83,22 @@ function IconChevRight() {
     </svg>
   );
 }
-function IconAI() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2a4 4 0 0 1 4 4v2H8V6a4 4 0 0 1 4-4z" />
-      <path d="M8 8H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-3" />
-      <circle cx="9" cy="14" r="1" fill="currentColor" />
-      <circle cx="15" cy="14" r="1" fill="currentColor" />
-    </svg>
-  );
+
+/* ─── Extract YouTube video ID from various URL formats ─── */
+function getYouTubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
 }
-
-/* ─── Curriculum data ─── */
-type LessonStatus = "completed" | "current" | "upcoming" | "locked";
-type CurriculumLesson = {
-  id: number;
-  title: string;
-  duration: string;
-  status: LessonStatus;
-  type: "video" | "quiz";
-};
-
-const curriculum: CurriculumLesson[] = [
-  { id: 1, title: "Fundamentals of Portfolio Theory", duration: "12:45", status: "completed", type: "video" },
-  { id: 2, title: "Risk vs. Reward Assessment",       duration: "08:20", status: "completed", type: "video" },
-  { id: 3, title: "Diversification Tactics",         duration: "15:10", status: "current",   type: "video" },
-  { id: 4, title: "Understanding Market Volatility", duration: "10:00", status: "upcoming",  type: "video" },
-  { id: 5, title: "Asset Allocation Workshop",       duration: "20:00", status: "locked",    type: "video" },
-  { id: 6, title: "Final Module Quiz",               duration: "15:00", status: "locked",    type: "quiz"  },
-];
-
-const keyLearnings = [
-  "Diversification reduces unsystematic risk by holding uncorrelated assets across sectors and geographies.",
-  "The Sharpe ratio measures return per unit of risk — diversification improves it by reducing volatility without reducing expected return.",
-  "Correlation coefficients below 1.0 indicate diversification benefit. Assets with negative correlation provide the strongest protection.",
-  "Modern Portfolio Theory shows there is an 'efficient frontier' — the optimal set of portfolios with maximum return for a given risk level.",
-  "Over-diversification beyond ~20–30 holdings adds minimal risk reduction but increases complexity and tracking costs.",
-];
 
 /* ─── Chart SVG for video background ─── */
 function ChartGraphic() {
   return (
     <svg viewBox="0 0 800 300" width="100%" height="100%"
       style={{ position: "absolute", inset: 0, width: "100%", height: "100%" }}>
-      {/* Bar chart */}
       {[60, 100, 80, 130, 110, 160, 140, 180].map((h, i) => (
         <rect key={i} x={80 + i * 55} y={280 - h} width={28} height={h}
           rx={4} fill="rgba(99,102,241,0.35)" />
       ))}
-      {/* Line chart */}
       <polyline
         points="80,220 135,190 190,200 245,150 300,165 355,110 410,125 465,80"
         fill="none" stroke="rgba(14,165,233,0.6)" strokeWidth="2.5"
@@ -145,32 +107,95 @@ function ChartGraphic() {
         <circle key={i} cx={80 + i * 55 + 14} cy={y} r={4}
           fill="rgba(14,165,233,0.9)" />
       ))}
-      {/* Donut */}
       <circle cx={650} cy={150} r={70} fill="none"
         stroke="rgba(99,102,241,0.2)" strokeWidth={20} />
       <circle cx={650} cy={150} r={70} fill="none"
         stroke="rgba(14,165,233,0.6)" strokeWidth={20}
         strokeDasharray="264 176" strokeDashoffset="88" />
-      <circle cx={650} cy={150} r={70} fill="none"
-        stroke="rgba(34,197,94,0.5)" strokeWidth={20}
-        strokeDasharray="110 330" strokeDashoffset="-176" />
     </svg>
   );
 }
 
 /* ─── Component ─── */
 export default function LessonViewPage() {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const moduleId = searchParams.get("moduleId") ?? "";
+  const lessonId = searchParams.get("lessonId") ?? "";
+
   const [playing, setPlaying] = useState(false);
-  const [activeTab, setActiveTab] = useState<"learnings" | "insight">("learnings");
-  const [activeLesson, setActiveLesson] = useState(3);
+  const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [curriculum, setCurriculum] = useState<Lesson[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [visited, setVisited] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem(`finorise_visited_${moduleId}`);
+      return new Set(raw ? JSON.parse(raw) : []);
+    } catch { return new Set(); }
+  });
 
-  const current = curriculum.find(l => l.id === activeLesson) || curriculum[2];
+  useEffect(() => {
+    if (!moduleId) { setLoading(false); return; }
 
-  function statusIcon(l: CurriculumLesson) {
-    if (l.status === "completed") return <IconCheck />;
-    if (l.status === "locked")    return <IconLock />;
-    if (l.status === "current")   return <IconCircle active />;
-    return <IconCircle />;
+    Promise.all([
+      lessonId ? modulesService.getLessonById(moduleId, lessonId) : Promise.resolve(null),
+      modulesService.getLessons(moduleId),
+    ])
+      .then(([currentLesson, allLessons]) => {
+        const sorted = allLessons.sort((a, b) => a.order_index - b.order_index);
+        setCurriculum(sorted);
+        if (currentLesson) {
+          setLesson(currentLesson);
+        } else if (sorted.length > 0) {
+          setLesson(sorted[0]);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [moduleId, lessonId]);
+
+  useEffect(() => {
+    if (!lesson?.id || !moduleId) return;
+    setVisited(prev => {
+      if (prev.has(lesson.id)) return prev;
+      const next = new Set(prev);
+      next.add(lesson.id);
+      localStorage.setItem(`finorise_visited_${moduleId}`, JSON.stringify([...next]));
+      return next;
+    });
+  }, [lesson?.id, moduleId]);
+
+  function goToLesson(l: Lesson) {
+    setLesson(l);
+    setSearchParams({ moduleId, lessonId: l.id });
+  }
+
+  const currentIndex = curriculum.findIndex(l => l.id === (lesson?.id ?? lessonId));
+  const prevLesson = currentIndex > 0 ? curriculum[currentIndex - 1] : null;
+  const nextLesson = currentIndex >= 0 && currentIndex < curriculum.length - 1
+    ? curriculum[currentIndex + 1]
+    : null;
+
+  if (loading) {
+    return (
+      <LearnerLayout>
+        <div style={{ padding: "2rem", color: "#6b7280" }}>Loading lesson…</div>
+      </LearnerLayout>
+    );
+  }
+
+  if (!lesson) {
+    return (
+      <LearnerLayout>
+        <div style={{ padding: "2rem", color: "#6b7280" }}>
+          Lesson not found.{" "}
+          <button type="button" onClick={() => navigate(`/learner/modules/${moduleId}`)}
+            style={{ color: "#0ea5e9", background: "none", border: "none", cursor: "pointer" }}>
+            Back to module
+          </button>
+        </div>
+      </LearnerLayout>
+    );
   }
 
   return (
@@ -181,23 +206,38 @@ export default function LessonViewPage() {
         <div className={s.header}>
           <div className={s.headerLeft}>
             <div className={s.titleRow}>
-              <h1 className={s.lessonTitle}>{current.title}</h1>
-              <span className={s.levelBadge}>Advanced</span>
+              <h1 className={s.lessonTitle}>{lesson.title}</h1>
             </div>
             <div className={s.breadcrumb}>
               <IconBook />
-              <span>Module 4: Market Dynamics</span>
+              <button
+                type="button"
+                style={{ background: "none", border: "none", cursor: "pointer", color: "inherit", fontSize: "inherit" }}
+                onClick={() => navigate(`/learner/modules/${moduleId}`)}
+              >
+                Back to module
+              </button>
               <span className={s.breadcrumbSep}>|</span>
-              <span>Lesson {activeLesson} of {curriculum.length}</span>
+              <span>
+                Lesson {currentIndex + 1} of {curriculum.length}
+              </span>
             </div>
           </div>
           <div className={s.headerNav}>
-            <button type="button" className={s.prevBtn}
-              onClick={() => setActiveLesson(l => Math.max(1, l - 1))}>
+            <button
+              type="button"
+              className={s.prevBtn}
+              disabled={!prevLesson}
+              onClick={() => prevLesson && goToLesson(prevLesson)}
+            >
               <IconChevLeft /> Previous
             </button>
-            <button type="button" className={s.nextBtn}
-              onClick={() => setActiveLesson(l => Math.min(curriculum.length, l + 1))}>
+            <button
+              type="button"
+              className={s.nextBtn}
+              disabled={!nextLesson}
+              onClick={() => nextLesson && goToLesson(nextLesson)}
+            >
               Next Lesson <IconChevRight />
             </button>
           </div>
@@ -207,95 +247,86 @@ export default function LessonViewPage() {
         <div className={s.body}>
           {/* Left: video + content */}
           <div className={s.videoCard}>
-            {/* Video player */}
-            <div className={s.videoPlayer} onClick={() => setPlaying(v => !v)}>
-              <div className={s.videoBg}><ChartGraphic /></div>
-              <div className={s.videoPlayBtn}>
-                <div className={s.playCircle}>
-                  {playing ? <IconPause /> : <IconPlay />}
-                </div>
+            {/* Video player — real embed when video_url is set, decorative fallback otherwise */}
+            {lesson.video_url && getYouTubeId(lesson.video_url) ? (
+              <div className={s.videoPlayer} style={{ padding: 0, overflow: "hidden" }}>
+                <iframe
+                  src={`https://www.youtube.com/embed/${getYouTubeId(lesson.video_url)}?rel=0&modestbranding=1`}
+                  title={lesson.title}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+                />
               </div>
-              <div className={s.videoControls}>
-                <div className={s.videoProgress}>
-                  <div className={s.videoProgressFill} style={{ width: "43%" }} />
-                </div>
-                <div className={s.controlsRow}>
-                  <div className={s.controlsLeft}>
-                    <button type="button" className={s.controlBtn}
-                      onClick={e => { e.stopPropagation(); setPlaying(v => !v); }}>
-                      {playing ? <IconPause /> : <IconPlay />}
-                    </button>
-                    <button type="button" className={s.controlBtn}
-                      onClick={e => e.stopPropagation()}>
-                      <IconVolume />
-                    </button>
-                    <span className={s.videoTime}>06:45 / 15:10</span>
-                  </div>
-                  <div className={s.controlsRight}>
-                    <button type="button" className={s.controlBtn}
-                      onClick={e => e.stopPropagation()}>
-                      <IconSettings />
-                    </button>
-                    <button type="button" className={s.controlBtn}
-                      onClick={e => e.stopPropagation()}>
-                      <IconMaximize />
-                    </button>
+            ) : (
+              <div className={s.videoPlayer} onClick={() => setPlaying(v => !v)}>
+                <div className={s.videoBg}><ChartGraphic /></div>
+                <div className={s.videoPlayBtn}>
+                  <div className={s.playCircle}>
+                    {playing ? <IconPause /> : <IconPlay />}
                   </div>
                 </div>
+                <div className={s.videoControls}>
+                  <div className={s.videoProgress}>
+                    <div className={s.videoProgressFill} style={{ width: "0%" }} />
+                  </div>
+                  <div className={s.controlsRow}>
+                    <div className={s.controlsLeft}>
+                      <button type="button" className={s.controlBtn}
+                        onClick={e => { e.stopPropagation(); setPlaying(v => !v); }}>
+                        {playing ? <IconPause /> : <IconPlay />}
+                      </button>
+                      <button type="button" className={s.controlBtn}
+                        onClick={e => e.stopPropagation()}>
+                        <IconVolume />
+                      </button>
+                    </div>
+                    <div className={s.controlsRight}>
+                      <button type="button" className={s.controlBtn}
+                        onClick={e => e.stopPropagation()}>
+                        <IconSettings />
+                      </button>
+                      <button type="button" className={s.controlBtn}
+                        onClick={e => e.stopPropagation()}>
+                        <IconMaximize />
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Lesson text */}
+            {/* Lesson text content */}
             <div className={s.lessonContent}>
-              <h2 className={s.lessonContentTitle}>Mastering Diversification Tactics</h2>
-              <p className={s.lessonContentText}>
-                Diversification is more than just "not putting all your eggs in one basket." In professional finance,
-                it is a mathematically-driven strategy to reduce unsystematic risk. By holding assets that are not
-                perfectly correlated, you can optimize your portfolio's Sharpe ratio — maximizing returns for a given
-                level of risk.
+              <h2 className={s.lessonContentTitle}>{lesson.title}</h2>
+              <p className={s.lessonContentText} style={{ whiteSpace: "pre-wrap" }}>
+                {lesson.content}
               </p>
+              {lesson.duration_minutes != null && (
+                <p style={{ color: "#9ca3af", fontSize: "0.8rem", marginTop: "0.75rem" }}>
+                  Estimated read time: {lesson.duration_minutes} min
+                </p>
+              )}
             </div>
 
-            {/* Bottom tabs */}
-            <div className={s.lessonTabs}>
-              <button
-                type="button"
-                className={`${s.lessonTab} ${activeTab === "learnings" ? s.lessonTabActive : ""}`}
-                onClick={() => setActiveTab("learnings")}
-              >
-                <IconBook /> Key Learnings
-              </button>
-              <button
-                type="button"
-                className={`${s.lessonTab} ${activeTab === "insight" ? s.lessonTabActive : ""}`}
-                onClick={() => setActiveTab("insight")}
-              >
-                <IconAI /> AI Insight
-              </button>
-            </div>
-
-            {/* Tab content */}
-            <div className={s.tabContent}>
-              {activeTab === "learnings" ? (
-                <ul className={s.keyLearningsList}>
-                  {keyLearnings.map((item, i) => (
-                    <li key={i} className={s.keyLearningsItem}>
-                      <span className={s.keyLearningsDot} />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+            {/* Next lesson / quiz action */}
+            <div style={{ padding: "1rem 1.5rem", borderTop: "1px solid #f3f4f6", display: "flex", gap: "0.75rem" }}>
+              {nextLesson ? (
+                <button type="button" className={s.nextBtn} onClick={() => goToLesson(nextLesson)}>
+                  Next Lesson <IconChevRight />
+                </button>
               ) : (
-                <div className={s.aiInsightBox}>
-                  <div className={s.aiInsightLabel}>
-                    <IconAI /> AI Insight
-                  </div>
-                  <p className={s.aiInsightText}>
-                    Based on your simulation performance, you tend to over-concentrate in technology assets (+34% vs
-                    benchmark). This lesson directly addresses that behavioral bias. After completing it, try the
-                    Portfolio Rebalancing simulation — learners who pair this lesson with that simulation show 28%
-                    better risk-adjusted outcomes in subsequent modules.
+                <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem", width: "100%" }}>
+                  <p style={{ fontSize: "0.8rem", color: "#6b7280", margin: 0 }}>
+                    You've reached the end of this module. Pass the quiz to earn XP and mark this module complete.
                   </p>
+                  <button
+                    type="button"
+                    className={s.nextBtn}
+                    onClick={() => navigate(`/learner/quiz?moduleId=${moduleId}`)}
+                  >
+                    Take Module Quiz <IconChevRight />
+                  </button>
                 </div>
               )}
             </div>
@@ -305,49 +336,42 @@ export default function LessonViewPage() {
           <div className={s.curriculumPanel}>
             <div className={s.curriculumTitle}>Module Curriculum</div>
 
-            <div className={s.progressRow}>
-              <span className={s.progressLabel}>Overall Progress</span>
-              <span className={s.progressPct}>65%</span>
-            </div>
-            <div className={s.progressBar}>
-              <div className={s.progressFill} style={{ width: "65%" }} />
-            </div>
-
             <div className={s.lessonList}>
               {curriculum.map((l) => (
                 <div
                   key={l.id}
-                  className={`${s.lessonItem} ${l.id === activeLesson ? s.lessonItemCurrent : ""}`}
-                  onClick={() => l.status !== "locked" && setActiveLesson(l.id)}
+                  className={`${s.lessonItem} ${l.id === lesson.id ? s.lessonItemCurrent : ""}`}
+                  onClick={() => goToLesson(l)}
+                  style={{ cursor: "pointer" }}
                 >
-                  <div className={s.lessonStatusIcon}>{statusIcon(l)}</div>
+                  <div className={s.lessonStatusIcon}>
+                    {l.id === lesson.id
+                      ? <IconCircle active />
+                      : visited.has(l.id)
+                        ? <IconCheckCircle />
+                        : <IconCircle />}
+                  </div>
                   <div className={s.lessonItemBody}>
                     <div className={s.lessonItemTitleRow}>
-                      <span className={`${s.lessonItemTitle} ${
-                        l.id === activeLesson ? s.lessonItemTitleCurrent
-                        : l.status === "locked" ? s.lessonItemTitleLocked : ""
-                      }`}>
+                      <span className={`${s.lessonItemTitle} ${l.id === lesson.id ? s.lessonItemTitleCurrent : ""}`}>
                         {l.title}
                       </span>
-                      {l.id === activeLesson && (
+                      {l.id === lesson.id && (
                         <span className={s.currentTag}>Current</span>
                       )}
                     </div>
-                    <div className={s.lessonItemMeta}>
-                      {l.type === "video"
-                        ? <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        : <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
-                      }
-                      {l.duration}
-                    </div>
+                    {l.duration_minutes != null && (
+                      <div className={s.lessonItemMeta}>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        {l.duration_minutes} min
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
-
-            <button type="button" className={s.viewResources}>
-              View Resources (4)
-            </button>
           </div>
         </div>
       </div>
