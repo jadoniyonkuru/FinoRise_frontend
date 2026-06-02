@@ -1,0 +1,55 @@
+/* Light mode (default portal dashboards) */
+html[data-theme="light"],
+html:not([data-theme]) {
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --surface-elevated: #f8fafc;
+  --border: #e4e7f3;
+  --text: #0f172a;
+  --text-muted: #64748b;
+  --shadow: 0 12px 26px rgba(15, 23, 42, 0.07);
+  --dash-input-bg: #ffffff;
+  --dash-hero-bg: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 45%, #ecfeff 100%);
+  --dash-hero-border: #bae6fd;
+  --dash-tab-active-bg: #0ea5e9;
+  --dash-tab-active-text: #ffffff;
+  --dash-tab-inactive-bg: #ffffff;
+  --dash-tab-inactive-text: #64748b;
+  --dash-trend-up-bg: #dbeafe;
+  --dash-trend-up-text: #1e40af;
+  --dash-modal-overlay: rgba(15, 23, 42, 0.45);
+  --dash-topbar-bg: #ffffff;
+}
+
+/* Dark mode */
+html[data-theme="dark"] {
+  --bg: #0d1117;
+  --surface: #1c2430;
+  --surface-elevated: #252f3d;
+  --border: #2f3d4f;
+  --text: #f0f4f8;
+  --text-muted: #94a3b8;
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  --dash-input-bg: #161f2a;
+  --dash-hero-bg: linear-gradient(135deg, #0f2744 0%, #152238 50%, #1a2d42 100%);
+  --dash-hero-border: #2f4a6b;
+  --dash-tab-active-bg: #2563eb;
+  --dash-tab-active-text: #ffffff;
+  --dash-tab-inactive-bg: #1c2430;
+  --dash-tab-inactive-text: #94a3b8;
+  --dash-trend-up-bg: rgba(37, 99, 235, 0.2);
+  --dash-trend-up-text: #93c5fd;
+  --dash-modal-overlay: rgba(0, 0, 0, 0.65);
+  --dash-topbar-bg: #161f2a;
+}
+
+html[data-theme="light"] body,
+html:not([data-theme]) body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+html[data-theme="dark"] body {
+  background: var(--bg);
+  color: var(--text);
+}
