@@ -2,19 +2,13 @@
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
-  background: #f8f9ff;
-  color: #0f172a;
-  --surface: #ffffff;
-  --surface-elevated: #f8fafc;
-  --border: #e4e7f3;
-  --text: #0f172a;
-  --text-muted: #64748b;
+  background: var(--bg);
+  color: var(--text);
   --radius: 14px;
-  --shadow: 0 12px 26px rgba(15, 23, 42, 0.07);
 }
 
 .sidebar {
-  background: #ffffff;
+  background: var(--surface);
   border-right: 1px solid var(--border);
   padding: 1.5rem;
   display: flex;
@@ -32,7 +26,7 @@
   font-weight: 700;
   font-size: 1.25rem;
   letter-spacing: -0.02em;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .roleBadge {
@@ -67,13 +61,13 @@
 }
 
 .navLink:hover {
-  color: #0f172a;
-  background: #f8fafc;
+  color: var(--text);
+  background: var(--surface-elevated);
 }
 
 .navActive {
-  background: #e0f2fe;
-  color: #0284c7;
+  background: color-mix(in srgb, var(--admin) 15%, var(--surface));
+  color: var(--admin-dim);
   font-weight: 700;
 }
 
@@ -116,7 +110,7 @@
   font-size: 1.75rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #0f172a;
+  color: var(--text);
 }
 
 .header p {

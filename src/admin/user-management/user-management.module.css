@@ -27,11 +27,11 @@
 .searchInput {
   width: 100%;
   padding: 0.6rem 0.9rem 0.6rem 2.35rem;
-  background: #fff;
-  border: 1px solid #e4e7f3;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 9px;
   font-size: 0.875rem;
-  color: #0f172a;
+  color: var(--text);
   outline: none;
   transition: border-color 0.15s;
   font-family: inherit;
@@ -68,8 +68,8 @@
   margin-bottom: 1.25rem;
 }
 
-.panelHeader h2 { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 700; color: #0f172a; }
-.panelHeader p  { margin: 0; color: #64748b; font-size: 0.84rem; }
+.panelHeader h2 { margin: 0 0 0.25rem; font-size: 1rem; font-weight: 700; color: var(--text); }
+.panelHeader p  { margin: 0; color: var(--text-muted); font-size: 0.84rem; }
 
 /* ── Filter tabs ── */
 .filterRow {
@@ -81,10 +81,10 @@
 
 .filterTab {
   padding: 0.38rem 0.9rem;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 999px;
-  background: #fff;
-  color: #64748b;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
@@ -92,7 +92,7 @@
   transition: all 0.15s;
 }
 
-.filterTab:hover { color: #0f172a; border-color: #94a3b8; }
+.filterTab:hover { color: var(--text); border-color: #94a3b8; }
 
 .filterTab[data-active="true"] {
   background: rgba(14,165,233,0.1);
@@ -115,9 +115,9 @@
   gap: 1rem;
   align-items: center;
   padding: 1rem 1.25rem;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 12px;
-  background: #fff;
+  background: var(--surface);
   box-shadow: 0 1px 3px rgba(15,23,42,0.04);
   transition: border-color 0.15s, box-shadow 0.15s;
 }
@@ -146,14 +146,14 @@
   flex-shrink: 0;
 }
 
-.userIdentity strong { display: block; color: #0f172a; font-size: 0.92rem; }
-.userIdentity span   { display: block; color: #64748b; font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; }
+.userIdentity strong { display: block; color: var(--text); font-size: 0.92rem; }
+.userIdentity span   { display: block; color: var(--text-muted); font-size: 0.78rem; overflow: hidden; text-overflow: ellipsis; }
 
 /* role column */
 .roleDetails { display: grid; gap: 0.35rem; }
 
 .roleDetails label {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -163,10 +163,10 @@
 .roleDetails select {
   width: 100%;
   min-height: 36px;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 8px;
   background: #f8fafc;
-  color: #0f172a;
+  color: var(--text);
   padding: 0.4rem 0.65rem;
   font-family: inherit;
   font-size: 0.875rem;
@@ -176,11 +176,11 @@
 }
 
 .roleDetails select:focus { border-color: #0ea5e9; }
-.roleDetails span { color: #64748b; font-size: 0.74rem; }
+.roleDetails span { color: var(--text-muted); font-size: 0.74rem; }
 
 /* status badge */
 .statusActive   { border-radius: 999px; padding: 0.25rem 0.7rem; background: rgba(34,197,94,0.1);  color: #16a34a; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
-.statusDisabled { border-radius: 999px; padding: 0.25rem 0.7rem; background: rgba(100,116,139,0.1); color: #64748b; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+.statusDisabled { border-radius: 999px; padding: 0.25rem 0.7rem; background: rgba(100,116,139,0.1); color: var(--text-muted); font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
 
 /* ── Action buttons ── */
 .actions {
@@ -194,10 +194,10 @@
   align-items: center;
   gap: 0.3rem;
   padding: 0.42rem 0.75rem;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
-  color: #0f172a;
+  background: var(--surface);
+  color: var(--text);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
@@ -241,7 +241,7 @@
 }
 
 .modal {
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   width: 100%;
@@ -255,7 +255,7 @@
 .modalTitle {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text);
   margin: 0;
 }
 
@@ -268,17 +268,17 @@
 .modalField label {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #64748b;
+  color: var(--text-muted);
   letter-spacing: 0.01em;
 }
 
 .modalInput,
 .modalSelect {
   padding: 0.65rem 0.85rem;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 9px;
   background: #f8fafc;
-  color: #0f172a;
+  color: var(--text);
   font-size: 0.9rem;
   font-family: inherit;
   outline: none;
@@ -294,13 +294,13 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 0.85rem;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 9px;
   background: #f8fafc;
 }
 
-.modalToggleLabel { font-size: 0.88rem; font-weight: 600; color: #0f172a; }
-.modalToggleSub   { font-size: 0.76rem; color: #64748b; }
+.modalToggleLabel { font-size: 0.88rem; font-weight: 600; color: var(--text); }
+.modalToggleSub   { font-size: 0.76rem; color: var(--text-muted); }
 
 .toggle {
   position: relative;
@@ -327,7 +327,7 @@
   height: 16px;
   left: 3px;
   top: 3px;
-  background: #fff;
+  background: var(--surface);
   border-radius: 50%;
   transition: transform 0.2s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.2);
@@ -346,10 +346,10 @@
 
 .btnCancel {
   padding: 0.6rem 1.25rem;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 9px;
-  background: #fff;
-  color: #64748b;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
@@ -357,7 +357,7 @@
   transition: border-color 0.15s;
 }
 
-.btnCancel:hover { border-color: #94a3b8; color: #0f172a; }
+.btnCancel:hover { border-color: #94a3b8; color: var(--text); }
 
 .btnSave {
   padding: 0.6rem 1.5rem;
@@ -376,7 +376,7 @@
 
 /* ── Delete confirm modal ── */
 .deleteModal {
-  background: #fff;
+  background: var(--surface);
   border-radius: 16px;
   padding: 2rem;
   width: 100%;
@@ -398,8 +398,8 @@
   justify-content: center;
 }
 
-.deleteTitle { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0; }
-.deleteDesc  { font-size: 0.875rem; color: #64748b; margin: 0; line-height: 1.5; }
+.deleteTitle { font-size: 1.1rem; font-weight: 800; color: var(--text); margin: 0; }
+.deleteDesc  { font-size: 0.875rem; color: var(--text-muted); margin: 0; line-height: 1.5; }
 
 .btnDeleteConfirm {
   padding: 0.6rem 1.25rem;

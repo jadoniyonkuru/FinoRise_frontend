@@ -39,8 +39,8 @@
 }
 
 .aStatCard {
-  background: #fff;
-  border: 1px solid #e4e7f3;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.1rem 1.15rem;
   display: flex;
@@ -80,8 +80,8 @@
 .aTrendDown    { background: rgba(239,68,68,0.12);  color: #dc2626; }
 .aTrendNeutral { background: rgba(251,191,36,0.12); color: #d97706; }
 
-.aStatLabel { font-size: 0.74rem; color: #64748b; }
-.aStatValue { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.03em; color: #0f172a; line-height: 1.1; }
+.aStatLabel { font-size: 0.74rem; color: var(--text-muted); }
+.aStatValue { font-size: 1.45rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); line-height: 1.1; }
 
 /* ── Charts row ── */
 .chartsRow {
@@ -92,8 +92,8 @@
 }
 
 .chartPanel {
-  background: #fff;
-  border: 1px solid #e4e7f3;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem;
   box-shadow: 0 1px 4px rgba(15,23,42,0.05);
@@ -104,28 +104,28 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #64748b;
+  color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
 .chartSvg { width: 100%; height: auto; display: block; overflow: visible; }
 
-.chartNote { font-size: 0.78rem; color: #64748b; margin-top: 0.65rem; }
-.chartNote strong { color: #0f172a; }
+.chartNote { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.65rem; }
+.chartNote strong { color: var(--text); }
 
 .donutWrap { display: flex; align-items: center; gap: 1rem; }
 
 .legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 0; }
 .legendItem { display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; }
 .legendDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.legendLabel { flex: 1; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.legendVal { font-weight: 700; color: #0f172a; font-size: 0.76rem; }
+.legendLabel { flex: 1; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legendVal { font-weight: 700; color: var(--text); font-size: 0.76rem; }
 .legendTotal {
   display: flex;
   justify-content: space-between;
   font-size: 0.76rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   border-top: 1px solid #e4e7f3;
   padding-top: 0.35rem;
   margin-top: 0.1rem;
@@ -140,21 +140,21 @@
 }
 
 .metaCard {
-  background: #fff;
-  border: 1px solid #e4e7f3;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.1rem 1.15rem;
   box-shadow: 0 1px 4px rgba(15,23,42,0.05);
 }
 
-.metaLabel { font-size: 0.74rem; color: #64748b; margin-bottom: 0.3rem; }
-.metaValue { font-size: 1.45rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em; line-height: 1.1; }
+.metaLabel { font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+.metaValue { font-size: 1.45rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; line-height: 1.1; }
 .metaHint  { font-size: 0.72rem; color: #94a3b8; margin-top: 0.2rem; }
 
 /* ── Program performance (analysis) ── */
 .perfPanel {
-  background: #fff;
-  border: 1px solid #e4e7f3;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem;
   box-shadow: 0 1px 4px rgba(15,23,42,0.05);
@@ -164,7 +164,7 @@
 .perfTitle {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text);
   margin: 0 0 1rem;
 }
 
@@ -182,8 +182,8 @@
   gap: 0.5rem;
 }
 
-.perfName { font-size: 0.84rem; font-weight: 600; color: #0f172a; }
-.perfMeta { font-size: 0.72rem; color: #64748b; white-space: nowrap; }
+.perfName { font-size: 0.84rem; font-weight: 600; color: var(--text); }
+.perfMeta { font-size: 0.72rem; color: var(--text-muted); white-space: nowrap; }
 
 .track {
   height: 6px;

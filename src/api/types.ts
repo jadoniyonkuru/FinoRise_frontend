@@ -18,6 +18,7 @@ export interface Module {
   category: string;
   difficulty: string;
   xp_reward: number;
+  is_published: boolean;
 }
 
 export type BadgeType = 'streak' | 'completion' | 'simulation' | 'special';
