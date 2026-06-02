@@ -13,7 +13,7 @@
 }
 
 .card[data-accent] {
-  border-color: #bae6fd;
+  border-color: color-mix(in srgb, var(--admin) 35%, var(--border));
 }
 
 .label {

@@ -7,8 +7,8 @@
   padding: 1.75rem 2rem;
   margin-bottom: 1.5rem;
   border-radius: 16px;
-  background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 45%, #ecfeff 100%);
-  border: 1px solid #bae6fd;
+  background: var(--dash-hero-bg);
+  border: 1px solid var(--dash-hero-border);
 }
 
 .heroContent {
@@ -19,7 +19,7 @@
 .heroTitle {
   font-size: 1.65rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.5rem;
   letter-spacing: -0.03em;
 }
@@ -30,7 +30,7 @@
 
 .heroText {
   font-size: 0.9rem;
-  color: #4b5563;
+  color: var(--text-muted);
   line-height: 1.55;
   margin: 0 0 1.25rem;
   max-width: 520px;
@@ -68,9 +68,9 @@
 }
 
 .btnSecondary {
-  background: #fff;
-  color: #374151;
-  border: 1.5px solid #e5e7eb;
+  background: var(--surface);
+  color: var(--text);
+  border: 1.5px solid var(--border);
 }
 
 .btnSecondary:hover {
@@ -113,10 +113,11 @@
 }
 
 .statCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem 1.35rem;
+  box-shadow: var(--shadow);
 }
 
 .statHeader {
@@ -131,7 +132,7 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .statIcon {
@@ -149,7 +150,7 @@
 .statNumber {
   font-size: 2rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.03em;
   line-height: 1;
 }
@@ -157,7 +158,7 @@
 .statDelta {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--dash-trend-up-text);
 }
 
 .statBadge {
@@ -168,7 +169,7 @@
 
 .progressBar {
   height: 8px;
-  background: #111827;
+  background: var(--surface-elevated);
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 0.65rem;
@@ -185,7 +186,7 @@
   justify-content: space-between;
   font-size: 0.78rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .scoreBar {
@@ -241,11 +242,11 @@
   flex: 1;
   margin: 0 0 1rem;
   padding: 0.85rem 1rem;
-  background: #e0f2fe;
+  background: color-mix(in srgb, var(--admin) 12%, var(--surface-elevated));
   border-radius: 10px;
   border-left: 3px solid #0ea5e9;
   font-size: 0.82rem;
-  color: #374151;
+  color: var(--text);
   line-height: 1.5;
   font-style: normal;
 }
@@ -369,10 +370,175 @@
   margin-top: 0.15rem;
 }
 
+/* ── Tab bar ── */
+.tabBar {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.3rem;
+  width: fit-content;
+  margin-bottom: 1.5rem;
+}
+
+.tabBtn {
+  padding: 0.45rem 1.25rem;
+  border: none;
+  background: transparent;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--dash-tab-inactive-text);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.tabBtn:hover { color: var(--text); }
+
+.tabBtn[data-active="true"] {
+  background: var(--dash-tab-active-bg);
+  color: var(--dash-tab-active-text);
+  box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+/* ── Analysis stat grid ── */
+.analysisGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.aStatCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: border-color 0.15s;
+}
+
+.aStatCard:hover { border-color: rgba(14,165,233,0.4); }
+
+.aStatTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.aStatIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.aTrend {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.18rem 0.45rem;
+  border-radius: 999px;
+}
+
+.aTrendUp      { background: var(--dash-trend-up-bg);  color: var(--dash-trend-up-text); }
+.aTrendDown    { background: rgba(239,68,68,0.12);  color: #dc2626; }
+.aTrendNeutral { background: rgba(251,191,36,0.12); color: #d97706; }
+
+.aStatLabel { font-size: 0.74rem; color: #6b7280; }
+.aStatValue { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; color: #111827; line-height: 1.1; }
+
+/* ── Charts row ── */
+.chartsRow {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(200px, 3fr) minmax(200px, 3fr);
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.chartPanel {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.25rem;
+}
+
+.chartTitle {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.chartSvg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.chartNote { font-size: 0.78rem; color: #6b7280; margin-top: 0.65rem; }
+.chartNote strong { color: #111827; }
+
+.donutWrap { display: flex; align-items: center; gap: 1rem; }
+
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 0; }
+
+.legendItem { display: flex; align-items: center; gap: 0.45rem; font-size: 0.76rem; }
+
+.legendDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+
+.legendLabel { flex: 1; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.legendVal { font-weight: 700; color: #111827; font-size: 0.76rem; }
+
+.legendTotal {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #111827;
+  border-top: 1px solid #e5e7eb;
+  padding-top: 0.35rem;
+  margin-top: 0.1rem;
+}
+
+/* ── Meta stats ── */
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+}
+
+.metaCard {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1.1rem 1.15rem;
+}
+
+.metaLabel { font-size: 0.74rem; color: #6b7280; margin-bottom: 0.3rem; }
+.metaValue { font-size: 1.45rem; font-weight: 800; color: #111827; letter-spacing: -0.02em; line-height: 1.1; }
+.metaHint  { font-size: 0.72rem; color: #9ca3af; margin-top: 0.2rem; }
+
 @media (max-width: 1100px) {
   .statsRow {
     grid-template-columns: 1fr;
   }
+  .chartsRow {
+    grid-template-columns: 1fr 1fr;
+  }
+  .chartsRow > :last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 768px) {
+  .chartsRow { grid-template-columns: 1fr; }
+  .analysisGrid { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
