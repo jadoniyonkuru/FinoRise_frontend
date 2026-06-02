@@ -23,14 +23,14 @@
 .pageTitle {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.45rem;
   letter-spacing: -0.025em;
 }
 
 .pageSubtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
   max-width: 480px;
@@ -39,10 +39,10 @@
 .headerStats {
   display: flex;
   flex-shrink: 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface);
 }
 
 .headerStat {
@@ -60,7 +60,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 0.35rem;
 }
 
@@ -68,7 +68,7 @@
   font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #111827;
+  color: var(--text);
 }
 
 .statValueAccent { color: #0ea5e9; }
@@ -98,7 +98,7 @@
   border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -107,7 +107,7 @@
   transition: color 0.15s;
 }
 
-.filterTab:hover { color: #374151; }
+.filterTab:hover { color: var(--text-muted); }
 
 .filterTabActive {
   background: #0ea5e9;
@@ -127,7 +127,7 @@
 .searchIcon {
   position: absolute;
   left: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   display: flex;
   pointer-events: none;
 }
@@ -138,14 +138,14 @@
   border-radius: 9px;
   font-size: 0.875rem;
   font-family: inherit;
-  color: #374151;
-  background: #fff;
+  color: var(--text-muted);
+  background: var(--surface);
   outline: none;
   width: 220px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.searchInput::placeholder { color: #9ca3af; }
+.searchInput::placeholder { color: var(--text-muted); }
 
 .searchInput:focus {
   border-color: #0ea5e9;
@@ -161,8 +161,8 @@
 
 /* ── Card ── */
 .card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
   display: flex;
@@ -212,10 +212,10 @@
   backdrop-filter: blur(4px);
 }
 
-.statusAvailable  { background: rgba(255,255,255,.9);  color: #374151; }
+.statusAvailable  { background: rgba(255,255,255,.9);  color: var(--text-muted); }
 .statusInProgress { background: rgba(255,237,0,.85);   color: #854d0e; }
 .statusCompleted  { background: rgba(220,252,231,.9);  color: #15803d; }
-.statusLocked     { background: rgba(255,255,255,.75); color: #6b7280; }
+.statusLocked     { background: rgba(255,255,255,.75); color: var(--text-muted); }
 
 /* Card body */
 .cardBody {
@@ -236,7 +236,7 @@
 .cardTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
   letter-spacing: -0.01em;
 }
@@ -258,7 +258,7 @@
 
 .cardDesc {
   font-size: 0.84rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.55;
   margin: 0;
   flex: 1;
@@ -280,8 +280,8 @@
   justify-content: space-between;
 }
 
-.progressLabel { font-size: 0.76rem; color: #9ca3af; font-weight: 500; }
-.progressPct   { font-size: 0.76rem; font-weight: 700; color: #6b7280; }
+.progressLabel { font-size: 0.76rem; color: var(--text-muted); font-weight: 500; }
+.progressPct   { font-size: 0.76rem; font-weight: 700; color: var(--text-muted); }
 
 .progressBar {
   height: 5px;
@@ -317,7 +317,7 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
@@ -366,7 +366,7 @@
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
   background: #f9fafb;
-  color: #374151;
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 600;
   font-family: inherit;
@@ -382,7 +382,7 @@
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
   background: #f9fafb;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 600;
   font-family: inherit;
@@ -394,7 +394,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 3rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
@@ -432,7 +432,7 @@
 .aiCalloutTitle {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.4rem;
   letter-spacing: -0.01em;
 }

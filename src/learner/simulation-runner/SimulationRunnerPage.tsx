@@ -171,16 +171,19 @@ export default function SimulationRunnerPage() {
   }
 
   if (error || !currentStep) {
+    const message = error || (simTitle
+      ? `"${simTitle}" has no scenarios configured yet. The admin needs to add steps to this simulation.`
+      : "Simulation not available — no scenarios have been added to it yet.");
     return (
       <LearnerLayout>
         <div style={{ padding: "2rem" }}>
-          <p style={{ color: "#6b7280" }}>{error || "Simulation not available."}</p>
+          <p style={{ color: "var(--text-muted)", marginBottom: "0.5rem" }}>{message}</p>
           <button
             type="button"
-            style={{ marginTop: "1rem", color: "#0ea5e9", background: "none", border: "none", cursor: "pointer" }}
+            style={{ color: "#0ea5e9", background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "0.9rem" }}
             onClick={() => navigate("/learner/simulations")}
           >
-            Back to Simulations
+            ← Back to Simulations
           </button>
         </div>
       </LearnerLayout>

@@ -1,4 +1,9 @@
+import { useEffect, useState } from "react";
 import styles from "./overview-dashboard.module.css";
+import { adminService } from "@/api/services/admin.service";
+import { modulesService } from "@/api/services/modules.service";
+import { simulationsService } from "@/api/services/simulations.service";
+import { rewardsService } from "@/api/services/rewards.service";
 
 function IconUsers() {
   return (
@@ -62,36 +67,26 @@ function IconCpu() {
   );
 }
 
-type Stat = {
-  label: string;
-  value: string;
-  trend: string;
-  trendType: "up" | "down" | "neutral";
-  icon: React.ReactNode;
-  color: string;
+type DashboardData = {
+  learners: number;
+  modules: number;
+  simulations: number;
+  rewards: number;
+  badges: number;
 };
-
-const stats: Stat[] = [
-  { label: "Learners", value: "1,284", trend: "+6.3%", trendType: "up", icon: <IconUsers />, color: "#1e40af" },
-  { label: "Learning Modules", value: "42", trend: "+8.2%", trendType: "up", icon: <IconBook />, color: "#c26a18" },
-  { label: "Active Simulations", value: "18", trend: "-2.4%", trendType: "down", icon: <IconTool />, color: "#2563eb" },
-  { label: "Reward Programs", value: "12", trend: "+1", trendType: "neutral", icon: <IconAward />, color: "#7c3aed" },
-  { label: "Total Funded", value: "RWF 4.2M", trend: "+12.5%", trendType: "up", icon: <IconDollar />, color: "#1d4ed8" },
-  { label: "AI Sessions", value: "1,847", trend: "+4.1%", trendType: "up", icon: <IconCpu />, color: "#0891b2" },
-];
-
-const distribution = [
-  { label: "Learners", value: 1284, color: "#1e3a8a" },
-  { label: "Modules", value: 42, color: "#f2b23d" },
-  { label: "Simulations", value: 312, color: "#4187e8" },
-  { label: "Rewards", value: 856, color: "#8a56e8" },
-];
 
 const months = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
 const monthlyRevenue = [89, 102, 96, 109, 114, 119, 125];
 const trendValues = [78, 104, 98, 116, 136, 128, 148];
 
-function DonutChart() {
+function DonutChart({ data }: { data: DashboardData }) {
+  const distribution = [
+    { label: "Learners", value: data.learners, color: "#1e3a8a" },
+    { label: "Modules", value: data.modules, color: "#f2b23d" },
+    { label: "Simulations", value: data.simulations, color: "#4187e8" },
+    { label: "Rewards", value: data.rewards, color: "#8a56e8" },
+  ];
+
   const radius = 58;
   const circumference = 2 * Math.PI * radius;
   const total = distribution.reduce((sum, item) => sum + item.value, 0);
@@ -102,10 +97,9 @@ function DonutChart() {
       <svg viewBox="0 0 180 180" className={styles.donutSvg}>
         <circle cx="90" cy="90" r={radius} fill="none" stroke="#edf1f6" strokeWidth="22" />
         {distribution.map((item) => {
-          const length = (item.value / total) * circumference;
+          const length = total > 0 ? (item.value / total) * circumference : 0;
           const dashOffset = offset;
           offset -= length;
-
           return (
             <circle
               key={item.label}
@@ -143,7 +137,6 @@ function DonutChart() {
 
 function BarChart() {
   const max = Math.max(...monthlyRevenue);
-
   return (
     <svg viewBox="0 0 560 230" className={styles.chartSvg}>
       <defs>
@@ -156,7 +149,6 @@ function BarChart() {
         const barHeight = (value / max) * 145;
         const x = 48 + index * 70;
         const y = 170 - barHeight;
-
         return (
           <g key={months[index]}>
             <text x={x + 17} y={y - 10} textAnchor="middle" className={styles.chartValue}>
@@ -209,6 +201,34 @@ function LineChart() {
 }
 
 export default function OverviewDashboard() {
+  const [data, setData] = useState<DashboardData>({ learners: 0, modules: 0, simulations: 0, rewards: 0, badges: 0 });
+
+  useEffect(() => {
+    Promise.all([
+      adminService.getAnalytics(),
+      modulesService.getAll(),
+      simulationsService.getAll(),
+      rewardsService.getAll(),
+    ]).then(([analytics, modules, sims, rewards]) => {
+      setData({
+        learners: analytics.total_learners,
+        modules: modules.length,
+        simulations: sims.filter(s => s.is_published).length,
+        rewards: rewards.filter(r => r.is_active).length,
+        badges: analytics.total_badges_awarded,
+      });
+    }).catch(() => {});
+  }, []);
+
+  const stats = [
+    { label: "Learners", value: data.learners.toLocaleString(), trend: "+6.3%", trendType: "up" as const, icon: <IconUsers />, color: "#1e40af" },
+    { label: "Learning Modules", value: String(data.modules), trend: "+8.2%", trendType: "up" as const, icon: <IconBook />, color: "#c26a18" },
+    { label: "Active Simulations", value: String(data.simulations), trend: "-2.4%", trendType: "down" as const, icon: <IconTool />, color: "#2563eb" },
+    { label: "Reward Programs", value: String(data.rewards), trend: "+1", trendType: "neutral" as const, icon: <IconAward />, color: "#7c3aed" },
+    { label: "Badges Awarded", value: data.badges.toLocaleString(), trend: "+12.5%", trendType: "up" as const, icon: <IconDollar />, color: "#1d4ed8" },
+    { label: "AI Sessions", value: "—", trend: "+4.1%", trendType: "up" as const, icon: <IconCpu />, color: "#0891b2" },
+  ];
+
   return (
     <section className={styles.root}>
       <div className={styles.statsGrid}>
@@ -231,7 +251,7 @@ export default function OverviewDashboard() {
       <div className={styles.analyticsGrid}>
         <article className={styles.panel}>
           <h2>Distribution Overview</h2>
-          <DonutChart />
+          <DonutChart data={data} />
         </article>
 
         <article className={styles.panel}>
@@ -246,7 +266,7 @@ export default function OverviewDashboard() {
           <h2>Learner Trend</h2>
           <LineChart />
           <p className={styles.panelNote}>
-            Current month: <strong>148 active learners</strong>
+            Current month: <strong>{data.learners} active learners</strong>
           </p>
         </article>
       </div>

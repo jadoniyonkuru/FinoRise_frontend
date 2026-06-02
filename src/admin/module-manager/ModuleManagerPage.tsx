@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/admin/AdminLayout";
 import s from "./module-manager.module.css";
+import { modulesService } from "@/api/services/modules.service";
 
 /* ── Icons ── */
 function SearchIcon() {
@@ -21,6 +22,7 @@ function BookIcon()    { return <svg width="16" height="16" viewBox="0 0 24 24" 
 function DraftIcon()   { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>; }
 function ArchiveIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>; }
 function LessonIcon()  { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>; }
+function AlertIcon()   { return <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>; }
 
 /* ── Types ── */
 type Status = "Published" | "Draft" | "Archived";
@@ -39,134 +41,67 @@ type Module = {
   accentColor: string;
 };
 
-/* ── Sample data ── */
-const SAMPLE_MODULES: Module[] = [
-  {
-    id: "1",
-    title: "Saving Basics",
-    description: "Foundational strategies for building consistent savings habits, setting goals, and understanding the psychology behind spending.",
-    category: "Personal Finance",
-    categoryColor: "#0ea5e9",
-    tagBg: "rgba(14,165,233,0.1)",
-    status: "Published",
-    lessons: 6,
-    learners: 342,
-    completion: 88,
-    accentColor: "#0ea5e9",
-  },
-  {
-    id: "2",
-    title: "Budgeting 101",
-    description: "Learn to create realistic budgets using the 50/30/20 rule, track expenses, and identify areas to cut spending.",
-    category: "Budgeting",
-    categoryColor: "#22c55e",
-    tagBg: "rgba(34,197,94,0.1)",
-    status: "Published",
-    lessons: 8,
-    learners: 287,
-    completion: 72,
-    accentColor: "#22c55e",
-  },
-  {
-    id: "3",
-    title: "Investment Fundamentals",
-    description: "Introduction to stocks, bonds, mutual funds and ETFs. Understand risk tolerance, diversification, and long-term wealth building.",
-    category: "Investing",
-    categoryColor: "#8b5cf6",
-    tagBg: "rgba(139,92,246,0.1)",
-    status: "Published",
-    lessons: 10,
-    learners: 198,
-    completion: 65,
-    accentColor: "#8b5cf6",
-  },
-  {
-    id: "4",
-    title: "Credit & Debt Management",
-    description: "Understand credit scores, how debt compounds, and proven strategies to pay off loans while protecting your financial health.",
-    category: "Debt",
-    categoryColor: "#f59e0b",
-    tagBg: "rgba(245,158,11,0.1)",
-    status: "Published",
-    lessons: 7,
-    learners: 156,
-    completion: 59,
-    accentColor: "#f59e0b",
-  },
-  {
-    id: "5",
-    title: "Emergency Funds",
-    description: "Why every household needs 3–6 months of expenses saved, how to build the fund step-by-step, and where to keep it.",
-    category: "Personal Finance",
-    categoryColor: "#0ea5e9",
-    tagBg: "rgba(14,165,233,0.1)",
-    status: "Published",
-    lessons: 5,
-    learners: 263,
-    completion: 81,
-    accentColor: "#0ea5e9",
-  },
-  {
-    id: "6",
-    title: "Understanding Market Volatility",
-    description: "Explore how markets fluctuate, the psychology of fear and greed, and how to stay calm and invested during downturns.",
-    category: "Investing",
-    categoryColor: "#8b5cf6",
-    tagBg: "rgba(139,92,246,0.1)",
-    status: "Draft",
-    lessons: 9,
+const CATEGORY_COLORS: Record<string, { color: string; bg: string; accent: string }> = {
+  "budgeting":          { color: "#22c55e", bg: "rgba(34,197,94,0.1)",   accent: "#22c55e" },
+  "investing":          { color: "#8b5cf6", bg: "rgba(139,92,246,0.1)", accent: "#8b5cf6" },
+  "debt":               { color: "#f59e0b", bg: "rgba(245,158,11,0.1)", accent: "#f59e0b" },
+  "savings":            { color: "#0ea5e9", bg: "rgba(14,165,233,0.1)", accent: "#0ea5e9" },
+  "personal finance":   { color: "#0ea5e9", bg: "rgba(14,165,233,0.1)", accent: "#0ea5e9" },
+  "emergency":          { color: "#0ea5e9", bg: "rgba(14,165,233,0.1)", accent: "#0ea5e9" },
+  "digital assets":     { color: "#f97316", bg: "rgba(249,115,22,0.1)", accent: "#f97316" },
+  "long-term planning": { color: "#64748b", bg: "rgba(100,116,139,0.1)", accent: "#94a3b8" },
+};
+
+function getCategoryStyle(category: string) {
+  const key = category.toLowerCase();
+  return CATEGORY_COLORS[key] ?? { color: "#64748b", bg: "rgba(100,116,139,0.1)", accent: "#64748b" };
+}
+
+function fromApiModule(m: { id: string; title: string; description: string; category: string; difficulty: string; xp_reward: number; is_published: boolean }, archivedIds: Set<string>): Module {
+  const st = getCategoryStyle(m.category);
+  const status: Status = archivedIds.has(m.id) ? "Archived" : m.is_published ? "Published" : "Draft";
+  return {
+    id: m.id,
+    title: m.title,
+    description: m.description,
+    category: m.category,
+    categoryColor: st.color,
+    tagBg: st.bg,
+    status,
+    lessons: 0,
     learners: 0,
     completion: 0,
-    accentColor: "#8b5cf6",
-  },
-  {
-    id: "7",
-    title: "Cryptocurrency Basics",
-    description: "A balanced introduction to digital assets — how blockchain works, the risks involved, and how to approach crypto responsibly.",
-    category: "Digital Assets",
-    categoryColor: "#f97316",
-    tagBg: "rgba(249,115,22,0.1)",
-    status: "Draft",
-    lessons: 4,
-    learners: 0,
-    completion: 0,
-    accentColor: "#f97316",
-  },
-  {
-    id: "8",
-    title: "Retirement Planning",
-    description: "Planning for retirement with pension schemes, voluntary savings accounts, and compound interest simulations.",
-    category: "Long-term Planning",
-    categoryColor: "#64748b",
-    tagBg: "rgba(100,116,139,0.1)",
-    status: "Archived",
-    lessons: 6,
-    learners: 45,
-    completion: 54,
-    accentColor: "#94a3b8",
-  },
-];
-
-/* ── Derived stats ── */
-const published = SAMPLE_MODULES.filter(m => m.status === "Published").length;
-const drafts     = SAMPLE_MODULES.filter(m => m.status === "Draft").length;
-const archived   = SAMPLE_MODULES.filter(m => m.status === "Archived").length;
-const totalLessons = SAMPLE_MODULES.reduce((a, m) => a + m.lessons, 0);
-
-const PAGE_STATS = [
-  { label: "Published modules", value: String(published), hint: "Live learning content",   iconBg: "rgba(34,197,94,0.1)",   iconColor: "#22c55e", badge: "+2 this month", badgeCls: "badgeGreen", icon: <BookIcon /> },
-  { label: "Draft modules",     value: String(drafts),    hint: "Being created",           iconBg: "rgba(251,191,36,0.1)",  iconColor: "#d97706", badge: "In progress",  badgeCls: "badgeAmber", icon: <DraftIcon /> },
-  { label: "Archived",          value: String(archived),  hint: "Hidden from learners",    iconBg: "rgba(100,116,139,0.1)", iconColor: "#64748b", badge: "Inactive",     badgeCls: "badgeGray",  icon: <ArchiveIcon /> },
-  { label: "Lessons total",     value: String(totalLessons), hint: "Across learning paths", iconBg: "rgba(14,165,233,0.1)", iconColor: "#0ea5e9", badge: "All paths",    badgeCls: "badgeBlue",  icon: <LessonIcon /> },
-];
+    accentColor: st.accent,
+  };
+}
 
 type Filter = "All" | Status;
 
 /* ── Component ── */
 export default function ModuleManagerPage() {
+  const [modules, setModules] = useState<Module[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [archivedIds, setArchivedIds] = useState<Set<string>>(new Set());
   const [filter, setFilter] = useState<Filter>("All");
   const [search, setSearch] = useState("");
-  const [modules, setModules] = useState<Module[]>(SAMPLE_MODULES);
+
+  /* Create modal */
+  const [showAdd, setShowAdd] = useState(false);
+  const [addForm, setAddForm] = useState({ title: "", description: "", category: "", difficulty: "beginner", xp_reward: 100 });
+  const [saving, setSaving] = useState(false);
+
+  /* Delete confirm */
+  const [deleteTarget, setDeleteTarget] = useState<Module | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    modulesService.getAll()
+      .then((data) => {
+        setModules(data.map(m => fromApiModule(m, archivedIds)));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const visible = modules.filter((m) => {
     const matchFilter = filter === "All" || m.status === filter;
@@ -175,12 +110,79 @@ export default function ModuleManagerPage() {
     return matchFilter && matchSearch;
   });
 
-  function handlePublish(id: string) {
-    setModules((prev) => prev.map((m) => m.id === id ? { ...m, status: "Published" as Status } : m));
+  const published = modules.filter(m => m.status === "Published").length;
+  const drafts     = modules.filter(m => m.status === "Draft").length;
+  const archived   = modules.filter(m => m.status === "Archived").length;
+  const totalLessons = modules.reduce((a, m) => a + m.lessons, 0);
+
+  const PAGE_STATS = [
+    { label: "Published modules", value: String(published), hint: "Live learning content",   iconBg: "rgba(34,197,94,0.1)",   iconColor: "#22c55e", badge: "Live",         badgeCls: "badgeGreen", icon: <BookIcon /> },
+    { label: "Draft modules",     value: String(drafts),    hint: "Being created",           iconBg: "rgba(251,191,36,0.1)",  iconColor: "#d97706", badge: "In progress",  badgeCls: "badgeAmber", icon: <DraftIcon /> },
+    { label: "Archived",          value: String(archived),  hint: "Hidden from learners",    iconBg: "rgba(100,116,139,0.1)", iconColor: "#64748b", badge: "Inactive",     badgeCls: "badgeGray",  icon: <ArchiveIcon /> },
+    { label: "Lessons total",     value: String(totalLessons), hint: "Across learning paths", iconBg: "rgba(14,165,233,0.1)", iconColor: "#0ea5e9", badge: "All paths",    badgeCls: "badgeBlue",  icon: <LessonIcon /> },
+  ];
+
+  async function handlePublish(id: string) {
+    try {
+      await modulesService.update(id, { is_published: true });
+      const newArchived = new Set(archivedIds);
+      newArchived.delete(id);
+      setArchivedIds(newArchived);
+      setModules(prev => prev.map(m => m.id === id ? { ...m, status: "Published" as Status } : m));
+    } catch { /* silent */ }
   }
 
-  function handleArchive(id: string) {
-    setModules((prev) => prev.map((m) => m.id === id ? { ...m, status: "Archived" as Status } : m));
+  async function handleArchive(id: string) {
+    const mod = modules.find(m => m.id === id);
+    if (!mod) return;
+    if (mod.status === "Archived") {
+      // Restore → Draft
+      const newArchived = new Set(archivedIds);
+      newArchived.delete(id);
+      setArchivedIds(newArchived);
+      setModules(prev => prev.map(m => m.id === id ? { ...m, status: "Draft" as Status } : m));
+    } else {
+      // Archive → set unpublished + mark archived locally
+      try {
+        await modulesService.update(id, { is_published: false });
+        const newArchived = new Set(archivedIds);
+        newArchived.add(id);
+        setArchivedIds(newArchived);
+        setModules(prev => prev.map(m => m.id === id ? { ...m, status: "Archived" as Status } : m));
+      } catch { /* silent */ }
+    }
+  }
+
+  async function handleCreate() {
+    if (!addForm.title.trim() || !addForm.description.trim()) return;
+    setSaving(true);
+    try {
+      const created = await modulesService.create({
+        title: addForm.title,
+        description: addForm.description,
+        category: addForm.category || "General",
+        difficulty: addForm.difficulty,
+        xp_reward: addForm.xp_reward,
+        is_published: false,
+      });
+      setModules(prev => [fromApiModule(created, archivedIds), ...prev]);
+      setShowAdd(false);
+      setAddForm({ title: "", description: "", category: "", difficulty: "beginner", xp_reward: 100 });
+    } catch { /* silent */ } finally {
+      setSaving(false);
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await modulesService.remove(deleteTarget.id);
+      setModules(prev => prev.filter(m => m.id !== deleteTarget.id));
+    } catch { /* silent */ } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   }
 
   return (
@@ -197,7 +199,7 @@ export default function ModuleManagerPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </label>
-        <button type="button" className={s.newBtn}>
+        <button type="button" className={s.newBtn} onClick={() => setShowAdd(true)}>
           <PlusIcon /> New Module
         </button>
       </div>
@@ -233,7 +235,9 @@ export default function ModuleManagerPage() {
       </div>
 
       {/* Module cards */}
-      {visible.length === 0 ? (
+      {loading ? (
+        <div className={s.empty}>Loading modules…</div>
+      ) : visible.length === 0 ? (
         <div className={s.empty}>No modules match your search or filter.</div>
       ) : (
         <div className={s.moduleGrid}>
@@ -255,9 +259,6 @@ export default function ModuleManagerPage() {
                 <div className={s.tagsRow}>
                   <span className={s.tag} style={{ background: m.tagBg, color: m.categoryColor }}>
                     {m.category}
-                  </span>
-                  <span className={s.tag} style={{ background: "rgba(100,116,139,0.08)", color: "#64748b" }}>
-                    {m.lessons} lessons
                   </span>
                 </div>
 
@@ -283,7 +284,6 @@ export default function ModuleManagerPage() {
               </div>
 
               <div className={s.actions}>
-                <button type="button" className={s.btnEdit}>Edit</button>
                 {m.status === "Draft" && (
                   <button type="button" className={s.btnPublish} onClick={() => handlePublish(m.id)}>
                     Publish
@@ -295,9 +295,82 @@ export default function ModuleManagerPage() {
                 <button type="button" className={s.btnArchive} onClick={() => handleArchive(m.id)}>
                   {m.status === "Archived" ? "Restore" : "Archive"}
                 </button>
+                <button type="button" className={s.btnDelete} onClick={() => setDeleteTarget(m)}>
+                  Delete
+                </button>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Create Module Modal ── */}
+      {showAdd && (
+        <div className={s.overlay} onClick={() => !saving && setShowAdd(false)}>
+          <div className={s.modal} onClick={e => e.stopPropagation()}>
+            <h3 className={s.modalTitle}>New Module</h3>
+
+            <div className={s.modalField}>
+              <label>Title</label>
+              <input className={s.modalInput} value={addForm.title}
+                onChange={e => setAddForm(f => ({ ...f, title: e.target.value }))} placeholder="Module title" />
+            </div>
+
+            <div className={s.modalField}>
+              <label>Description</label>
+              <textarea className={s.modalTextarea} value={addForm.description}
+                onChange={e => setAddForm(f => ({ ...f, description: e.target.value }))} placeholder="Brief description…" rows={3} />
+            </div>
+
+            <div className={s.modalField}>
+              <label>Category</label>
+              <input className={s.modalInput} value={addForm.category}
+                onChange={e => setAddForm(f => ({ ...f, category: e.target.value }))} placeholder="e.g. Budgeting, Investing…" />
+            </div>
+
+            <div className={s.modalRow}>
+              <div className={s.modalField}>
+                <label>Difficulty</label>
+                <select className={s.modalSelect} value={addForm.difficulty}
+                  onChange={e => setAddForm(f => ({ ...f, difficulty: e.target.value }))}>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+              <div className={s.modalField}>
+                <label>XP reward</label>
+                <input className={s.modalInput} type="number" min={0} value={addForm.xp_reward}
+                  onChange={e => setAddForm(f => ({ ...f, xp_reward: Number(e.target.value) }))} />
+              </div>
+            </div>
+
+            <div className={s.modalActions}>
+              <button type="button" className={s.btnCancel} onClick={() => setShowAdd(false)} disabled={saving}>Cancel</button>
+              <button type="button" className={s.btnSave} onClick={handleCreate} disabled={saving}>
+                {saving ? "Creating…" : "Create"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Delete Confirm Modal ── */}
+      {deleteTarget && (
+        <div className={s.overlay} onClick={() => !deleting && setDeleteTarget(null)}>
+          <div className={s.deleteModal} onClick={e => e.stopPropagation()}>
+            <div className={s.deleteIconWrap}><AlertIcon /></div>
+            <h3 className={s.deleteTitle}>Delete module?</h3>
+            <p className={s.deleteDesc}>
+              Delete <strong>{deleteTarget.title}</strong>? This removes all lessons and progress data and cannot be undone.
+            </p>
+            <div className={s.modalActions}>
+              <button type="button" className={s.btnCancel} onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</button>
+              <button type="button" className={s.btnDeleteConfirm} onClick={confirmDelete} disabled={deleting}>
+                {deleting ? "Deleting…" : "Yes, delete"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </AdminLayout>
