@@ -1,0 +1,100 @@
+/* Theme-aware cards (matches CSS module class name fragments) */
+
+[class*="userRow"],
+[class*="simRow"],
+[class*="rewardRow"],
+[class*="insightRow"],
+[class*="statCard"],
+[class*="aStatCard"],
+[class*="chartPanel"],
+[class*="metaCard"],
+[class*="moduleCard"],
+[class*="programCard"],
+[class*="actionCard"],
+[class*="perfPanel"],
+[class*="modal"]:not([class*="deleteModal"]) {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+[class*="userIdentity"] strong,
+[class*="simIdentity"] strong,
+[class*="rewardIdentity"] strong,
+[class*="insightIdentity"] strong,
+[class*="moduleTitle"],
+[class*="aStatValue"],
+[class*="metaValue"],
+[class*="panelHeader"] h2,
+[class*="chartTitle"],
+[class*="perfTitle"] {
+  color: var(--text) !important;
+}
+
+[class*="userIdentity"] span,
+[class*="simIdentity"] span,
+[class*="rewardIdentity"] span,
+[class*="insightIdentity"] span,
+[class*="configDetails"] span,
+[class*="configDetails"] label,
+[class*="aStatLabel"],
+[class*="metaLabel"],
+[class*="metaHint"],
+[class*="panelHeader"] p {
+  color: var(--text-muted) !important;
+}
+
+[class*="configDetails"] select,
+[class*="searchInput"],
+[class*="modalInput"],
+[class*="modalSelect"],
+[class*="modalTextarea"] {
+  background: var(--surface-elevated) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+[class*="searchInput"]::placeholder,
+[class*="modalInput"]::placeholder {
+  color: var(--text-muted) !important;
+}
+
+[class*="filterTab"] {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text-muted) !important;
+}
+
+[class*="filterTab"][data-active="true"] {
+  background: color-mix(in srgb, var(--admin) 12%, var(--surface)) !important;
+  color: var(--admin-dim) !important;
+  border-color: color-mix(in srgb, var(--admin) 35%, var(--border)) !important;
+}
+
+[class*="btnEdit"] {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+[class*="overlay"] {
+  background: var(--dash-modal-overlay) !important;
+}
+
+[class*="deleteModal"] {
+  background: var(--surface) !important;
+}
+
+[class*="empty"] {
+  color: var(--text-muted) !important;
+}
+
+[class*="tabBar"] {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+}
+
+[class*="tabBtn"][data-active="true"] {
+  background: var(--dash-tab-active-bg) !important;
+  color: var(--dash-tab-active-text) !important;
+}

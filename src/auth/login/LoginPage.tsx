@@ -84,11 +84,12 @@ function ShieldCheckIcon() {
   );
 }
 
-type Role = "learner" | "partner";
+type Role = "learner" | "partner" | "admin";
 
 const roles: { id: Role; label: string; description: string }[] = [
   { id: "learner", label: "Learner", description: "Learn & earn XP" },
   { id: "partner", label: "Partner", description: "Track impact" },
+  { id: "admin", label: "Admin", description: "Manage platform" },
 ];
 
 /* ── Data ── */
@@ -285,6 +286,10 @@ export default function LoginPage() {
             <p className={styles.cardFooter}>
               Don't have an account?{" "}
               <Link to="/auth/register">Sign up for free</Link>
+            </p>
+            <p className={styles.cardFooter}>
+              Are you an admin?{" "}
+              <Link to="/auth/admin-login">Admin portal →</Link>
             </p>
             <div className={styles.secureNote}>
               <ShieldCheckIcon />
