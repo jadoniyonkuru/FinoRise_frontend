@@ -12,10 +12,10 @@
 
 .statCard,
 .panel {
-  background: #ffffff;
-  border: 1px solid #e6eaf1;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.07);
+  box-shadow: var(--shadow);
 }
 
 .statCard {
@@ -58,8 +58,8 @@
 
 .trend[data-type="up"],
 .trend[data-type="neutral"] {
-  background: #e5f9ef;
-  color: #15803d;
+  background: var(--dash-trend-up-bg);
+  color: var(--dash-trend-up-text);
 }
 
 .trend[data-type="down"] {
@@ -73,12 +73,12 @@
 
 .statCard p {
   margin: 0;
-  color: #7b8492;
+  color: var(--text-muted);
   font-size: 0.88rem;
 }
 
 .statCard strong {
-  color: #0f172a;
+  color: var(--text);
   font-size: 1.75rem;
   line-height: 1;
   letter-spacing: 0;
@@ -98,7 +98,7 @@
 
 .panel h2 {
   margin: 0 0 1.25rem;
-  color: #1f2937;
+  color: var(--text);
   font-size: 0.78rem;
   font-weight: 900;
   text-transform: uppercase;
@@ -122,7 +122,7 @@
 .donutLabel {
   transform: rotate(90deg);
   transform-origin: 90px 90px;
-  fill: #0f172a;
+  fill: var(--text);
 }
 
 .donutTotal {
@@ -132,7 +132,7 @@
 
 .donutLabel {
   font-size: 0.75rem;
-  fill: #7b8492;
+  fill: var(--text-muted);
 }
 
 .legend {
@@ -149,12 +149,12 @@
   grid-template-columns: 10px 1fr auto;
   align-items: center;
   gap: 0.55rem;
-  color: #667085;
+  color: var(--text-muted);
   font-size: 0.84rem;
 }
 
 .legend strong {
-  color: #111827;
+  color: var(--text);
 }
 
 .legendDot {
@@ -183,13 +183,13 @@
 .panelNote {
   margin: 0.75rem 0 0;
   padding-top: 0.85rem;
-  border-top: 1px solid #edf1f6;
-  color: #7b8492;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
   font-size: 0.88rem;
 }
 
 .panelNote strong {
-  color: #526071;
+  color: var(--text);
 }
 
 @media (max-width: 1280px) {
