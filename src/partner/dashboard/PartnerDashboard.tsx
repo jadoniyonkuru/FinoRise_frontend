@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { partnerNavItems } from "../partnerNav";
+import { partnerService } from "@/api/services/partner.service";
+import type { PartnerDashboard as PartnerDashboardData, PartnerImpact } from "@/api/types";
 import statStyles from "@/components/StatCard.module.css";
 import x from "@/components/dashboard-extras.module.css";
 import s from "./partner-dashboard.module.css";
@@ -12,30 +14,32 @@ function IconDollar()   { return <svg width="16" height="16" viewBox="0 0 24 24"
 function IconTarget()   { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>; }
 function IconAward()    { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>; }
 function IconBriefcase(){ return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>; }
-function IconTrend()    { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>; }
+
+/* ── Constants ── */
+const CATEGORY_COLORS: Record<string, string> = {
+  budgeting:  "#0ea5e9",
+  investing:  "#8b5cf6",
+  emergency:  "#f59e0b",
+  debt:       "#1e40af",
+  loan:       "#10b981",
+  general:    "#6b7280",
+};
+
+const W = 380, H_C = 110, yBase = 135, bW = 28;
 
 /* ── Charts ── */
-const months = ["Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"];
-const W = 380, H_C = 110, yBase = 135, bW = 28;
-const sp = (W - months.length * bW) / (months.length + 1);
-
-const donutData = [
-  { label: "Youth Financial Literacy", value: 48, color: "#0ea5e9" },
-  { label: "Women Entrepreneurs",      value: 62, color: "#8b5cf6" },
-  { label: "Rural Savings Initiative", value: 46, color: "#1e40af" },
-];
-
-function DonutChart() {
+function DonutChart({ data }: { data: { label: string; value: number; color: string }[] }) {
   const r = 55, cx = 80, cy = 80, sw = 18;
   const C = 2 * Math.PI * r;
   const gap = 4;
-  const total = donutData.reduce((acc, d) => acc + d.value, 0);
-  const drawable = C - gap * donutData.length;
+  const total = data.reduce((acc, d) => acc + d.value, 0);
+  if (total === 0) return <svg viewBox="0 0 160 160" style={{ width: 130, height: 130 }}><circle cx={cx} cy={cy} r={r} fill="none" stroke="#e4e7f3" strokeWidth={sw} /></svg>;
+  const drawable = C - gap * data.length;
   let offset = C / 4;
   return (
     <svg viewBox="0 0 160 160" style={{ width: 130, height: 130, flexShrink: 0, display: "block" }}>
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#e4e7f3" strokeWidth={sw} />
-      {donutData.map((d) => {
+      {data.map((d) => {
         const len = (d.value / total) * drawable;
         const da = `${len} ${C - len}`;
         const co = offset;
@@ -47,15 +51,16 @@ function DonutChart() {
         );
       })}
       <text x={cx} y={cy - 5} textAnchor="middle" fontSize="16" fontWeight="700" fill="#0f172a">{total}</text>
-      <text x={cx} y={cy + 12} textAnchor="middle" fontSize="9" fill="#64748b">learners</text>
+      <text x={cx} y={cy + 12} textAnchor="middle" fontSize="9" fill="#64748b">programs</text>
     </svg>
   );
 }
 
-const enrollValues = [18, 22, 19, 28, 24, 21, 24];
-
-function EnrollBarChart() {
-  const max = Math.max(...enrollValues);
+function DifficultyBarChart({ breakdown }: { breakdown: Record<string, number> }) {
+  const labels = ["beginner", "intermediate", "advanced"];
+  const values = labels.map((l) => breakdown[l] ?? 0);
+  const max = Math.max(...values, 1);
+  const sp = (W - labels.length * bW) / (labels.length + 1);
   return (
     <svg viewBox={`0 0 ${W} 155`} style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}>
       <defs>
@@ -64,16 +69,15 @@ function EnrollBarChart() {
           <stop offset="100%" stopColor="#93c5fd" stopOpacity="0.4" />
         </linearGradient>
       </defs>
-      {enrollValues.map((v, i) => {
+      {values.map((v, i) => {
         const bh = (v / max) * H_C;
-        const x = sp + i * (bW + sp);
-        const y = yBase - bh;
+        const xPos = sp + i * (bW + sp);
+        const yPos = yBase - bh;
         return (
-          <g key={months[i]}>
-            <rect x={x} y={y} width={bW} height={bh} rx={4}
-              fill="url(#pGrad)" opacity={i === enrollValues.length - 1 ? 1 : 0.65} />
-            <text x={x + bW / 2} y={y - 4} textAnchor="middle" fontSize="8" fontWeight="600" fill="#64748b">{v}</text>
-            <text x={x + bW / 2} y={150} textAnchor="middle" fontSize="9" fill="#94a3b8">{months[i]}</text>
+          <g key={labels[i]}>
+            <rect x={xPos} y={yPos} width={bW} height={bh} rx={4} fill="url(#pGrad)" />
+            <text x={xPos + bW / 2} y={yPos - 4} textAnchor="middle" fontSize="8" fontWeight="600" fill="#64748b">{v}</text>
+            <text x={xPos + bW / 2} y={150} textAnchor="middle" fontSize="9" fill="#94a3b8">{labels[i].slice(0, 5)}</text>
           </g>
         );
       })}
@@ -81,79 +85,96 @@ function EnrollBarChart() {
   );
 }
 
-const completionValues = [55, 58, 62, 60, 65, 68, 72];
-
-function CompletionLineChart() {
-  const max = 80, min = 45;
-  const pts = completionValues.map((v, i) => ({
-    x: sp + i * (bW + sp) + bW / 2,
-    y: yBase - ((v - min) / (max - min)) * H_C,
-  }));
-  const lineStr = pts.map(p => `${p.x},${p.y}`).join(" ");
-  const areaStr = [`${pts[0].x},${yBase}`, ...pts.map(p => `${p.x},${p.y}`), `${pts[pts.length - 1].x},${yBase}`].join(" ");
+function XpBarChart({ programs }: { programs: { title: string; xp_reward: number }[] }) {
+  const shown = programs.slice(0, 7);
+  const max = Math.max(...shown.map((p) => p.xp_reward), 1);
+  const sp = (W - shown.length * bW) / (shown.length + 1);
   return (
     <svg viewBox={`0 0 ${W} 155`} style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}>
       <defs>
-        <linearGradient id="cGrad" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f59e0b" stopOpacity="0.25" />
-          <stop offset="100%" stopColor="#f59e0b" stopOpacity="0" />
+        <linearGradient id="xpGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#f59e0b" />
+          <stop offset="100%" stopColor="#fcd34d" stopOpacity="0.4" />
         </linearGradient>
       </defs>
-      <polygon points={areaStr} fill="url(#cGrad)" />
-      <polyline points={lineStr} fill="none" stroke="#f59e0b" strokeWidth="2.5"
-        strokeLinejoin="round" strokeLinecap="round" />
-      {pts.map((p, i) => (
-        <circle key={months[i]} cx={p.x} cy={p.y} r={4} fill="#fff" stroke="#f59e0b" strokeWidth="2.5" />
-      ))}
-      {months.map((m, i) => (
-        <text key={m} x={sp + i * (bW + sp) + bW / 2} y={150}
-          textAnchor="middle" fontSize="9" fill="#94a3b8">{m}</text>
-      ))}
+      {shown.map((p, i) => {
+        const bh = (p.xp_reward / max) * H_C;
+        const xPos = sp + i * (bW + sp);
+        const yPos = yBase - bh;
+        return (
+          <g key={p.title}>
+            <rect x={xPos} y={yPos} width={bW} height={bh} rx={4} fill="url(#xpGrad)" />
+            <text x={xPos + bW / 2} y={yPos - 4} textAnchor="middle" fontSize="8" fontWeight="600" fill="#64748b">{p.xp_reward}</text>
+            <text x={xPos + bW / 2} y={150} textAnchor="middle" fontSize="9" fill="#94a3b8">{p.title.slice(0, 4)}</text>
+          </g>
+        );
+      })}
     </svg>
   );
 }
 
-/* ── Data ── */
-const overviewStats = [
-  { label: "Funded learners",   value: "156",      hint: "Across 3 programs"  },
-  { label: "Contribution (YTD)",value: "RWF 4.2M", hint: "On track"           },
-  { label: "Active programs",   value: "3",        hint: "1 renewal due"      },
-  { label: "Impact score",      value: "92%",      hint: "Avg completion rate" },
-];
-
-const programs = [
-  { name: "Youth Financial Literacy", learners: 48, progress: 72, status: "Active" },
-  { name: "Women Entrepreneurs",      learners: 62, progress: 55, status: "Active" },
-  { name: "Rural Savings Initiative", learners: 46, progress: 30, status: "Pilot"  },
-];
-
-const actions = [
-  { label: "View programs",  sub: "3 active",       to: "/partner/programs" },
-  { label: "Impact report",  sub: "Latest insights", to: "/partner/impact"  },
-  { label: "Profile",        sub: "Update details",  to: "/partner/profile" },
-];
-
-type Stat = { label: string; value: string; trend: string; dir: "up" | "down" | "neutral"; iconBg: string; iconColor: string; icon: React.ReactNode };
-
-const analysisStats: Stat[] = [
-  { label: "Funded Learners",   value: "156",      trend: "+8",     dir: "up",      iconBg: "rgba(14,165,233,0.1)",  iconColor: "#0ea5e9", icon: <IconUsers /> },
-  { label: "Contribution YTD",  value: "RWF 4.2M", trend: "+12.5%", dir: "up",      iconBg: "rgba(30,64,175,0.1)",   iconColor: "#1d4ed8", icon: <IconDollar /> },
-  { label: "Avg Completion",    value: "72%",      trend: "+4%",    dir: "up",      iconBg: "rgba(251,191,36,0.1)",  iconColor: "#f59e0b", icon: <IconTarget /> },
-  { label: "Impact Score",      value: "92%",      trend: "+1%",    dir: "up",      iconBg: "rgba(139,92,246,0.1)",  iconColor: "#8b5cf6", icon: <IconAward /> },
-  { label: "Active Programs",   value: "3",        trend: "stable", dir: "neutral", iconBg: "rgba(14,165,233,0.1)",  iconColor: "#0ea5e9", icon: <IconBriefcase /> },
-  { label: "Avg XP / Learner",  value: "2,840",    trend: "+180",   dir: "up",      iconBg: "rgba(249,115,22,0.1)",  iconColor: "#f97316", icon: <IconTrend /> },
-];
-
-const metaStats = [
-  { label: "Avg completion rate",  value: "72%",               hint: "+4% vs last quarter" },
-  { label: "Learner retention",    value: "84%",               hint: "30-day return rate"   },
-  { label: "Total XP generated",   value: "442K",              hint: "Across all programs"  },
-  { label: "Best program",         value: "Women Entrep.",     hint: "Highest retention"    },
-];
-
 /* ── Component ── */
 export default function PartnerDashboard() {
   const [tab, setTab] = useState<"overview" | "analysis">("overview");
+  const [dashboard, setDashboard] = useState<PartnerDashboardData | null>(null);
+  const [impact, setImpact] = useState<PartnerImpact | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    Promise.all([partnerService.getDashboard(), partnerService.getImpact()])
+      .then(([dash, imp]) => {
+        setDashboard(dash);
+        setImpact(imp);
+      })
+      .catch(() => setError("Failed to load dashboard data"))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const impactStats = impact?.stats;
+  const dashStats = dashboard?.stats;
+
+  const overviewStats = [
+    { label: "Published programs", value: String(dashStats?.published_programs ?? "—"), hint: `${dashStats?.draft_programs ?? 0} in draft` },
+    { label: "Learners reached",   value: String(impactStats?.learners_reached ?? "—"),  hint: "Enrolled in programs" },
+    { label: "Total XP available", value: (impactStats?.total_xp_available ?? 0).toLocaleString(), hint: "Across all modules" },
+    { label: "Categories covered", value: String(impactStats?.categories_covered ?? "—"), hint: "Financial topics" },
+  ];
+
+  const donutData = Object.entries(impact?.category_breakdown ?? {}).map(([label, value]) => ({
+    label,
+    value: value as number,
+    color: CATEGORY_COLORS[label] ?? "#6b7280",
+  }));
+
+  const topCategory = donutData.length
+    ? donutData.reduce((a, b) => (a.value >= b.value ? a : b)).label
+    : "—";
+
+  const analysisStats = [
+    { label: "Published Programs", value: String(dashStats?.published_programs ?? "—"), trend: `${dashStats?.total_programs ?? 0} total`, dir: "neutral" as const, iconBg: "rgba(14,165,233,0.1)",  iconColor: "#0ea5e9", icon: <IconBriefcase /> },
+    { label: "Draft Programs",     value: String(dashStats?.draft_programs ?? "—"),     trend: "unpublished",                                                    dir: "neutral" as const, iconBg: "rgba(100,116,139,0.1)", iconColor: "#64748b", icon: <IconBriefcase /> },
+    { label: "Learners Reached",   value: String(impactStats?.learners_reached ?? "—"), trend: "enrolled",                                                       dir: "up"      as const, iconBg: "rgba(14,165,233,0.1)",  iconColor: "#0ea5e9", icon: <IconUsers /> },
+    { label: "Total XP Available", value: (impactStats?.total_xp_available ?? 0).toLocaleString(), trend: "XP",                                                 dir: "up"      as const, iconBg: "rgba(249,115,22,0.1)",  iconColor: "#f97316", icon: <IconDollar /> },
+    { label: "Categories Covered", value: String(impactStats?.categories_covered ?? "—"), trend: "topics",                                                      dir: "up"      as const, iconBg: "rgba(139,92,246,0.1)",  iconColor: "#8b5cf6", icon: <IconTarget /> },
+    { label: "Total Programs",     value: String(impactStats?.total_programs ?? "—"),   trend: "all programs",                                                   dir: "neutral" as const, iconBg: "rgba(251,191,36,0.1)",  iconColor: "#f59e0b", icon: <IconAward /> },
+  ];
+
+  const metaStats = [
+    { label: "Total programs",      value: String(impactStats?.total_programs ?? "—"),            hint: "All time" },
+    { label: "Published",           value: String(dashStats?.published_programs ?? "—"),           hint: "Live on platform" },
+    { label: "Learners reached",    value: String(impactStats?.learners_reached ?? "—"),           hint: "Enrolled users" },
+    { label: "Top category",        value: topCategory,                                            hint: "Most programs" },
+  ];
+
+  const actions = [
+    { label: "View programs",  sub: `${impactStats?.total_programs ?? 0} programs`,   to: "/partner/programs" },
+    { label: "Impact report",  sub: "Latest insights",                                 to: "/partner/impact"   },
+    { label: "Profile",        sub: "Update details",                                  to: "/partner/profile"  },
+  ];
+
+  const recentPrograms = dashboard?.recent_programs ?? [];
+  const allPrograms    = impact?.programs ?? [];
 
   return (
     <DashboardLayout
@@ -170,8 +191,11 @@ export default function PartnerDashboard() {
           <button className={s.tabBtn} data-active={String(tab === "analysis")} onClick={() => setTab("analysis")}>Analysis</button>
         </div>
 
+        {loading && <p style={{ color: "var(--text-2)", padding: "2rem 0" }}>Loading dashboard…</p>}
+        {error   && <p style={{ color: "var(--danger)", padding: "2rem 0" }}>{error}</p>}
+
         {/* ── Overview ── */}
-        {tab === "overview" && (
+        {!loading && !error && tab === "overview" && (
           <>
             <div className={statStyles.grid}>
               {overviewStats.map((st) => (
@@ -194,40 +218,43 @@ export default function PartnerDashboard() {
             </div>
 
             <section className={statStyles.panel} style={{ marginTop: "1.5rem" }}>
-              <h2>Active programs</h2>
+              <h2>Recent programs</h2>
+              {recentPrograms.length === 0 && (
+                <p style={{ color: "var(--text-2)", fontSize: "0.875rem" }}>No programs yet.</p>
+              )}
               <div className={x.programList}>
-                {programs.map((p) => (
-                  <div key={p.name} className={x.programCard}>
+                {recentPrograms.map((p) => (
+                  <div key={p.id} className={x.programCard}>
                     <div className={x.programBody}>
-                      <div className={x.programName}>{p.name}</div>
-                      <div className={x.programMeta}><span>{p.learners} learners enrolled</span></div>
-                      <div className={x.bar} style={{ maxWidth: 320 }}>
-                        <div className={x.fill} style={{ width: `${p.progress}%` }} />
+                      <div className={x.programName}>{p.title}</div>
+                      <div className={x.programMeta}>
+                        <span style={{ textTransform: "capitalize" }}>{p.category}</span>
+                        {" · "}
+                        <span style={{ textTransform: "capitalize" }}>{p.difficulty}</span>
+                        {" · "}
+                        <span>{p.xp_reward} XP</span>
                       </div>
-                      <div className={x.programProgressLabel}>{p.progress}% completion rate</div>
                     </div>
-                    <span className={`${x.tag} ${p.status === "Active" ? x.tagGreen : x.tagAmber}`}>
-                      {p.status}
+                    <span className={`${x.tag} ${p.is_published ? x.tagGreen : x.tagAmber}`}>
+                      {p.is_published ? "Published" : "Draft"}
                     </span>
                   </div>
                 ))}
               </div>
             </section>
 
-            <div className={x.aiInsightBanner}>
-              <div className={x.aiInsightLabel}>Impact insight</div>
-              <p className={x.aiInsightText}>
-                The Women Entrepreneurs program has a 15% drop-off after Module 4. Consider adding a
-                motivational nudge or mentorship check-in at that stage to improve retention.
-              </p>
-            </div>
+            {dashboard?.ai_insight && (
+              <div className={x.aiInsightBanner}>
+                <div className={x.aiInsightLabel}>AI impact insight</div>
+                <p className={x.aiInsightText}>{dashboard.ai_insight.insight_text}</p>
+              </div>
+            )}
           </>
         )}
 
         {/* ── Analysis ── */}
-        {tab === "analysis" && (
+        {!loading && !error && tab === "analysis" && (
           <>
-            {/* Stat cards */}
             <div className={s.analysisGrid}>
               {analysisStats.map((st) => (
                 <div key={st.label} className={s.aStatCard}>
@@ -241,55 +268,70 @@ export default function PartnerDashboard() {
               ))}
             </div>
 
-            {/* Charts */}
             <div className={s.chartsRow}>
-              {/* Donut */}
+              {/* Donut — category distribution */}
               <div className={s.chartPanel}>
-                <div className={s.chartTitle}>Program distribution</div>
+                <div className={s.chartTitle}>Programs by category</div>
                 <div className={s.donutWrap}>
-                  <DonutChart />
+                  <DonutChart data={donutData} />
                   <ul className={s.legend}>
                     {donutData.map((d) => (
                       <li key={d.label} className={s.legendItem}>
                         <span className={s.legendDot} style={{ background: d.color }} />
-                        <span className={s.legendLabel}>{d.label}</span>
+                        <span className={s.legendLabel} style={{ textTransform: "capitalize" }}>{d.label}</span>
                         <span className={s.legendVal}>{d.value}</span>
                       </li>
                     ))}
-                    <li className={s.legendTotal}>
-                      <span>Total</span>
-                      <span>{donutData.reduce((a, d) => a + d.value, 0)}</span>
-                    </li>
+                    {donutData.length > 0 && (
+                      <li className={s.legendTotal}>
+                        <span>Total</span>
+                        <span>{donutData.reduce((a, d) => a + d.value, 0)}</span>
+                      </li>
+                    )}
                   </ul>
                 </div>
               </div>
 
-              {/* Bar */}
+              {/* Bar — difficulty breakdown */}
               <div className={s.chartPanel}>
-                <div className={s.chartTitle}>Monthly enrollments</div>
-                <EnrollBarChart />
-                <div className={s.chartNote}>Current month: <strong>24 new learners</strong></div>
+                <div className={s.chartTitle}>Programs by difficulty</div>
+                <DifficultyBarChart breakdown={impact?.difficulty_breakdown ?? {}} />
+                <div className={s.chartNote}>
+                  Beginner · Intermediate · Advanced
+                </div>
               </div>
 
-              {/* Line */}
+              {/* Bar — XP reward per program */}
               <div className={s.chartPanel}>
-                <div className={s.chartTitle}>Completion rate trend</div>
-                <CompletionLineChart />
-                <div className={s.chartNote}>Current rate: <strong>72% avg</strong></div>
+                <div className={s.chartTitle}>XP reward per program</div>
+                {allPrograms.length > 0
+                  ? <XpBarChart programs={allPrograms} />
+                  : <p style={{ color: "var(--text-2)", fontSize: "0.875rem", paddingTop: "1rem" }}>No programs yet.</p>
+                }
+                {allPrograms.length > 0 && (
+                  <div className={s.chartNote}>
+                    Max: <strong>{Math.max(...allPrograms.map((p) => p.xp_reward))} XP</strong>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Program performance */}
             <div className={s.perfPanel}>
-              <h3 className={s.perfTitle}>Program performance breakdown</h3>
-              {programs.map((p) => (
-                <div key={p.name} className={s.perfItem}>
+              <h3 className={s.perfTitle}>All programs</h3>
+              {allPrograms.length === 0 && (
+                <p style={{ color: "var(--text-2)", fontSize: "0.875rem" }}>No programs yet.</p>
+              )}
+              {allPrograms.map((p) => (
+                <div key={p.id} className={s.perfItem}>
                   <div className={s.perfHeader}>
-                    <span className={s.perfName}>{p.name}</span>
-                    <span className={s.perfMeta}>{p.learners} learners · {p.progress}% completion</span>
+                    <span className={s.perfName}>{p.title}</span>
+                    <span className={s.perfMeta} style={{ textTransform: "capitalize" }}>
+                      {p.category} · {p.difficulty} · {p.xp_reward} XP · {p.is_published ? "Published" : "Draft"}
+                    </span>
                   </div>
                   <div className={s.track}>
-                    <div className={s.fill} style={{ width: `${p.progress}%` }} />
+                    <div className={s.fill} style={{ width: `${Math.min((p.xp_reward / 500) * 100, 100)}%` }} />
                   </div>
                 </div>
               ))}
@@ -300,7 +342,7 @@ export default function PartnerDashboard() {
               {metaStats.map((m) => (
                 <div key={m.label} className={s.metaCard}>
                   <div className={s.metaLabel}>{m.label}</div>
-                  <div className={s.metaValue}>{m.value}</div>
+                  <div className={s.metaValue} style={{ textTransform: "capitalize" }}>{m.value}</div>
                   <div className={s.metaHint}>{m.hint}</div>
                 </div>
               ))}

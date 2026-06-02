@@ -23,14 +23,14 @@
 .pageTitle {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.45rem;
   letter-spacing: -0.025em;
 }
 
 .pageSubtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0;
   max-width: 480px;
@@ -39,10 +39,10 @@
 .headerStats {
   display: flex;
   flex-shrink: 0;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
-  background: #fff;
+  background: var(--surface);
 }
 
 .headerStat {
@@ -60,7 +60,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 0.35rem;
 }
 
@@ -68,7 +68,7 @@
   font-size: 1.35rem;
   font-weight: 800;
   letter-spacing: -0.02em;
-  color: #111827;
+  color: var(--text);
 }
 
 .statValueAccent {
@@ -99,7 +99,7 @@
   border-radius: 999px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -109,7 +109,7 @@
 }
 
 .filterTab:hover {
-  color: #374151;
+  color: var(--text-muted);
 }
 
 .filterTabActive {
@@ -132,7 +132,7 @@
 .searchIcon {
   position: absolute;
   left: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   display: flex;
   pointer-events: none;
 }
@@ -143,15 +143,15 @@
   border-radius: 9px;
   font-size: 0.875rem;
   font-family: inherit;
-  color: #374151;
-  background: #fff;
+  color: var(--text-muted);
+  background: var(--surface);
   outline: none;
   width: 220px;
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
 .searchInput::placeholder {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .searchInput:focus {
@@ -168,8 +168,8 @@
 
 /* ── Module card ── */
 .card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.4rem;
   display: flex;
@@ -234,14 +234,14 @@
 .cardTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
   letter-spacing: -0.01em;
 }
 
 .cardDesc {
   font-size: 0.84rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.55;
   margin: 0;
   flex: 1;
@@ -267,13 +267,13 @@
 .progressLabel {
   font-size: 0.77rem;
   font-weight: 500;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .progressPct {
   font-size: 0.77rem;
   font-weight: 700;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .progressBar {
@@ -316,7 +316,7 @@
   align-items: center;
   gap: 0.25rem;
   font-size: 0.76rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   white-space: nowrap;
 }
 
@@ -334,8 +334,8 @@
   padding: 0.45rem 0.95rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
-  background: #fff;
-  color: #374151;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 600;
   font-family: inherit;
@@ -390,7 +390,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 3rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
