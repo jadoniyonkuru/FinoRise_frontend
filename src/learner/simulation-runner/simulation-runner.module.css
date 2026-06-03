@@ -45,7 +45,7 @@
 .topBarTitle {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--text-muted);
 }
 
 .topBarRight {
@@ -70,7 +70,7 @@
 .stepCount {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 /* ── Progress bar ── */
@@ -100,8 +100,8 @@
 
 /* ── Left: context panel ── */
 .contextCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.5rem 1.6rem;
   margin-bottom: 1.1rem;
@@ -123,14 +123,14 @@
 .contextTitle {
   font-size: 1.25rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.85rem;
   letter-spacing: -0.02em;
 }
 
 .contextScenario {
   font-size: 0.9rem;
-  color: #374151;
+  color: var(--text-muted);
   line-height: 1.7;
   margin: 0 0 1.1rem;
 }
@@ -151,8 +151,8 @@
 
 /* ── Debt snapshot ── */
 .snapshotCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
 }
@@ -162,7 +162,7 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 0.85rem;
 }
 
@@ -186,7 +186,7 @@
 .debtLabel {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
@@ -201,7 +201,7 @@
 .debtBalance {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
 }
 
 .debtRate {
@@ -215,7 +215,7 @@
 
 .debtMin {
   font-size: 0.72rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .debtTotal {
@@ -226,19 +226,19 @@
   border-top: 1px solid #f3f4f6;
   font-size: 0.82rem;
   font-weight: 700;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .debtTotalValue {
   font-size: 1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
 }
 
 /* ── Right: decision panel ── */
 .decisionCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.5rem 1.6rem;
   position: sticky;
@@ -248,13 +248,13 @@
 .decisionTitle {
   font-size: 1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.3rem;
 }
 
 .decisionSubtitle {
   font-size: 0.82rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0 0 1.25rem;
 }
 
@@ -274,7 +274,7 @@
   padding: 0.85rem 1rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   font-family: inherit;
   cursor: pointer;
   text-align: left;
@@ -305,7 +305,7 @@
   justify-content: center;
   font-size: 0.7rem;
   font-weight: 800;
-  color: #9ca3af;
+  color: var(--text-muted);
   transition: all 0.15s;
 }
 
@@ -320,13 +320,13 @@
 .choiceLabel {
   font-size: 0.875rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 0.2rem;
 }
 
 .choiceDesc {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.5;
 }
 
@@ -415,8 +415,8 @@
 .resultsCard {
   width: 100%;
   max-width: 600px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 2.25rem 2.25rem 2rem;
   display: flex;
@@ -439,14 +439,14 @@
 .resultsTitle {
   font-size: 1.5rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.5rem;
   letter-spacing: -0.02em;
 }
 
 .resultsSubtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0 0 1.75rem;
   text-align: center;
@@ -457,7 +457,7 @@
   display: flex;
   align-items: center;
   background: #f9fafb;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.25rem 2rem;
   width: 100%;
@@ -469,7 +469,7 @@
 .resultsStatValue {
   font-size: 1.6rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.03em;
   line-height: 1;
   margin-bottom: 0.3rem;
@@ -482,7 +482,7 @@
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .resultsDivider {
@@ -528,13 +528,13 @@
 .recapTitle {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--text-muted);
   margin-bottom: 0.2rem;
 }
 
 .recapChoice {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .resultsActions {
@@ -552,11 +552,11 @@
   padding: 0.7rem 1rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-muted);
   cursor: pointer;
   transition: border-color 0.15s, color 0.15s;
 }

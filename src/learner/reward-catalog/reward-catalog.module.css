@@ -11,14 +11,14 @@
 .pageTitle {
   font-size: 1.75rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.35rem;
   letter-spacing: -0.03em;
 }
 
 .pageSubtitle {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin: 0;
   line-height: 1.6;
 }
@@ -27,8 +27,8 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 0.65rem 1.1rem;
   flex-shrink: 0;
@@ -49,13 +49,13 @@
 .streakTitle {
   font-size: 0.78rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   line-height: 1.2;
 }
 
 .streakSub {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 /* ── XP Wallet banner ── */
@@ -63,8 +63,8 @@
   display: flex;
   align-items: center;
   gap: 1.25rem;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -90,14 +90,14 @@
 .walletTitle {
   font-size: 1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 0.15rem;
   letter-spacing: -0.01em;
 }
 
 .walletSub {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 0.65rem;
 }
 
@@ -110,7 +110,7 @@
 .walletLevelLabel {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #374151;
+  color: var(--text-muted);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -132,7 +132,7 @@
 
 .walletLevelNext {
   font-size: 0.72rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -155,7 +155,7 @@
 .walletXpLabel {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 /* ── Filter bar ── */
@@ -186,18 +186,18 @@
   font-family: inherit;
   font-size: 0.84rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   background: transparent;
   cursor: pointer;
   transition: all 0.15s;
   white-space: nowrap;
 }
 
-.tabBtn:hover { color: #374151; }
+.tabBtn:hover { color: var(--text-muted); }
 
 .tabBtnActive {
-  background: #fff;
-  color: #111827;
+  background: var(--surface);
+  color: var(--text);
   box-shadow: 0 1px 4px rgba(0,0,0,.08);
 }
 
@@ -216,7 +216,7 @@
 .searchIcon {
   position: absolute;
   left: 0.7rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   pointer-events: none;
 }
 
@@ -226,8 +226,8 @@
   border-radius: 9px;
   font-family: inherit;
   font-size: 0.84rem;
-  color: #374151;
-  background: #fff;
+  color: var(--text-muted);
+  background: var(--surface);
   outline: none;
   width: 200px;
   transition: border-color 0.15s, box-shadow 0.15s;
@@ -241,8 +241,8 @@
   height: 36px;
   border: 1.5px solid #e5e7eb;
   border-radius: 9px;
-  background: #fff;
-  color: #6b7280;
+  background: var(--surface);
+  color: var(--text-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -261,8 +261,8 @@
 }
 
 .card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -334,7 +334,7 @@
 .cardName {
   font-size: 0.95rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin-bottom: 0.15rem;
   letter-spacing: -0.01em;
   line-height: 1.3;
@@ -343,13 +343,13 @@
 .cardPartner {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 0.5rem;
 }
 
 .cardDesc {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.55;
   flex: 1;
   margin-bottom: 0.9rem;
@@ -391,7 +391,7 @@
 
 .redeemBtnDisabled {
   background: #f3f4f6;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.78rem;
   cursor: not-allowed;
 }
@@ -400,14 +400,14 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 3rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   font-size: 0.95rem;
 }
 
 /* ── History ── */
 .historyCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -423,12 +423,12 @@
 .historyTitle {
   font-size: 0.9rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
 }
 
 .historySub {
   font-size: 0.78rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .historyRow {
@@ -458,13 +458,13 @@
 .historyName {
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-muted);
   margin-bottom: 0.15rem;
 }
 
 .historyDate {
   font-size: 0.72rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .historyCost {
@@ -498,7 +498,7 @@
 }
 
 .modal {
-  background: #fff;
+  background: var(--surface);
   border-radius: 18px;
   width: 100%;
   max-width: 380px;
@@ -526,7 +526,7 @@
 .modalTitle {
   font-size: 1.15rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 1.25rem 0 0.4rem;
   text-align: center;
   padding: 0 1.75rem;
@@ -534,7 +534,7 @@
 
 .modalDesc {
   font-size: 0.82rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.6;
   margin: 0 0 1rem;
   text-align: center;
@@ -556,7 +556,7 @@
 
 .modalBalance {
   font-size: 0.72rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 1.25rem;
   text-align: center;
 }
@@ -573,11 +573,11 @@
   padding: 0.65rem 1rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 10px;
-  background: #fff;
+  background: var(--surface);
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #374151;
+  color: var(--text-muted);
   cursor: pointer;
   transition: border-color 0.15s;
 }

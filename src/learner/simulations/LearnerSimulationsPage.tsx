@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LearnerLayout from "../LearnerLayout";
+import { simulationsService } from "@/api";
+import type { Simulation, SimulationAttempt } from "@/api";
 import s from "./simulations.module.css";
 
 /* ── Icons ── */
@@ -18,24 +20,10 @@ function SearchIcon() {
     </svg>
   );
 }
-function ClockIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-    </svg>
-  );
-}
 function BoltIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
       <path d="M13 2L4.5 13.5H11L9.5 22L20 10.5H13.5L13 2Z" />
-    </svg>
-  );
-}
-function LockIcon() {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
     </svg>
   );
 }
@@ -68,35 +56,11 @@ function BriefcaseIcon() {
     </svg>
   );
 }
-function HomeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
-    </svg>
-  );
-}
 function RepeatIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
       <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" />
       <polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
-    </svg>
-  );
-}
-function SparkleIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
-    </svg>
-  );
-}
-function BuildingIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="2" y="7" width="9" height="14" /><rect x="13" y="3" width="9" height="18" />
-      <line x1="2" y1="21" x2="22" y2="21" />
-      <line x1="6" y1="11" x2="7" y2="11" /><line x1="6" y1="15" x2="7" y2="15" />
-      <line x1="17" y1="7" x2="18" y2="7" /><line x1="17" y1="11" x2="18" y2="11" /><line x1="17" y1="15" x2="18" y2="15" />
     </svg>
   );
 }
@@ -116,166 +80,89 @@ function ArrowRightIcon() {
   );
 }
 
-/* ── Types ── */
-type Difficulty = "Beginner" | "Intermediate" | "Advanced";
-type Category   = "Budgeting" | "Investing" | "Emergency" | "Business" | "Planning" | "Crisis" | "Retirement" | "Real Estate";
-type Status     = "available" | "in-progress" | "completed" | "locked";
+/* ── UI helpers ── */
+type Status = "available" | "in-progress" | "completed";
 
-type Simulation = {
-  id: number;
-  category: Category;
+type UISimulation = {
+  id: string;
+  category: string;
   title: string;
   description: string;
-  difficulty: Difficulty;
-  duration: string;
+  difficulty: string;
   xp: number;
   status: Status;
-  progress?: number;
   headerBg: string;
   icon: React.ReactNode;
 };
 
-/* ── Data ── */
-const simulations: Simulation[] = [
-  {
-    id: 1,
-    category: "Budgeting",
-    title: "Monthly Budget Challenge",
-    description: "Manage a full month of income and expenses. Allocate funds across needs, savings, and discretionary spending.",
-    difficulty: "Beginner",
-    duration: "15 mins",
-    xp: 400,
-    status: "completed",
-    headerBg: "linear-gradient(135deg,#16a34a,#4ade80)",
-    icon: <WalletIcon />,
-  },
-  {
-    id: 2,
-    category: "Budgeting",
-    title: "Debt Payoff Strategy",
-    description: "Avalanche vs. snowball — choose a debt payoff method and simulate the 24-month outcome across 3 loans.",
-    difficulty: "Intermediate",
-    duration: "20 mins",
-    xp: 600,
-    status: "in-progress",
-    progress: 65,
-    headerBg: "linear-gradient(135deg,#0ea5e9,#38bdf8)",
-    icon: <WalletIcon />,
-  },
-  {
-    id: 3,
-    category: "Emergency",
-    title: "Emergency Fund Crisis",
-    description: "An unexpected medical bill arrives. Navigate this financial shock with limited savings — debt, loans, or insurance?",
-    difficulty: "Intermediate",
-    duration: "25 mins",
-    xp: 750,
-    status: "available",
-    headerBg: "linear-gradient(135deg,#dc2626,#fb923c)",
-    icon: <AlertIcon />,
-  },
-  {
-    id: 4,
-    category: "Investing",
-    title: "Stock Portfolio Builder",
-    description: "Allocate RWF 500,000 across stocks, bonds, and ETFs based on your risk profile and a 5-year horizon.",
-    difficulty: "Advanced",
-    duration: "30 mins",
-    xp: 1000,
-    status: "available",
-    headerBg: "linear-gradient(135deg,#1d4ed8,#38bdf8)",
-    icon: <TrendIcon />,
-  },
-  {
-    id: 5,
-    category: "Business",
-    title: "Business Startup Finance",
-    description: "Launch a small business with limited capital. Manage startup costs, cash flow, and decide when to take on debt.",
-    difficulty: "Advanced",
-    duration: "40 mins",
-    xp: 1200,
-    status: "locked",
-    headerBg: "linear-gradient(135deg,#475569,#94a3b8)",
-    icon: <BriefcaseIcon />,
-  },
-  {
-    id: 6,
-    category: "Planning",
-    title: "Retirement Nest Egg",
-    description: "Simulate 30 years of retirement saving. Compare 401(k), pension, and real estate returns to hit your target.",
-    difficulty: "Advanced",
-    duration: "35 mins",
-    xp: 1100,
-    status: "locked",
-    headerBg: "linear-gradient(135deg,#475569,#94a3b8)",
-    icon: <HomeIcon />,
-  },
-  {
-    id: 7,
-    category: "Crisis",
-    title: "Debt Snowball vs Avalanche",
-    description: "You have 4 sources of debt. Strategize the most efficient way to reach zero balance.",
-    difficulty: "Beginner",
-    duration: "12 mins",
-    xp: 350,
-    status: "available",
-    headerBg: "linear-gradient(135deg,#7c3aed,#a78bfa)",
-    icon: <RepeatIcon />,
-  },
-  {
-    id: 8,
-    category: "Retirement",
-    title: "FIRE: Early Retirement",
-    description: "Aggressive saving meets lifestyle choices. Can you reach your target number by age 45?",
-    difficulty: "Advanced",
-    duration: "25 mins",
-    xp: 750,
-    status: "available",
-    headerBg: "linear-gradient(135deg,#0369a1,#38bdf8)",
-    icon: <SparkleIcon />,
-  },
-  {
-    id: 9,
-    category: "Real Estate",
-    title: "Rental Property Pivot",
-    description: "Convert your primary residence into a rental. Calculate ROI and manage tenant risks.",
-    difficulty: "Intermediate",
-    duration: "18 mins",
-    xp: 500,
-    status: "available",
-    headerBg: "linear-gradient(135deg,#065f46,#34d399)",
-    icon: <BuildingIcon />,
-  },
-];
+function categoryBg(cat: string): string {
+  const map: Record<string, string> = {
+    budgeting:  "linear-gradient(135deg,#16a34a,#4ade80)",
+    loan:       "linear-gradient(135deg,#0ea5e9,#38bdf8)",
+    emergency:  "linear-gradient(135deg,#dc2626,#fb923c)",
+    debt:       "linear-gradient(135deg,#7c3aed,#a78bfa)",
+    investing:  "linear-gradient(135deg,#1d4ed8,#38bdf8)",
+  };
+  return map[cat] ?? "linear-gradient(135deg,#475569,#94a3b8)";
+}
 
-type FilterKey = "All" | Category | "Completed";
-const filters: FilterKey[] = ["All", "Budgeting", "Investing", "Crisis", "Retirement", "Real Estate", "Completed"];
+function categoryIcon(cat: string): React.ReactNode {
+  if (cat === "emergency") return <AlertIcon />;
+  if (cat === "investing")  return <TrendIcon />;
+  if (cat === "debt")       return <RepeatIcon />;
+  if (cat === "loan")       return <BriefcaseIcon />;
+  return <WalletIcon />;
+}
 
-function badgeClass(d: Difficulty) {
+function toUISimulation(sim: Simulation, completedIds: Set<string>): UISimulation {
+  return {
+    id: sim.id,
+    category: sim.category,
+    title: sim.title,
+    description: sim.description,
+    difficulty: sim.difficulty.charAt(0).toUpperCase() + sim.difficulty.slice(1),
+    xp: sim.xp_reward,
+    status: completedIds.has(sim.id) ? "completed" : "available",
+    headerBg: categoryBg(sim.category),
+    icon: categoryIcon(sim.category),
+  };
+}
+
+function badgeClass(d: string) {
   if (d === "Beginner")     return s.badgeBeginner;
   if (d === "Intermediate") return s.badgeIntermediate;
   return s.badgeAdvanced;
 }
 
 function statusChipClass(st: Status) {
-  if (st === "available")    return s.statusAvailable;
-  if (st === "in-progress")  return s.statusInProgress;
-  if (st === "completed")    return s.statusCompleted;
-  return s.statusLocked;
+  if (st === "available")   return s.statusAvailable;
+  if (st === "in-progress") return s.statusInProgress;
+  return s.statusCompleted;
 }
 
 function statusLabel(st: Status) {
   if (st === "available")   return "Available";
   if (st === "in-progress") return "In Progress";
-  if (st === "completed")   return "Completed";
-  return "Locked";
+  return "Completed";
 }
 
 export default function LearnerSimulationsPage() {
   const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState<FilterKey>("All");
+  const [simulations, setSimulations] = useState<UISimulation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState("All");
   const [search, setSearch] = useState("");
 
+  useEffect(() => {
+    Promise.all([simulationsService.getAll(), simulationsService.getHistory()])
+      .then(([sims, history]: [Simulation[], SimulationAttempt[]]) => {
+        const completedIds = new Set(history.map((a) => a.simulation_id));
+        setSimulations(sims.map((s) => toUISimulation(s, completedIds)));
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const categories = ["All", ...Array.from(new Set(simulations.map((s) => s.category))), "Completed"];
   const completedCount = simulations.filter((s) => s.status === "completed").length;
 
   const visible = simulations.filter((sim) => {
@@ -321,14 +208,14 @@ export default function LearnerSimulationsPage() {
       {/* Filter + search */}
       <div className={s.filterRow}>
         <div className={s.filterTabs}>
-          {filters.map((f) => (
+          {categories.map((f) => (
             <button
               key={f}
               type="button"
               className={`${s.filterTab} ${activeFilter === f ? s.filterTabActive : ""}`}
               onClick={() => setActiveFilter(f)}
             >
-              {f}
+              {f.charAt(0).toUpperCase() + f.slice(1)}
             </button>
           ))}
         </div>
@@ -345,13 +232,15 @@ export default function LearnerSimulationsPage() {
 
       {/* Grid */}
       <div className={s.grid}>
-        {visible.length === 0 ? (
+        {loading ? (
+          <div className={s.empty}>Loading simulations…</div>
+        ) : visible.length === 0 ? (
           <div className={s.empty}>No simulations match your search.</div>
         ) : (
           visible.map((sim) => (
             <div
               key={sim.id}
-              className={`${s.card} ${sim.status === "locked" ? s.cardLocked : ""}`}
+              className={s.card}
             >
               {/* Coloured header strip */}
               <div
@@ -360,7 +249,6 @@ export default function LearnerSimulationsPage() {
               >
                 <div className={s.cardIconCircle}>{sim.icon}</div>
                 <span className={`${s.statusChip} ${statusChipClass(sim.status)}`}>
-                  {sim.status === "locked" && <LockIcon />}
                   {statusLabel(sim.status)}
                 </span>
               </div>
@@ -374,31 +262,18 @@ export default function LearnerSimulationsPage() {
                 </div>
                 <p className={s.cardDesc}>{sim.description}</p>
 
-                {sim.status === "in-progress" && sim.progress !== undefined && (
-                  <div className={s.progressSection}>
-                    <div className={s.progressLabelRow}>
-                      <span className={s.progressLabel}>Progress</span>
-                      <span className={s.progressPct}>{sim.progress}%</span>
-                    </div>
-                    <div className={s.progressBar}>
-                      <div className={s.progressFill} style={{ width: `${sim.progress}%` }} />
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className={s.cardFooter}>
                 <div className={s.cardMeta}>
-                  <span className={s.metaItem}><ClockIcon /> {sim.duration}</span>
                   <span className={`${s.metaItem} ${s.metaXp}`}>
                     <BoltIcon /> {sim.xp} XP
                   </span>
                 </div>
 
-                {sim.status === "available"    && <button type="button" className={s.startBtn} onClick={() => navigate("/learner/simulation-runner")}>Start Simulation</button>}
-                {sim.status === "in-progress"  && <button type="button" className={s.resumeBtn} onClick={() => navigate("/learner/simulation-runner")}>Continue</button>}
-                {sim.status === "completed"    && <button type="button" className={s.replayBtn} onClick={() => navigate("/learner/simulation-runner")}>Replay</button>}
-                {sim.status === "locked"       && <button type="button" className={s.lockedBtn} disabled><LockIcon /> Locked</button>}
+                {sim.status === "available"   && <button type="button" className={s.startBtn}  onClick={() => navigate(`/learner/simulation-runner?id=${sim.id}`)}>Start Simulation</button>}
+                {sim.status === "in-progress" && <button type="button" className={s.resumeBtn} onClick={() => navigate(`/learner/simulation-runner?id=${sim.id}`)}>Continue</button>}
+                {sim.status === "completed"   && <button type="button" className={s.replayBtn} onClick={() => navigate(`/learner/simulation-runner?id=${sim.id}`)}>Replay</button>}
               </div>
             </div>
           ))

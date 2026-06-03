@@ -90,7 +90,7 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 0.4rem;
 }
 
@@ -136,7 +136,7 @@
 }
 
 .statIcon {
-  color: #9ca3af;
+  color: var(--text-muted);
   display: flex;
 }
 
@@ -210,7 +210,7 @@
 
 .statDesc {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
   line-height: 1.45;
   margin: 0;
 }
@@ -228,13 +228,13 @@
 .insightTitle {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.2rem;
 }
 
 .insightSub {
   font-size: 0.75rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin: 0;
 }
 
@@ -259,8 +259,8 @@
   padding: 0.55rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 9px;
-  background: #fff;
-  color: #374151;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.84rem;
   font-weight: 600;
   text-decoration: none;
@@ -288,7 +288,7 @@
 .recommendedTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
 }
 
@@ -307,8 +307,8 @@
   display: flex;
   gap: 1rem;
   max-width: 420px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   text-decoration: none;
@@ -350,14 +350,14 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  color: #9ca3af;
+  color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .moduleName {
   font-size: 0.92rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text);
   margin: 0;
 }
 
@@ -366,7 +366,7 @@
   align-items: center;
   gap: 0.3rem;
   font-size: 0.76rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-top: 0.15rem;
 }
 
@@ -411,8 +411,8 @@
 }
 
 .aStatCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.1rem 1.15rem;
   display: flex;
@@ -451,8 +451,8 @@
 .aTrendDown    { background: rgba(239,68,68,0.12);  color: #dc2626; }
 .aTrendNeutral { background: rgba(251,191,36,0.12); color: #d97706; }
 
-.aStatLabel { font-size: 0.74rem; color: #6b7280; }
-.aStatValue { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; color: #111827; line-height: 1.1; }
+.aStatLabel { font-size: 0.74rem; color: var(--text-muted); }
+.aStatValue { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.03em; color: var(--text); line-height: 1.1; }
 
 /* ── Charts row ── */
 .chartsRow {
@@ -463,8 +463,8 @@
 }
 
 .chartPanel {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem;
 }
@@ -474,14 +474,14 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #6b7280;
+  color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
 .chartSvg { width: 100%; height: auto; display: block; overflow: visible; }
 
-.chartNote { font-size: 0.78rem; color: #6b7280; margin-top: 0.65rem; }
-.chartNote strong { color: #111827; }
+.chartNote { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.65rem; }
+.chartNote strong { color: var(--text); }
 
 .donutWrap { display: flex; align-items: center; gap: 1rem; }
 
@@ -491,17 +491,17 @@
 
 .legendDot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
 
-.legendLabel { flex: 1; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legendLabel { flex: 1; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.legendVal { font-weight: 700; color: #111827; font-size: 0.76rem; }
+.legendVal { font-weight: 700; color: var(--text); font-size: 0.76rem; }
 
 .legendTotal {
   display: flex;
   justify-content: space-between;
   font-size: 0.76rem;
   font-weight: 700;
-  color: #111827;
-  border-top: 1px solid #e5e7eb;
+  color: var(--text);
+  border-top: 1px solid var(--border);
   padding-top: 0.35rem;
   margin-top: 0.1rem;
 }
@@ -514,15 +514,15 @@
 }
 
 .metaCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.1rem 1.15rem;
 }
 
-.metaLabel { font-size: 0.74rem; color: #6b7280; margin-bottom: 0.3rem; }
-.metaValue { font-size: 1.45rem; font-weight: 800; color: #111827; letter-spacing: -0.02em; line-height: 1.1; }
-.metaHint  { font-size: 0.72rem; color: #9ca3af; margin-top: 0.2rem; }
+.metaLabel { font-size: 0.74rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+.metaValue { font-size: 1.45rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; line-height: 1.1; }
+.metaHint  { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem; }
 
 @media (max-width: 1100px) {
   .statsRow {

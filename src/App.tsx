@@ -32,6 +32,7 @@ import PartnerDashboard from "@/partner/dashboard/PartnerDashboard";
 import PartnerProfile from "@/partner/profile/PartnerProfile";
 import PartnerProgramsPage from "@/partner/programs/PartnerProgramsPage";
 import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
+
 import PlatformDashboard from "@/portal/PlatformDashboard";
 
 export default function App() {
@@ -77,6 +78,9 @@ export default function App() {
       <Route path="/partner/programs" element={<PartnerProgramsPage />} />
       <Route path="/partner/impact" element={<PartnerImpactPage />} />
       <Route path="/partner/profile" element={<PartnerProfile />} />
+
+      {/* Catch-all */}
+      <Route path="*" element={<Navigate to="/auth/login" replace />} />
     </Routes>
   );
 }

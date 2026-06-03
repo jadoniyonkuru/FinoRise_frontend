@@ -1,6 +1,9 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LearnerLayout from "../LearnerLayout";
+import { modulesService } from "@/api";
+import { useAuth } from "@/context/AuthContext";
+import type { QuizQuestion, QuizResult } from "@/api";
 import s from "./module-quiz.module.css";
 
 /* ─── Icons ─── */
@@ -8,8 +11,7 @@ function IconInfo() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
+      <line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   );
 }
@@ -62,69 +64,44 @@ function IconRepeat() {
   );
 }
 
-/* ─── Quiz data ─── */
-type Question = {
-  id: number;
-  text: string;
-  options: string[];
-  correct: number;
-};
-
-const questions: Question[] = [
-  {
-    id: 1,
-    text: "What is the primary benefit of a High-Yield Savings Account (HYSA) compared to a standard savings account?",
-    options: [
-      "It allows for unlimited monthly withdrawals.",
-      "It offers a significantly higher Annual Percentage Yield (APY).",
-      "It provides a line of credit based on your balance.",
-      "It is exempt from federal income taxes.",
-    ],
-    correct: 1,
-  },
-  {
-    id: 2,
-    text: "Which savings strategy involves automatically transferring a fixed amount to savings each payday?",
-    options: [
-      "The Snowball Method",
-      "Zero-Based Budgeting",
-      "Pay Yourself First",
-      "The Envelope System",
-    ],
-    correct: 2,
-  },
-  {
-    id: 3,
-    text: "What is the generally recommended size of an emergency fund?",
-    options: [
-      "1 month of expenses",
-      "3–6 months of expenses",
-      "12 months of expenses",
-      "One full year of salary",
-    ],
-    correct: 1,
-  },
-];
-
-const XP_PER_CORRECT = 150;
-
 /* ─── Component ─── */
 export default function ModuleQuizPage() {
   const navigate = useNavigate();
+  const { refreshUser } = useAuth();
+  const [searchParams] = useSearchParams();
+  const moduleId = searchParams.get("moduleId") ?? "";
+
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [currentQ, setCurrentQ] = useState(0);
-  const [selected, setSelected] = useState<(number | null)[]>(Array(questions.length).fill(null));
-  const [submitted, setSubmitted] = useState(false);
+  const [selected, setSelected] = useState<(string | null)[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<QuizResult | null>(null);
+
+  useEffect(() => {
+    if (!moduleId) { setError("No module specified."); setLoading(false); return; }
+
+    modulesService.getQuiz(moduleId)
+      .then((quiz) => {
+        setQuestions(quiz.questions);
+        setSelected(Array(quiz.questions.length).fill(null));
+      })
+      .catch(() => setError("Quiz not available for this module."))
+      .finally(() => setLoading(false));
+  }, [moduleId]);
 
   const q = questions[currentQ];
   const totalQ = questions.length;
-  const progress = ((currentQ + 1) / totalQ) * 100;
-  const selectedForCurrent = selected[currentQ];
+  const progress = totalQ > 0 ? ((currentQ + 1) / totalQ) * 100 : 0;
+  const selectedForCurrent = selected[currentQ] ?? null;
 
-  function select(optionIdx: number) {
-    if (submitted) return;
+  function select(option: string) {
+    if (result) return;
     setSelected(prev => {
       const next = [...prev];
-      next[currentQ] = optionIdx;
+      next[currentQ] = option;
       return next;
     });
   }
@@ -133,7 +110,7 @@ export default function ModuleQuizPage() {
     if (currentQ < totalQ - 1) {
       setCurrentQ(i => i + 1);
     } else {
-      setSubmitted(true);
+      submitQuiz();
     }
   }
 
@@ -141,47 +118,93 @@ export default function ModuleQuizPage() {
     if (currentQ > 0) setCurrentQ(i => i - 1);
   }
 
+  async function submitQuiz() {
+    setSubmitting(true);
+    const answers = questions.map((q, i) => ({
+      question_id: q.id,
+      answer: selected[i] ?? "",
+    }));
+    try {
+      const res = await modulesService.submitQuiz(moduleId, answers);
+      setResult(res);
+      if (res.passed) {
+        try { await modulesService.complete(moduleId); } catch { /* already completed is fine */ }
+        await refreshUser();
+      }
+    } catch {
+      setError("Failed to submit quiz. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   function retry() {
     setSelected(Array(questions.length).fill(null));
     setCurrentQ(0);
-    setSubmitted(false);
+    setResult(null);
   }
 
-  const score = submitted
-    ? questions.filter((q, i) => selected[i] === q.correct).length
-    : 0;
-  const xpEarned = score * XP_PER_CORRECT;
-  const passed = score >= Math.ceil(totalQ * 0.6);
+  if (loading) {
+    return (
+      <LearnerLayout>
+        <div style={{ padding: "2rem", color: "#6b7280" }}>Loading quiz…</div>
+      </LearnerLayout>
+    );
+  }
+
+  if (error || questions.length === 0) {
+    return (
+      <LearnerLayout>
+        <div style={{ padding: "2rem" }}>
+          <p style={{ color: "#6b7280" }}>{error || "No quiz questions available for this module."}</p>
+          <button
+            type="button"
+            style={{ marginTop: "1rem", color: "#0ea5e9", background: "none", border: "none", cursor: "pointer" }}
+            onClick={() => navigate(moduleId ? `/learner/modules/${moduleId}` : "/learner/modules")}
+          >
+            Back to module
+          </button>
+        </div>
+      </LearnerLayout>
+    );
+  }
 
   /* ── Results screen ── */
-  if (submitted) {
+  if (result) {
+    const correctAnswerMap = Object.fromEntries(
+      result.results.map(r => [r.question_id, r.correct_answer])
+    );
+    const correctnessMap = Object.fromEntries(
+      result.results.map(r => [r.question_id, r.correct])
+    );
+
     return (
       <LearnerLayout>
         <div className={s.resultsWrap}>
           <div className={s.resultsCard}>
-            <div className={`${s.resultsBadge} ${passed ? s.resultsBadgePass : s.resultsBadgeFail}`}>
+            <div className={`${s.resultsBadge} ${result.passed ? s.resultsBadgePass : s.resultsBadgeFail}`}>
               <IconTrophy />
             </div>
-            <h2 className={s.resultsTitle}>{passed ? "Quiz Passed!" : "Keep Practicing"}</h2>
+            <h2 className={s.resultsTitle}>{result.passed ? "Quiz Passed!" : "Keep Practicing"}</h2>
             <p className={s.resultsSubtitle}>
-              {passed
-                ? "Great work! You've completed the Foundations of Saving quiz."
+              {result.passed
+                ? "Great work! You've completed the module quiz."
                 : "You didn't pass this time, but every attempt builds your knowledge."}
             </p>
 
             <div className={s.resultsStats}>
               <div className={s.resultsStat}>
-                <div className={s.resultsStatValue}>{score}/{totalQ}</div>
+                <div className={s.resultsStatValue}>{result.correct_answers}/{result.total_questions}</div>
                 <div className={s.resultsStatLabel}>Correct</div>
               </div>
               <div className={s.resultsDivider} />
               <div className={s.resultsStat}>
-                <div className={`${s.resultsStatValue} ${s.resultsXp}`}>+{xpEarned} XP</div>
+                <div className={`${s.resultsStatValue} ${s.resultsXp}`}>+{result.xp_earned} XP</div>
                 <div className={s.resultsStatLabel}>Earned</div>
               </div>
               <div className={s.resultsDivider} />
               <div className={s.resultsStat}>
-                <div className={s.resultsStatValue}>{Math.round((score / totalQ) * 100)}%</div>
+                <div className={s.resultsStatValue}>{Math.round(result.score)}%</div>
                 <div className={s.resultsStatLabel}>Score</div>
               </div>
             </div>
@@ -189,18 +212,21 @@ export default function ModuleQuizPage() {
             {/* Answer review */}
             <div className={s.reviewList}>
               {questions.map((q, i) => {
+                const correct = correctnessMap[q.id] ?? false;
                 const userAns = selected[i];
-                const correct = userAns === q.correct;
+                const correctAns = correctAnswerMap[q.id];
                 return (
                   <div key={q.id} className={`${s.reviewItem} ${correct ? s.reviewItemCorrect : s.reviewItemWrong}`}>
                     <div className={`${s.reviewIcon} ${correct ? s.reviewIconCorrect : s.reviewIconWrong}`}>
                       {correct ? <IconCheck /> : <IconX />}
                     </div>
                     <div className={s.reviewText}>
-                      <div className={s.reviewQ}>Q{q.id}: {q.text.slice(0, 60)}…</div>
+                      <div className={s.reviewQ}>Q{i + 1}: {q.question.slice(0, 60)}…</div>
                       <div className={s.reviewAns}>
-                        Your answer: <strong>{userAns !== null ? q.options[userAns] : "Skipped"}</strong>
-                        {!correct && <span className={s.reviewCorrectAns}> · Correct: {q.options[q.correct]}</span>}
+                        Your answer: <strong>{userAns ?? "Skipped"}</strong>
+                        {!correct && correctAns && (
+                          <span className={s.reviewCorrectAns}> · Correct: {correctAns}</span>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -212,8 +238,12 @@ export default function ModuleQuizPage() {
               <button type="button" className={s.retryBtn} onClick={retry}>
                 <IconRepeat /> Retry Quiz
               </button>
-              <button type="button" className={s.backBtn} onClick={() => navigate("/learner/modules")}>
-                Back to Modules
+              <button
+                type="button"
+                className={s.backBtn}
+                onClick={() => navigate(moduleId ? `/learner/modules/${moduleId}` : "/learner/modules")}
+              >
+                Back to Module
               </button>
             </div>
           </div>
@@ -229,7 +259,7 @@ export default function ModuleQuizPage() {
         <div className={s.quizCard}>
           {/* Header row */}
           <div className={s.quizHeader}>
-            <span className={s.moduleName}>Module: Foundations of Saving</span>
+            <span className={s.moduleName}>Module Quiz</span>
             <span className={s.questionCount}>Question {currentQ + 1} of {totalQ}</span>
           </div>
 
@@ -239,7 +269,7 @@ export default function ModuleQuizPage() {
           </div>
 
           {/* Question */}
-          <p className={s.questionText}>{q.text}</p>
+          <p className={s.questionText}>{q.question}</p>
 
           {/* Options */}
           <div className={s.optionList}>
@@ -247,10 +277,10 @@ export default function ModuleQuizPage() {
               <button
                 key={idx}
                 type="button"
-                className={`${s.optionBtn} ${selectedForCurrent === idx ? s.optionSelected : ""}`}
-                onClick={() => select(idx)}
+                className={`${s.optionBtn} ${selectedForCurrent === opt ? s.optionSelected : ""}`}
+                onClick={() => select(opt)}
               >
-                <span className={`${s.optionLetter} ${selectedForCurrent === idx ? s.optionLetterSelected : ""}`}>
+                <span className={`${s.optionLetter} ${selectedForCurrent === opt ? s.optionLetterSelected : ""}`}>
                   {String.fromCharCode(65 + idx)}
                 </span>
                 {opt}
@@ -272,9 +302,9 @@ export default function ModuleQuizPage() {
               type="button"
               className={`${s.nextBtn} ${selectedForCurrent === null ? s.nextBtnDisabled : ""}`}
               onClick={goNext}
-              disabled={selectedForCurrent === null}
+              disabled={selectedForCurrent === null || submitting}
             >
-              {currentQ === totalQ - 1 ? "Submit Quiz" : "Next Question"}
+              {submitting ? "Submitting…" : currentQ === totalQ - 1 ? "Submit Quiz" : "Next Question"}
               <IconChevRight />
             </button>
           </div>
@@ -283,8 +313,8 @@ export default function ModuleQuizPage() {
           <div className={s.tipBox}>
             <IconInfo />
             <p className={s.tipText}>
-              Take your time to read each question carefully. Correct answers in this end-of-module quiz
-              contribute directly to your XP ranking and unlock the next learning module.
+              Take your time to read each question carefully. Correct answers contribute directly
+              to your XP ranking and unlock the next learning module.
             </p>
           </div>
         </div>

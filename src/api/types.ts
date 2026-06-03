@@ -18,6 +18,7 @@ export interface Module {
   category: string;
   difficulty: string;
   xp_reward: number;
+  is_published: boolean;
 }
 
 export type BadgeType = 'streak' | 'completion' | 'simulation' | 'special';
@@ -176,4 +177,170 @@ export interface PartnerImpact {
   category_breakdown: Record<string, number>;
   difficulty_breakdown: Record<string, number>;
   programs: Module[];
+}
+
+// ── Lessons ──────────────────────────────────────────────────────────────────
+export interface Lesson {
+  id: string;
+  module_id: string;
+  title: string;
+  content: string;
+  order_index: number;
+  duration_minutes: number | null;
+  video_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+// ── Quiz ─────────────────────────────────────────────────────────────────────
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  xp_reward: number;
+}
+
+export interface QuizData {
+  module_id: string;
+  questions: QuizQuestion[];
+}
+
+export interface QuizAnswerResult {
+  question_id: string;
+  correct: boolean;
+  correct_answer: string;
+}
+
+export interface QuizResult {
+  score: number;
+  correct_answers: number;
+  total_questions: number;
+  xp_earned: number;
+  passed: boolean;
+  results: QuizAnswerResult[];
+}
+
+// ── Module Progress ───────────────────────────────────────────────────────────
+export interface ModuleProgress {
+  module_id: string;
+  title: string;
+  category: string;
+  difficulty: string;
+  xp_reward: number;
+  completed: boolean;
+  completed_at: string | null;
+  score: number | null;
+}
+
+export interface CompleteModuleResult {
+  message: string;
+  xp_awarded: number;
+  completed_at: string;
+}
+
+// ── Simulations ───────────────────────────────────────────────────────────────
+export type SimCategory = 'budgeting' | 'loan' | 'emergency' | 'debt' | 'investing';
+
+export interface Simulation {
+  id: string;
+  title: string;
+  description: string;
+  category: SimCategory;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  xp_reward: number;
+  choices: string[];
+  correct_choice: string | null;
+  feedback: string;
+  is_published: boolean;
+  created_at: string;
+}
+
+export interface SimChoice {
+  id: string;
+  step_id: string;
+  choice_text: string;
+  outcome_text: string;
+  financial_impact: number;
+  xp_bonus: number;
+  next_step_id: string | null;
+}
+
+export interface SimStep {
+  id: string;
+  simulation_id: string;
+  step_number: number;
+  scenario_text: string;
+  is_first_step: boolean;
+  SimChoices: SimChoice[];
+}
+
+export interface SimulationWithSteps extends Simulation {
+  SimSteps: SimStep[];
+}
+
+export interface SimulationStartResult {
+  attempt_id: string;
+  message: string;
+  simulation: {
+    id: string;
+    title: string;
+    description: string;
+    category: string;
+    difficulty: string;
+    xp_reward: number;
+  };
+  current_step: SimStep;
+}
+
+export interface SubmitChoiceResult {
+  status: 'in_progress' | 'completed';
+  outcome: string;
+  financial_impact: number;
+  xp_bonus?: number;
+  next_step?: SimStep;
+  final_score?: number;
+  xp_earned?: number;
+  message?: string;
+}
+
+export interface SimulationAttempt {
+  id: string;
+  user_id: string;
+  simulation_id: string;
+  status: 'in_progress' | 'completed';
+  score: number;
+  xp_earned: number;
+  started_at: string;
+  completed_at: string | null;
+  Simulation?: { title: string; category: string; difficulty: string };
+}
+
+// ── Analytics ─────────────────────────────────────────────────────────────────
+export interface LearnerAnalytics {
+  overview: {
+    xp_total: number;
+    level: number;
+    streak_days: number;
+    last_active: string | null;
+  };
+  modules: {
+    completed: number;
+    total_available: number;
+    completion_rate: number;
+    average_quiz_score: number | null;
+    category_breakdown: Record<string, number>;
+    recent_completions: ModuleProgress[];
+  };
+  recent_activity: BehaviorEvent[];
+  insights: Insight[];
+  badges: Badge[];
+}
+
+// ── Admin ─────────────────────────────────────────────────────────────────────
+export interface AdminAnalytics {
+  total_users: number;
+  total_admins: number;
+  total_learners: number;
+  total_badges_awarded: number;
+  top_users: { id: string; full_name: string; email: string; xp_total: number; level: number }[];
 }
