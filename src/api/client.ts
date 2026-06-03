@@ -3,7 +3,7 @@ import axios from 'axios';
 export const TOKEN_KEY = 'finorise_token';
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'https://finorise-backend.onrender.com',
   headers: { 'Content-Type': 'application/json' },
 });
 
