@@ -26,13 +26,13 @@
     "src/app",
     "src/ai",
     "src/firebase",
+    "src/lib",
     "src/components/ui",
     "src/components/fino-sidebar.tsx",
     "src/components/mode-toggle.tsx",
     "src/components/FirebaseErrorListener.tsx",
     "src/components/theme-provider.tsx",
     "src/hooks/use-toast.ts",
-    "src/hooks/use-mobile.tsx",
-    "src/lib/utils.ts"
+    "src/hooks/use-mobile.tsx"
   ]
 }

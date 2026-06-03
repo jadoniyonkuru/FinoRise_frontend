@@ -260,7 +260,7 @@ export default function PartnerDashboard() {
                 <div key={st.label} className={s.aStatCard}>
                   <div className={s.aStatTop}>
                     <div className={s.aStatIcon} style={{ background: st.iconBg, color: st.iconColor }}>{st.icon}</div>
-                    <span className={`${s.aTrend} ${st.dir === "up" ? s.aTrendUp : s.aTrendNeutral}`}>{st.trend}</span>
+                    <span className={`${s.aTrend} ${{ up: s.aTrendUp, down: s.aTrendDown, neutral: s.aTrendNeutral }[st.dir] ?? s.aTrendNeutral}`}>{st.trend}</span>
                   </div>
                   <div className={s.aStatLabel}>{st.label}</div>
                   <div className={s.aStatValue}>{st.value}</div>
