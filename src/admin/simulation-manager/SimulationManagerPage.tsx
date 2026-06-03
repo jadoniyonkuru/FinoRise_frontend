@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/admin/AdminLayout";
 import cardStyles from "@/components/StatCard.module.css";
 import styles from "./simulation-manager.module.css";
+import { simulationsService } from "@/api/services/simulations.service";
+import type { SimCategory } from "@/api/types";
 
 function SearchIcon() {
   return (
@@ -41,7 +43,7 @@ function AlertIcon() {
 
 type SimStatus = "Live" | "Draft";
 
-type Simulation = {
+type UISim = {
   id: string;
   title: string;
   topic: string;
@@ -51,37 +53,61 @@ type Simulation = {
   accentColor: string;
 };
 
-const accessOptions: { value: Simulation["access"]; label: string; description: string }[] = [
-  { value: "public", label: "All learners", description: "Visible on the learner simulation hub" },
-  { value: "cohort", label: "Assigned cohorts", description: "Only learners in selected groups" },
-  { value: "preview", label: "Admin preview", description: "Hidden from learners until published" },
+const accessOptions: { value: UISim["access"]; label: string; description: string }[] = [
+  { value: "public",  label: "All learners",      description: "Visible on the learner simulation hub" },
+  { value: "cohort",  label: "Assigned cohorts",  description: "Only learners in selected groups" },
+  { value: "preview", label: "Admin preview",     description: "Hidden from learners until published" },
 ];
 
-const INITIAL_SIMULATIONS: Simulation[] = [
-  { id: "1", title: "Emergency fund challenge", topic: "Personal savings", scenarios: 3, status: "Live", access: "public", accentColor: "#0ea5e9" },
-  { id: "2", title: "Small business cash flow", topic: "Entrepreneurship", scenarios: 5, status: "Live", access: "cohort", accentColor: "#8b5cf6" },
-  { id: "3", title: "Retirement planning", topic: "Long-term investing", scenarios: 4, status: "Draft", access: "preview", accentColor: "#f59e0b" },
-  { id: "4", title: "Debt payoff sprint", topic: "Debt management", scenarios: 3, status: "Live", access: "public", accentColor: "#22c55e" },
-  { id: "5", title: "First home purchase", topic: "Major purchases", scenarios: 6, status: "Draft", access: "preview", accentColor: "#ec4899" },
-  { id: "6", title: "Insurance decisions", topic: "Risk protection", scenarios: 2, status: "Live", access: "public", accentColor: "#06b6d4" },
-  { id: "7", title: "Side hustle finances", topic: "Income growth", scenarios: 4, status: "Live", access: "cohort", accentColor: "#10b981" },
-  { id: "8", title: "Tax season prep", topic: "Compliance", scenarios: 3, status: "Draft", access: "preview", accentColor: "#6366f1" },
-  { id: "9", title: "College savings plan", topic: "Education funding", scenarios: 3, status: "Live", access: "public", accentColor: "#f97316" },
+const CATEGORY_OPTIONS: { value: SimCategory; label: string }[] = [
+  { value: "budgeting", label: "Budgeting" },
+  { value: "loan",      label: "Loan" },
+  { value: "emergency", label: "Emergency" },
+  { value: "debt",      label: "Debt" },
+  { value: "investing", label: "Investing" },
 ];
+
+const ACCENT_COLORS = ["#0ea5e9","#8b5cf6","#22c55e","#f59e0b","#f97316","#ec4899","#06b6d4","#10b981"];
+
+function fromApiSim(s: { id: string; title: string; category: string; is_published: boolean }, idx: number): UISim {
+  return {
+    id: s.id,
+    title: s.title,
+    topic: s.category,
+    scenarios: 0,
+    status: s.is_published ? "Live" : "Draft",
+    access: s.is_published ? "public" : "preview",
+    accentColor: ACCENT_COLORS[idx % ACCENT_COLORS.length],
+  };
+}
 
 type FilterType = "All" | "Live" | "Draft";
 
 export default function SimulationManagerPage() {
-  const [simulations, setSimulations] = useState<Simulation[]>(INITIAL_SIMULATIONS);
+  const [simulations, setSimulations] = useState<UISim[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("All");
 
-  const [editTarget, setEditTarget] = useState<Simulation | null>(null);
-  const [editForm, setEditForm] = useState({ title: "", topic: "", scenarios: 3, status: "Live" as SimStatus, access: "public" as Simulation["access"] });
+  const [editTarget, setEditTarget] = useState<UISim | null>(null);
+  const [editForm, setEditForm] = useState({ title: "", topic: "budgeting" as SimCategory, status: "Live" as SimStatus, access: "public" as UISim["access"] });
+  const [saving, setSaving] = useState(false);
 
-  const [deleteTarget, setDeleteTarget] = useState<Simulation | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<UISim | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState({ title: "", topic: "", scenarios: 3, access: "preview" as Simulation["access"] });
+  const [addForm, setAddForm] = useState({ title: "", description: "", topic: "budgeting" as SimCategory, difficulty: "beginner" as "beginner" | "intermediate" | "advanced", xp_reward: 50, access: "preview" as UISim["access"] });
+  const [adding, setAdding] = useState(false);
+
+  useEffect(() => {
+    simulationsService.getAll()
+      .then((data) => {
+        setSimulations(data.map((s, i) => fromApiSim(s, i)));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const visible = simulations.filter((sim) => {
     const matchFilter = filter === "All" || sim.status === filter;
@@ -95,63 +121,80 @@ export default function SimulationManagerPage() {
 
   const liveCount = simulations.filter((s) => s.status === "Live").length;
   const draftCount = simulations.filter((s) => s.status === "Draft").length;
-  const totalScenarios = simulations.reduce((sum, s) => sum + s.scenarios, 0);
 
   const stats = [
     { label: "Active simulations", value: String(liveCount), hint: "Available to learners" },
-    { label: "Scenario setups", value: String(totalScenarios), hint: "Across simulations" },
-    { label: "Completions (30d)", value: "412", hint: "+18% vs prior" },
-    { label: "Avg. score", value: "78%", hint: "All scenarios" },
+    { label: "Total simulations",  value: String(simulations.length), hint: "All setups" },
+    { label: "Completions (30d)",  value: "—", hint: "From backend analytics" },
+    { label: "Avg. score",         value: "—", hint: "All scenarios" },
   ];
 
-  function openEdit(sim: Simulation) {
+  function openEdit(sim: UISim) {
     setEditTarget(sim);
     setEditForm({
       title: sim.title,
-      topic: sim.topic,
-      scenarios: sim.scenarios,
+      topic: (sim.topic as SimCategory) || "budgeting",
       status: sim.status,
       access: sim.access,
     });
   }
 
-  function saveEdit() {
+  async function saveEdit() {
     if (!editTarget) return;
-    setSimulations((prev) =>
-      prev.map((s) =>
-        s.id === editTarget.id
-          ? { ...s, ...editForm, scenarios: Math.max(1, editForm.scenarios) }
-          : s
-      )
-    );
-    setEditTarget(null);
+    setSaving(true);
+    try {
+      await simulationsService.update(editTarget.id, {
+        title: editForm.title,
+        category: editForm.topic,
+        is_published: editForm.status === "Live",
+      });
+      setSimulations((prev) =>
+        prev.map((s) =>
+          s.id === editTarget.id
+            ? { ...s, title: editForm.title, topic: editForm.topic, status: editForm.status, access: editForm.access }
+            : s
+        )
+      );
+      setEditTarget(null);
+    } catch { /* silent */ } finally {
+      setSaving(false);
+    }
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (!deleteTarget) return;
-    setSimulations((prev) => prev.filter((s) => s.id !== deleteTarget.id));
-    setDeleteTarget(null);
+    setDeleting(true);
+    try {
+      await simulationsService.remove(deleteTarget.id);
+      setSimulations((prev) => prev.filter((s) => s.id !== deleteTarget.id));
+    } catch { /* silent */ } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   }
 
-  function handleAccessChange(simId: string, access: Simulation["access"]) {
+  function handleAccessChange(simId: string, access: UISim["access"]) {
     setSimulations((prev) => prev.map((s) => (s.id === simId ? { ...s, access } : s)));
   }
 
-  function saveAdd() {
-    if (!addForm.title.trim() || !addForm.topic.trim()) return;
-    const colors = ["#0ea5e9", "#8b5cf6", "#22c55e", "#f59e0b", "#f97316", "#ec4899", "#06b6d4", "#10b981"];
-    const newSim: Simulation = {
-      id: String(Date.now()),
-      title: addForm.title,
-      topic: addForm.topic,
-      scenarios: Math.max(1, addForm.scenarios),
-      status: "Draft",
-      access: addForm.access,
-      accentColor: colors[simulations.length % colors.length],
-    };
-    setSimulations((prev) => [...prev, newSim]);
-    setShowAdd(false);
-    setAddForm({ title: "", topic: "", scenarios: 3, access: "preview" });
+  async function saveAdd() {
+    if (!addForm.title.trim()) return;
+    setAdding(true);
+    try {
+      const created = await simulationsService.create({
+        title: addForm.title,
+        description: addForm.description,
+        category: addForm.topic,
+        difficulty: addForm.difficulty,
+        xp_reward: addForm.xp_reward,
+        is_published: false,
+      });
+      setSimulations((prev) => [fromApiSim(created, prev.length), ...prev]);
+      setShowAdd(false);
+      setAddForm({ title: "", description: "", topic: "budgeting", difficulty: "beginner", xp_reward: 50, access: "preview" });
+    } catch { /* silent */ } finally {
+      setAdding(false);
+    }
   }
 
   return (
@@ -212,7 +255,8 @@ export default function SimulationManagerPage() {
         </div>
 
         <div className={styles.simTable}>
-          {visible.length === 0 && <div className={styles.empty}>No simulations match your search.</div>}
+          {loading && <div className={styles.empty}>Loading simulations…</div>}
+          {!loading && visible.length === 0 && <div className={styles.empty}>No simulations match your search.</div>}
           {visible.map((sim) => {
             const currentAccess = accessOptions.find((a) => a.value === sim.access);
             return (
@@ -223,9 +267,7 @@ export default function SimulationManagerPage() {
                   </span>
                   <div>
                     <strong>{sim.title}</strong>
-                    <span>
-                      {sim.topic} · {sim.scenarios} scenario{sim.scenarios !== 1 ? "s" : ""}
-                    </span>
+                    <span>{sim.topic}</span>
                   </div>
                 </div>
 
@@ -234,7 +276,7 @@ export default function SimulationManagerPage() {
                   <select
                     id={`access-${sim.id}`}
                     value={sim.access}
-                    onChange={(e) => handleAccessChange(sim.id, e.target.value as Simulation["access"])}
+                    onChange={(e) => handleAccessChange(sim.id, e.target.value as UISim["access"])}
                   >
                     {accessOptions.map((a) => (
                       <option key={a.value} value={a.value}>
@@ -262,7 +304,7 @@ export default function SimulationManagerPage() {
       </section>
 
       {editTarget && (
-        <div className={styles.overlay} onClick={() => setEditTarget(null)}>
+        <div className={styles.overlay} onClick={() => !saving && setEditTarget(null)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Edit simulation</h3>
 
@@ -277,24 +319,14 @@ export default function SimulationManagerPage() {
             </div>
 
             <div className={styles.modalField}>
-              <label>Topic</label>
-              <input
-                className={styles.modalInput}
+              <label>Category</label>
+              <select
+                className={styles.modalSelect}
                 value={editForm.topic}
-                onChange={(e) => setEditForm((f) => ({ ...f, topic: e.target.value }))}
-                placeholder="e.g. Personal savings"
-              />
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Scenarios</label>
-              <input
-                className={styles.modalInput}
-                type="number"
-                min={1}
-                value={editForm.scenarios}
-                onChange={(e) => setEditForm((f) => ({ ...f, scenarios: Number(e.target.value) }))}
-              />
+                onChange={(e) => setEditForm((f) => ({ ...f, topic: e.target.value as SimCategory }))}
+              >
+                {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
             </div>
 
             <div className={styles.modalField}>
@@ -314,7 +346,7 @@ export default function SimulationManagerPage() {
               <select
                 className={styles.modalSelect}
                 value={editForm.access}
-                onChange={(e) => setEditForm((f) => ({ ...f, access: e.target.value as Simulation["access"] }))}
+                onChange={(e) => setEditForm((f) => ({ ...f, access: e.target.value as UISim["access"] }))}
               >
                 {accessOptions.map((a) => (
                   <option key={a.value} value={a.value}>
@@ -325,11 +357,11 @@ export default function SimulationManagerPage() {
             </div>
 
             <div className={styles.modalActions}>
-              <button type="button" className={styles.btnCancel} onClick={() => setEditTarget(null)}>
+              <button type="button" className={styles.btnCancel} onClick={() => setEditTarget(null)} disabled={saving}>
                 Cancel
               </button>
-              <button type="button" className={styles.btnSave} onClick={saveEdit}>
-                Save changes
+              <button type="button" className={styles.btnSave} onClick={saveEdit} disabled={saving}>
+                {saving ? "Saving…" : "Save changes"}
               </button>
             </div>
           </div>
@@ -337,7 +369,7 @@ export default function SimulationManagerPage() {
       )}
 
       {deleteTarget && (
-        <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
+        <div className={styles.overlay} onClick={() => !deleting && setDeleteTarget(null)}>
           <div className={styles.deleteModal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.deleteIconWrap}>
               <AlertIcon />
@@ -348,11 +380,11 @@ export default function SimulationManagerPage() {
               for this simulation will be removed.
             </p>
             <div className={styles.modalActions}>
-              <button type="button" className={styles.btnCancel} onClick={() => setDeleteTarget(null)}>
+              <button type="button" className={styles.btnCancel} onClick={() => setDeleteTarget(null)} disabled={deleting}>
                 Cancel
               </button>
-              <button type="button" className={styles.btnDeleteConfirm} onClick={confirmDelete}>
-                Yes, delete
+              <button type="button" className={styles.btnDeleteConfirm} onClick={confirmDelete} disabled={deleting}>
+                {deleting ? "Deleting…" : "Yes, delete"}
               </button>
             </div>
           </div>
@@ -360,7 +392,7 @@ export default function SimulationManagerPage() {
       )}
 
       {showAdd && (
-        <div className={styles.overlay} onClick={() => setShowAdd(false)}>
+        <div className={styles.overlay} onClick={() => !adding && setShowAdd(false)}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Add simulation</h3>
 
@@ -375,47 +407,45 @@ export default function SimulationManagerPage() {
             </div>
 
             <div className={styles.modalField}>
-              <label>Topic</label>
+              <label>Description</label>
               <input
                 className={styles.modalInput}
-                value={addForm.topic}
-                onChange={(e) => setAddForm((f) => ({ ...f, topic: e.target.value }))}
-                placeholder="e.g. Personal savings"
+                value={addForm.description}
+                onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))}
+                placeholder="Brief description"
               />
             </div>
 
             <div className={styles.modalField}>
-              <label>Scenarios</label>
-              <input
-                className={styles.modalInput}
-                type="number"
-                min={1}
-                value={addForm.scenarios}
-                onChange={(e) => setAddForm((f) => ({ ...f, scenarios: Number(e.target.value) }))}
-              />
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Learner access</label>
+              <label>Category</label>
               <select
                 className={styles.modalSelect}
-                value={addForm.access}
-                onChange={(e) => setAddForm((f) => ({ ...f, access: e.target.value as Simulation["access"] }))}
+                value={addForm.topic}
+                onChange={(e) => setAddForm((f) => ({ ...f, topic: e.target.value as SimCategory }))}
               >
-                {accessOptions.map((a) => (
-                  <option key={a.value} value={a.value}>
-                    {a.label}
-                  </option>
-                ))}
+                {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+            </div>
+
+            <div className={styles.modalField}>
+              <label>Difficulty</label>
+              <select
+                className={styles.modalSelect}
+                value={addForm.difficulty}
+                onChange={(e) => setAddForm((f) => ({ ...f, difficulty: e.target.value as typeof addForm.difficulty }))}
+              >
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
               </select>
             </div>
 
             <div className={styles.modalActions}>
-              <button type="button" className={styles.btnCancel} onClick={() => setShowAdd(false)}>
+              <button type="button" className={styles.btnCancel} onClick={() => setShowAdd(false)} disabled={adding}>
                 Cancel
               </button>
-              <button type="button" className={styles.btnSave} onClick={saveAdd}>
-                Add simulation
+              <button type="button" className={styles.btnSave} onClick={saveAdd} disabled={adding}>
+                {adding ? "Creating…" : "Add simulation"}
               </button>
             </div>
           </div>

@@ -1,6 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import LearnerLayout from "../LearnerLayout";
+import { simulationsService } from "@/api";
+import type { SimStep, SimChoice, SubmitChoiceResult } from "@/api";
 import s from "./simulation-runner.module.css";
 
 /* ─── Icons ─── */
@@ -58,141 +60,137 @@ function IconRepeat() {
   );
 }
 
-/* ─── Simulation data ─── */
-type Debt = { label: string; balance: string; rate: string; minPayment: string };
-
-const debts: Debt[] = [
-  { label: "Credit Card A", balance: "RWF 450,000", rate: "22%",  minPayment: "RWF 18,000" },
-  { label: "Personal Loan",  balance: "RWF 200,000", rate: "15%",  minPayment: "RWF 12,000" },
-  { label: "Credit Card B", balance: "RWF 85,000",  rate: "19%",  minPayment: "RWF 6,000"  },
-  { label: "Car Loan",       balance: "RWF 1,200,000", rate: "9%", minPayment: "RWF 35,000" },
-];
-
-type Step = {
-  id: number;
-  title: string;
-  scenario: string;
-  context: string;
-  choices: { label: string; desc: string; outcome: string }[];
-};
-
-const steps: Step[] = [
-  {
-    id: 1,
-    title: "Choose Your Strategy",
-    scenario: "You have RWF 1,935,000 in total debt across 4 accounts. You can afford RWF 100,000/month toward debt payoff — RWF 29,000 more than the combined minimums.",
-    context: "Your extra RWF 29,000/month is your weapon. The question is where to aim it.",
-    choices: [
-      {
-        label: "Avalanche Method",
-        desc: "Pay minimums on all debts, then put the RWF 29,000 extra toward the highest-interest debt first.",
-        outcome: "You save ~RWF 87,000 in interest over 24 months. Mathematically optimal.",
-      },
-      {
-        label: "Snowball Method",
-        desc: "Pay minimums on all debts, then put the RWF 29,000 extra toward the smallest balance first.",
-        outcome: "Credit Card B is cleared in month 3, giving you a motivational win. Costs slightly more in interest.",
-      },
-      {
-        label: "Split 50/50",
-        desc: "Split the extra payment evenly between the two highest-interest debts.",
-        outcome: "Balanced approach — moderate savings, moderate progress across accounts.",
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: "Unexpected Expense",
-    scenario: "Month 4 arrives. Your car needs urgent repairs costing RWF 120,000. Your emergency fund holds only RWF 50,000.",
-    context: "You're making great progress on your debts. Now you face a RWF 70,000 shortfall.",
-    choices: [
-      {
-        label: "Pause debt extra payments",
-        desc: "Use the RWF 70,000 shortfall from pausing your extra debt payments for 2.5 months.",
-        outcome: "Smart choice. You preserve your emergency fund and avoid new high-interest debt.",
-      },
-      {
-        label: "Put it on Credit Card A",
-        desc: "Charge the RWF 70,000 to Credit Card A at 22% interest.",
-        outcome: "Costly — adds ~RWF 15,400/year in interest and sets your payoff timeline back 1.5 months.",
-      },
-      {
-        label: "Take a personal loan",
-        desc: "Apply for a small emergency loan at 12% interest.",
-        outcome: "Better than the credit card rate, but adds complexity. Manageable if you stay disciplined.",
-      },
-    ],
-  },
-  {
-    id: 3,
-    title: "End-of-Year Bonus",
-    scenario: "Month 12. You receive an annual bonus of RWF 250,000. Your debt is down to RWF 1,450,000.",
-    context: "This windfall can dramatically change your trajectory. How do you deploy it?",
-    choices: [
-      {
-        label: "Lump-sum debt payment",
-        desc: "Apply the full RWF 250,000 to your highest-interest debt immediately.",
-        outcome: "Excellent! Saves ~RWF 55,000 in future interest and shortens your payoff by 4 months.",
-      },
-      {
-        label: "Half debt, half savings",
-        desc: "Put RWF 125,000 toward debt and RWF 125,000 into a high-yield savings account.",
-        outcome: "Solid balance. Reduces debt and builds your emergency buffer simultaneously.",
-      },
-      {
-        label: "Invest it all",
-        desc: "Put the full RWF 250,000 into an index fund at ~10% projected annual return.",
-        outcome: "High risk at this debt level — your debt interest likely exceeds investment returns short-term.",
-      },
-    ],
-  },
-];
-
-const XP_TOTAL = 350;
+type Decision = { stepNumber: number; choiceText: string; outcome: string };
 
 /* ─── Component ─── */
 export default function SimulationRunnerPage() {
   const navigate = useNavigate();
-  const [stepIdx, setStepIdx] = useState(0);
-  const [chosen, setChosen] = useState<(number | null)[]>(Array(steps.length).fill(null));
-  const [showFeedback, setShowFeedback] = useState(false);
+  const [searchParams] = useSearchParams();
+  const simulationId = searchParams.get("id") ?? "";
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  const [simTitle, setSimTitle] = useState("");
+  const [xpReward, setXpReward] = useState(0);
+  const [attemptId, setAttemptId] = useState("");
+  const [currentStep, setCurrentStep] = useState<SimStep | null>(null);
+  const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState<{ outcome: string; financial_impact: number; xp_bonus?: number } | null>(null);
+  const [pendingNextStep, setPendingNextStep] = useState<SimStep | undefined>(undefined);
+  const [decisions, setDecisions] = useState<Decision[]>([]);
+
   const [done, setDone] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
+  const [xpEarned, setXpEarned] = useState(0);
 
-  const step = steps[stepIdx];
-  const chosenForStep = chosen[stepIdx];
-  const progress = ((stepIdx + 1) / steps.length) * 100;
+  useEffect(() => {
+    if (!simulationId) { setError("No simulation selected."); setLoading(false); return; }
 
-  function choose(idx: number) {
-    if (showFeedback) return;
-    setChosen(prev => {
-      const next = [...prev];
-      next[stepIdx] = idx;
-      return next;
-    });
-  }
+    simulationsService.start(simulationId)
+      .then((res) => {
+        setSimTitle(res.simulation.title);
+        setXpReward(res.simulation.xp_reward);
+        setAttemptId(res.attempt_id);
+        setCurrentStep(res.current_step);
+      })
+      .catch(() => setError("Failed to load simulation. Please try again."))
+      .finally(() => setLoading(false));
+  }, [simulationId]);
 
-  function confirm() {
-    if (chosenForStep === null) return;
-    setShowFeedback(true);
-  }
+  async function confirmChoice() {
+    if (!selectedChoiceId || !attemptId || submitting) return;
+    setSubmitting(true);
 
-  function goNext() {
-    setShowFeedback(false);
-    if (stepIdx < steps.length - 1) {
-      setStepIdx(i => i + 1);
-    } else {
-      setDone(true);
+    const choiceText = currentStep?.SimChoices.find(c => c.id === selectedChoiceId)?.choice_text ?? "";
+
+    try {
+      const res: SubmitChoiceResult = await simulationsService.submitChoice(attemptId, selectedChoiceId);
+
+      setFeedback({
+        outcome: res.outcome,
+        financial_impact: res.financial_impact,
+        xp_bonus: res.xp_bonus,
+      });
+      setPendingNextStep(res.next_step);
+
+      setDecisions(prev => [
+        ...prev,
+        { stepNumber: currentStep?.step_number ?? prev.length + 1, choiceText, outcome: res.outcome },
+      ]);
+
+      if (res.status === "completed") {
+        setFinalScore(res.final_score ?? 0);
+        setXpEarned(res.xp_earned ?? xpReward);
+        setDone(true);
+      }
+    } catch {
+      setFeedback({ outcome: "An error occurred. Please try again.", financial_impact: 0 });
+    } finally {
+      setSubmitting(false);
     }
   }
 
-  function restart() {
-    setChosen(Array(steps.length).fill(null));
-    setStepIdx(0);
-    setShowFeedback(false);
-    setDone(false);
+  function goNext() {
+    setFeedback(null);
+    setSelectedChoiceId(null);
+    if (pendingNextStep) {
+      setCurrentStep(pendingNextStep);
+      setPendingNextStep(undefined);
+    }
   }
 
-  /* ── Results ── */
+  async function restart() {
+    setLoading(true);
+    setDone(false);
+    setDecisions([]);
+    setFeedback(null);
+    setPendingNextStep(undefined);
+    setSelectedChoiceId(null);
+    setError("");
+
+    simulationsService.start(simulationId)
+      .then((res) => {
+        setSimTitle(res.simulation.title);
+        setXpReward(res.simulation.xp_reward);
+        setAttemptId(res.attempt_id);
+        setCurrentStep(res.current_step);
+      })
+      .catch(() => setError("Failed to restart simulation."))
+      .finally(() => setLoading(false));
+  }
+
+  /* ── Loading / error ── */
+  if (loading) {
+    return (
+      <LearnerLayout>
+        <div style={{ padding: "2rem", color: "#6b7280" }}>Loading simulation…</div>
+      </LearnerLayout>
+    );
+  }
+
+  if (error || !currentStep) {
+    const message = error || (simTitle
+      ? `"${simTitle}" has no scenarios configured yet. The admin needs to add steps to this simulation.`
+      : "Simulation not available — no scenarios have been added to it yet.");
+    return (
+      <LearnerLayout>
+        <div style={{ padding: "2rem" }}>
+          <p style={{ color: "var(--text-muted)", marginBottom: "0.5rem" }}>{message}</p>
+          <button
+            type="button"
+            style={{ color: "#0ea5e9", background: "none", border: "none", cursor: "pointer", padding: 0, fontSize: "0.9rem" }}
+            onClick={() => navigate("/learner/simulations")}
+          >
+            ← Back to Simulations
+          </button>
+        </div>
+      </LearnerLayout>
+    );
+  }
+
+  /* ── Results screen ── */
   if (done) {
     return (
       <LearnerLayout>
@@ -201,38 +199,36 @@ export default function SimulationRunnerPage() {
             <div className={s.resultsBadge}><IconTrophy /></div>
             <h2 className={s.resultsTitle}>Simulation Complete!</h2>
             <p className={s.resultsSubtitle}>
-              You navigated all 3 financial decision points in the Debt Snowball vs Avalanche simulation.
+              You navigated all financial decision points in the <strong>{simTitle}</strong> simulation.
             </p>
 
             <div className={s.resultsStats}>
               <div className={s.resultsStat}>
-                <div className={s.resultsStatValue}>{steps.length}/{steps.length}</div>
+                <div className={s.resultsStatValue}>{decisions.length}</div>
                 <div className={s.resultsStatLabel}>Decisions</div>
               </div>
               <div className={s.resultsDivider} />
               <div className={s.resultsStat}>
-                <div className={`${s.resultsStatValue} ${s.resultsXp}`}>+{XP_TOTAL} XP</div>
+                <div className={`${s.resultsStatValue} ${s.resultsXp}`}>+{xpEarned} XP</div>
                 <div className={s.resultsStatLabel}>Earned</div>
               </div>
               <div className={s.resultsDivider} />
               <div className={s.resultsStat}>
-                <div className={s.resultsStatValue}>24 mo</div>
-                <div className={s.resultsStatLabel}>Payoff Est.</div>
+                <div className={s.resultsStatValue}>{finalScore}%</div>
+                <div className={s.resultsStatLabel}>Score</div>
               </div>
             </div>
 
             {/* Decision recap */}
             <div className={s.recapList}>
-              {steps.map((st, i) => (
-                <div key={st.id} className={s.recapItem}>
+              {decisions.map((d, i) => (
+                <div key={i} className={s.recapItem}>
                   <div className={s.recapCheck}><IconCheck /></div>
                   <div className={s.recapText}>
-                    <div className={s.recapTitle}>Step {st.id}: {st.title}</div>
-                    {chosen[i] !== null && (
-                      <div className={s.recapChoice}>
-                        You chose: <strong>{st.choices[chosen[i]!].label}</strong>
-                      </div>
-                    )}
+                    <div className={s.recapTitle}>Step {d.stepNumber}</div>
+                    <div className={s.recapChoice}>
+                      You chose: <strong>{d.choiceText}</strong>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -253,6 +249,8 @@ export default function SimulationRunnerPage() {
   }
 
   /* ── Step screen ── */
+  const choices: SimChoice[] = currentStep.SimChoices ?? [];
+
   return (
     <LearnerLayout>
       <div className={s.runnerWrap}>
@@ -264,17 +262,12 @@ export default function SimulationRunnerPage() {
               <IconChevLeft /> Simulations
             </button>
             <span className={s.topBarSep}>/</span>
-            <span className={s.topBarTitle}>Debt Snowball vs Avalanche</span>
+            <span className={s.topBarTitle}>{simTitle}</span>
           </div>
           <div className={s.topBarRight}>
-            <span className={s.xpPill}><IconBolt /> +{XP_TOTAL} XP on completion</span>
-            <span className={s.stepCount}>Step {stepIdx + 1} of {steps.length}</span>
+            <span className={s.xpPill}><IconBolt /> +{xpReward} XP on completion</span>
+            <span className={s.stepCount}>Step {currentStep.step_number}</span>
           </div>
-        </div>
-
-        {/* Progress bar */}
-        <div className={s.progressBar}>
-          <div className={s.progressFill} style={{ width: `${progress}%` }} />
         </div>
 
         {/* Main two-column layout */}
@@ -283,35 +276,16 @@ export default function SimulationRunnerPage() {
           {/* Left: context panel */}
           <div className={s.contextPanel}>
             <div className={s.contextCard}>
-              <div className={s.contextTag}>Scenario {step.id}</div>
-              <h2 className={s.contextTitle}>{step.title}</h2>
-              <p className={s.contextScenario}>{step.scenario}</p>
+              <div className={s.contextTag}>Scenario {currentStep.step_number}</div>
+              <h2 className={s.contextTitle}>Decision Point</h2>
+              <p className={s.contextScenario}>{currentStep.scenario_text}</p>
 
-              <div className={s.contextHint}>
-                <IconInfo />
-                <span>{step.context}</span>
-              </div>
-            </div>
-
-            {/* Debt snapshot */}
-            <div className={s.snapshotCard}>
-              <div className={s.snapshotTitle}>Your Debt Snapshot</div>
-              <div className={s.debtList}>
-                {debts.map((d) => (
-                  <div key={d.label} className={s.debtRow}>
-                    <div className={s.debtLabel}>{d.label}</div>
-                    <div className={s.debtDetails}>
-                      <span className={s.debtBalance}>{d.balance}</span>
-                      <span className={s.debtRate}>{d.rate} APR</span>
-                      <span className={s.debtMin}>Min: {d.minPayment}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className={s.debtTotal}>
-                <span>Total</span>
-                <span className={s.debtTotalValue}>RWF 1,935,000</span>
-              </div>
+              {decisions.length > 0 && (
+                <div className={s.contextHint}>
+                  <IconInfo />
+                  <span>Previous decisions: {decisions.length} completed</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -322,48 +296,56 @@ export default function SimulationRunnerPage() {
               <p className={s.decisionSubtitle}>Choose the strategy you would apply in this situation.</p>
 
               <div className={s.choiceList}>
-                {step.choices.map((c, idx) => (
+                {choices.map((c, idx) => (
                   <button
-                    key={idx}
+                    key={c.id}
                     type="button"
-                    className={`${s.choiceBtn} ${chosenForStep === idx ? s.choiceBtnSelected : ""}`}
-                    onClick={() => choose(idx)}
-                    disabled={showFeedback}
+                    className={`${s.choiceBtn} ${selectedChoiceId === c.id ? s.choiceBtnSelected : ""}`}
+                    onClick={() => !feedback && setSelectedChoiceId(c.id)}
+                    disabled={!!feedback}
                   >
-                    <span className={`${s.choiceLetter} ${chosenForStep === idx ? s.choiceLetterSelected : ""}`}>
+                    <span className={`${s.choiceLetter} ${selectedChoiceId === c.id ? s.choiceLetterSelected : ""}`}>
                       {String.fromCharCode(65 + idx)}
                     </span>
                     <div className={s.choiceText}>
-                      <div className={s.choiceLabel}>{c.label}</div>
-                      <div className={s.choiceDesc}>{c.desc}</div>
+                      <div className={s.choiceLabel}>{c.choice_text}</div>
                     </div>
                   </button>
                 ))}
               </div>
 
               {/* Feedback box */}
-              {showFeedback && chosenForStep !== null && (
+              {feedback && (
                 <div className={s.feedbackBox}>
                   <div className={s.feedbackLabel}><IconCheck /> Outcome</div>
-                  <p className={s.feedbackText}>{step.choices[chosenForStep].outcome}</p>
+                  <p className={s.feedbackText}>{feedback.outcome}</p>
+                  {feedback.financial_impact !== 0 && (
+                    <p style={{ fontSize: "0.85rem", color: feedback.financial_impact > 0 ? "#16a34a" : "#ef4444", marginTop: "0.5rem" }}>
+                      Financial impact: {feedback.financial_impact > 0 ? "+" : ""}{feedback.financial_impact} pts
+                    </p>
+                  )}
+                  {feedback.xp_bonus != null && feedback.xp_bonus > 0 && (
+                    <p style={{ fontSize: "0.85rem", color: "#22c55e", marginTop: "0.25rem" }}>
+                      <IconBolt /> +{feedback.xp_bonus} XP bonus
+                    </p>
+                  )}
                 </div>
               )}
 
               {/* Action buttons */}
               <div className={s.actionRow}>
-                {!showFeedback ? (
+                {!feedback ? (
                   <button
                     type="button"
-                    className={`${s.confirmBtn} ${chosenForStep === null ? s.confirmBtnDisabled : ""}`}
-                    onClick={confirm}
-                    disabled={chosenForStep === null}
+                    className={`${s.confirmBtn} ${!selectedChoiceId ? s.confirmBtnDisabled : ""}`}
+                    onClick={confirmChoice}
+                    disabled={!selectedChoiceId || submitting}
                   >
-                    Confirm Choice <IconChevRight />
+                    {submitting ? "Submitting…" : "Confirm Choice"} <IconChevRight />
                   </button>
                 ) : (
-                  <button type="button" className={s.nextBtn} onClick={goNext}>
-                    {stepIdx < steps.length - 1 ? "Next Scenario" : "See Results"}
-                    <IconChevRight />
+                  <button type="button" className={s.nextBtn} onClick={() => goNext()}>
+                    {done ? "See Results" : "Next Scenario"} <IconChevRight />
                   </button>
                 )}
               </div>

@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/admin/AdminLayout";
 import cardStyles from "@/components/StatCard.module.css";
 import styles from "./analytics.module.css";
+import { adminService } from "@/api/services/admin.service";
+import type { AdminAnalytics } from "@/api/types";
 
 function SearchIcon() {
   return (
@@ -138,6 +140,7 @@ export default function AnalyticsPage() {
   const [insights, setInsights] = useState<PlatformInsight[]>(INITIAL_INSIGHTS);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("All");
+  const [analytics, setAnalytics] = useState<AdminAnalytics | null>(null);
 
   const [editTarget, setEditTarget] = useState<PlatformInsight | null>(null);
   const [editForm, setEditForm] = useState({
@@ -154,6 +157,10 @@ export default function AnalyticsPage() {
     category: "engagement" as InsightCategory,
   });
 
+  useEffect(() => {
+    adminService.getAnalytics().then(setAnalytics).catch(() => {});
+  }, []);
+
   const visible = insights.filter((insight) => {
     const matchFilter =
       filter === "All" || insight.category === filterToCategory[filter];
@@ -166,10 +173,10 @@ export default function AnalyticsPage() {
   });
 
   const stats = [
-    { label: "Daily active users", value: "342", hint: "+12% vs last week" },
-    { label: "Engagement rate", value: "64%", hint: "Lessons + simulations" },
-    { label: "30-day retention", value: "71%", hint: "Returning learners" },
-    { label: "Avg. session", value: "18m", hint: "Per visit" },
+    { label: "Total users",      value: analytics ? String(analytics.total_users)    : "—", hint: "All platform accounts" },
+    { label: "Learners",         value: analytics ? String(analytics.total_learners)  : "—", hint: "Active learning accounts" },
+    { label: "Admins",           value: analytics ? String(analytics.total_admins)    : "—", hint: "Admin & staff" },
+    { label: "Badges awarded",   value: analytics ? String(analytics.total_badges_awarded) : "—", hint: "All time" },
   ];
 
   function openEdit(insight: PlatformInsight) {

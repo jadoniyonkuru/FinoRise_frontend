@@ -1,5 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LearnerLayout from "../LearnerLayout";
+import { useAuth } from "@/context/AuthContext";
+import { rewardsService } from "@/api";
+import type { Reward, Redemption, RewardType } from "@/api";
 import s from "./reward-catalog.module.css";
 
 /* ─── Icons ─── */
@@ -66,52 +69,18 @@ function IconCheck() {
     </svg>
   );
 }
-function IconStar() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-    </svg>
-  );
-}
-
 /* ─── Card visual SVGs ─── */
-function VisualFrame() {
+function VisualDefault() {
   return (
     <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
       <circle cx="140" cy="80" r="55" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="10" />
       <circle cx="140" cy="80" r="40" fill="rgba(255,255,255,0.15)" />
       <circle cx="140" cy="80" r="22" fill="rgba(255,255,255,0.25)" />
       <circle cx="140" cy="80" r="8" fill="rgba(255,255,255,0.6)" />
-      <circle cx="140" cy="25" r="5" fill="rgba(255,255,255,0.5)" />
-      <circle cx="140" cy="135" r="5" fill="rgba(255,255,255,0.5)" />
-      <circle cx="85" cy="80" r="5" fill="rgba(255,255,255,0.5)" />
-      <circle cx="195" cy="80" r="5" fill="rgba(255,255,255,0.5)" />
     </svg>
   );
 }
-function VisualCoffee() {
-  return (
-    <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
-      <ellipse cx="140" cy="90" rx="38" ry="42" fill="rgba(255,255,255,0.2)" />
-      <rect x="102" y="55" width="76" height="75" rx="10" fill="rgba(255,255,255,0.25)" />
-      <path d="M178 75 Q195 75 195 90 Q195 105 178 105" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="6" strokeLinecap="round" />
-      <ellipse cx="140" cy="55" rx="38" ry="8" fill="rgba(255,255,255,0.3)" />
-      <path d="M125 30 Q130 20 135 30 Q140 20 145 30" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="3" strokeLinecap="round" />
-    </svg>
-  );
-}
-function VisualKey() {
-  return (
-    <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
-      <circle cx="110" cy="75" r="32" fill="none" stroke="rgba(255,255,255,0.55)" strokeWidth="10" />
-      <circle cx="110" cy="75" r="15" fill="rgba(255,255,255,0.25)" />
-      <rect x="138" y="72" width="70" height="12" rx="6" fill="rgba(255,255,255,0.5)" />
-      <rect x="190" y="84" width="12" height="18" rx="3" fill="rgba(255,255,255,0.5)" />
-      <rect x="172" y="84" width="12" height="14" rx="3" fill="rgba(255,255,255,0.4)" />
-    </svg>
-  );
-}
-function VisualPhone() {
+function VisualAirtime() {
   return (
     <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
       <rect x="108" y="20" width="64" height="120" rx="12" fill="rgba(255,255,255,0.25)" />
@@ -121,7 +90,28 @@ function VisualPhone() {
     </svg>
   );
 }
-function VisualCrown() {
+function VisualDiscount() {
+  return (
+    <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
+      <ellipse cx="140" cy="90" rx="38" ry="42" fill="rgba(255,255,255,0.2)" />
+      <rect x="102" y="55" width="76" height="75" rx="10" fill="rgba(255,255,255,0.25)" />
+      <path d="M178 75 Q195 75 195 90 Q195 105 178 105" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx="140" cy="55" rx="38" ry="8" fill="rgba(255,255,255,0.3)" />
+    </svg>
+  );
+}
+function VisualVoucher() {
+  return (
+    <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
+      <rect x="80" y="30" width="120" height="95" rx="8" fill="rgba(255,255,255,0.2)" />
+      <rect x="90" y="42" width="100" height="6" rx="3" fill="rgba(255,255,255,0.5)" />
+      <rect x="95" y="56" width="60" height="4" rx="2" fill="rgba(255,255,255,0.35)" />
+      <rect x="90" y="68" width="100" height="3" rx="1.5" fill="rgba(255,255,255,0.25)" />
+      <circle cx="140" cy="108" r="12" fill="rgba(255,255,255,0.5)" />
+    </svg>
+  );
+}
+function VisualPremium() {
   return (
     <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
       <path d="M80 110 L100 55 L140 85 L180 40 L220 55 L200 110 Z" fill="rgba(255,255,255,0.3)" stroke="rgba(255,255,255,0.6)" strokeWidth="3" strokeLinejoin="round" />
@@ -132,112 +122,9 @@ function VisualCrown() {
     </svg>
   );
 }
-function VisualCert() {
-  return (
-    <svg viewBox="0 0 280 160" className={s.cardVisualSvg}>
-      <rect x="80" y="30" width="120" height="95" rx="8" fill="rgba(255,255,255,0.2)" />
-      <rect x="90" y="42" width="100" height="6" rx="3" fill="rgba(255,255,255,0.5)" />
-      <rect x="95" y="56" width="60" height="4" rx="2" fill="rgba(255,255,255,0.35)" />
-      <rect x="90" y="68" width="100" height="3" rx="1.5" fill="rgba(255,255,255,0.25)" />
-      <rect x="90" y="76" width="80" height="3" rx="1.5" fill="rgba(255,255,255,0.25)" />
-      <rect x="90" y="84" width="90" height="3" rx="1.5" fill="rgba(255,255,255,0.25)" />
-      <circle cx="140" cy="108" r="12" fill="rgba(255,255,255,0.5)" />
-      <text x="140" y="113" textAnchor="middle" style={{ fill: "rgba(255,255,255,0.9)", fontSize: 12, fontWeight: 800, fontFamily: "inherit" }}>✓</text>
-    </svg>
-  );
-}
 
-/* ─── Data ─── */
-const XP_BALANCE = 2450;
-const XP_LVL_CURRENT = 450;
-const XP_LVL_NEXT = 1000;
-const LEVEL = 3;
-
+/* ─── Helpers ─── */
 type Tag = "Digital" | "Discount" | "Airtime" | "Premium" | "Voucher";
-
-type Reward = {
-  id: number;
-  name: string;
-  partner: string;
-  description: string;
-  cost: number;
-  tag: Tag;
-  popular?: boolean;
-  gradient: string;
-  visual: React.ReactNode;
-};
-
-const rewards: Reward[] = [
-  {
-    id: 1,
-    name: "Financial Master Avatar Frame",
-    partner: "FinoRise",
-    description: "Exclusive gold-plated profile border for elite learners. Show off your status in the community.",
-    cost: 500,
-    tag: "Digital",
-    popular: true,
-    gradient: "linear-gradient(135deg, #92400e 0%, #d97706 50%, #fbbf24 100%)",
-    visual: <VisualFrame />,
-  },
-  {
-    id: 2,
-    name: "Starbucks Gift Voucher",
-    partner: "Starbucks",
-    description: "Redeem 1,200 XP for a $5 Starbucks coffee. Real-world rewards for your educational efforts.",
-    cost: 1200,
-    tag: "Discount",
-    gradient: "linear-gradient(135deg, #064e3b 0%, #059669 60%, #34d399 100%)",
-    visual: <VisualCoffee />,
-  },
-  {
-    id: 3,
-    name: "Advanced Investing Module Unlock",
-    partner: "FinoRise",
-    description: "Bypass level requirements for the 'Advanced Crypto Strategies' module.",
-    cost: 800,
-    tag: "Digital",
-    gradient: "linear-gradient(135deg, #1e2d5c 0%, #1d4ed8 60%, #60a5fa 100%)",
-    visual: <VisualKey />,
-  },
-  {
-    id: 4,
-    name: "MTN Airtime Bundle",
-    partner: "MTN Rwanda",
-    description: "RWF 1,000 airtime + 1 GB mobile data valid for 7 days. Instantly credited to your number.",
-    cost: 400,
-    tag: "Airtime",
-    gradient: "linear-gradient(135deg, #7c2d12 0%, #ea580c 60%, #fb923c 100%)",
-    visual: <VisualPhone />,
-  },
-  {
-    id: 5,
-    name: "FinoRise Pro – 1 Month",
-    partner: "FinoRise",
-    description: "Full Pro tier: unlimited AI Coach sessions, advanced analytics, exclusive simulations, and no ads.",
-    cost: 1500,
-    tag: "Premium",
-    popular: true,
-    gradient: "linear-gradient(135deg, #4c1d95 0%, #7c3aed 60%, #a78bfa 100%)",
-    visual: <VisualCrown />,
-  },
-  {
-    id: 6,
-    name: "Financial Literacy Certificate",
-    partner: "FinoRise",
-    description: "Official digital certificate verifiable via blockchain. Share on LinkedIn and your resume.",
-    cost: 800,
-    tag: "Digital",
-    gradient: "linear-gradient(135deg, #1e3a5f 0%, #2563eb 60%, #93c5fd 100%)",
-    visual: <VisualCert />,
-  },
-];
-
-type HistoryItem = { id: number; name: string; cost: number; date: string; status: "Delivered" | "Processing" };
-const history: HistoryItem[] = [
-  { id: 1, name: "Airtime Top-up",           cost: 200,  date: "May 20, 2026", status: "Delivered" },
-  { id: 2, name: "Budget Master Badge",       cost: 150,  date: "May 14, 2026", status: "Delivered" },
-  { id: 3, name: "Learning Voucher – Coursera", cost: 500, date: "May 05, 2026", status: "Delivered" },
-];
 
 const tagColors: Record<Tag, { bg: string; color: string }> = {
   Digital:  { bg: "#eff6ff", color: "#2563eb" },
@@ -247,28 +134,96 @@ const tagColors: Record<Tag, { bg: string; color: string }> = {
   Voucher:  { bg: "#fefce8", color: "#ca8a04" },
 };
 
-type Tab = "marketplace" | "history";
+function rewardGradient(type: RewardType): string {
+  const map: Record<string, string> = {
+    airtime: "linear-gradient(135deg,#7c2d12,#ea580c 60%,#fb923c)",
+    discount: "linear-gradient(135deg,#064e3b,#059669 60%,#34d399)",
+    voucher: "linear-gradient(135deg,#1e3a5f,#2563eb 60%,#93c5fd)",
+    partner_offer: "linear-gradient(135deg,#4c1d95,#7c3aed 60%,#a78bfa)",
+  };
+  return map[type] ?? "linear-gradient(135deg,#1e2d5c,#1d4ed8 60%,#60a5fa)";
+}
 
-/* ─── Modal ─── */
-type ModalState = { open: boolean; reward: Reward | null; done: boolean };
+function rewardTag(type: RewardType): Tag {
+  const map: Record<string, Tag> = {
+    airtime: "Airtime",
+    discount: "Discount",
+    voucher: "Voucher",
+    partner_offer: "Premium",
+  };
+  return map[type] ?? "Digital";
+}
+
+function rewardVisual(type: RewardType): React.ReactNode {
+  if (type === "airtime") return <VisualAirtime />;
+  if (type === "discount") return <VisualDiscount />;
+  if (type === "voucher") return <VisualVoucher />;
+  if (type === "partner_offer") return <VisualPremium />;
+  return <VisualDefault />;
+}
+
+function formatDate(dateStr: string): string {
+  return new Date(dateStr).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+}
+
+type Tab = "marketplace" | "history";
+type ModalState = { open: boolean; reward: Reward | null; done: boolean; code: string | null };
 
 export default function RewardCatalogPage() {
+  const { user, refreshUser } = useAuth();
   const [tab, setTab] = useState<Tab>("marketplace");
   const [search, setSearch] = useState("");
-  const [modal, setModal] = useState<ModalState>({ open: false, reward: null, done: false });
+  const [rewards, setRewards] = useState<Reward[]>([]);
+  const [redemptions, setRedemptions] = useState<Redemption[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState<ModalState>({ open: false, reward: null, done: false, code: null });
+  const [redeeming, setRedeeming] = useState(false);
+  const [redeemError, setRedeemError] = useState("");
+
+  const xpBalance = user?.xp_total ?? 0;
+  const level = user?.level ?? 1;
+
+  useEffect(() => {
+    Promise.all([rewardsService.getAll(), rewardsService.getMyRedemptions()])
+      .then(([r, h]) => { setRewards(r); setRedemptions(h); })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  const rewardMap = Object.fromEntries(rewards.map(r => [r.id, r]));
 
   const visible = rewards.filter(r =>
-    search.trim() === "" ||
-    r.name.toLowerCase().includes(search.toLowerCase()) ||
-    r.partner.toLowerCase().includes(search.toLowerCase())
+    r.is_active &&
+    (search.trim() === "" ||
+      r.title.toLowerCase().includes(search.toLowerCase()) ||
+      r.description.toLowerCase().includes(search.toLowerCase()))
   );
 
   function openModal(r: Reward) {
-    if (XP_BALANCE >= r.cost) setModal({ open: true, reward: r, done: false });
+    if (xpBalance >= r.xp_cost) {
+      setModal({ open: true, reward: r, done: false, code: null });
+      setRedeemError("");
+    }
   }
 
-  function confirm() { setModal(m => ({ ...m, done: true })); }
-  function closeModal() { setModal({ open: false, reward: null, done: false }); }
+  async function confirm() {
+    if (!modal.reward) return;
+    setRedeeming(true);
+    setRedeemError("");
+    try {
+      const result = await rewardsService.redeem(modal.reward.id);
+      await refreshUser();
+      const updated = await rewardsService.getMyRedemptions();
+      setRedemptions(updated);
+      setModal(m => ({ ...m, done: true, code: result.redemption_code }));
+    } catch {
+      setRedeemError("Redemption failed. Please try again.");
+    } finally {
+      setRedeeming(false);
+    }
+  }
+
+  function closeModal() { setModal({ open: false, reward: null, done: false, code: null }); }
 
   return (
     <LearnerLayout>
@@ -282,7 +237,7 @@ export default function RewardCatalogPage() {
           <span className={s.streakIcon}><IconGift /></span>
           <div>
             <div className={s.streakTitle}>Redemption Streak</div>
-            <div className={s.streakSub}>3 items this month</div>
+            <div className={s.streakSub}>{redemptions.length} redemptions total</div>
           </div>
         </div>
       </div>
@@ -294,15 +249,11 @@ export default function RewardCatalogPage() {
           <div className={s.walletTitle}>XP Wallet</div>
           <div className={s.walletSub}>Keep learning to unlock premium rewards.</div>
           <div className={s.walletLevelRow}>
-            <span className={s.walletLevelLabel}>Level {LEVEL}</span>
-            <div className={s.walletBar}>
-              <div className={s.walletBarFill} style={{ width: `${(XP_LVL_CURRENT / XP_LVL_NEXT) * 100}%` }} />
-            </div>
-            <span className={s.walletLevelNext}>{XP_LVL_CURRENT}/{XP_LVL_NEXT} XP to Lvl {LEVEL + 1}</span>
+            <span className={s.walletLevelLabel}>Level {level}</span>
           </div>
         </div>
         <div className={s.walletTotal}>
-          <span className={s.walletXp}>{XP_BALANCE.toLocaleString()}</span>
+          <span className={s.walletXp}>{xpBalance.toLocaleString()}</span>
           <span className={s.walletXpLabel}>Total XP</span>
         </div>
       </div>
@@ -343,43 +294,44 @@ export default function RewardCatalogPage() {
 
       {/* ── Marketplace grid ── */}
       {tab === "marketplace" && (
-        <div className={s.grid}>
-          {visible.map(r => {
-            const affordable = XP_BALANCE >= r.cost;
-            const tc = tagColors[r.tag];
-            return (
-              <div key={r.id} className={`${s.card} ${!affordable ? s.cardDimmed : ""}`}>
-                {/* Visual area */}
-                <div className={s.cardVisual} style={{ background: r.gradient }}>
-                  {r.visual}
-                  {r.popular && <span className={s.popularBadge}><IconStar /> Popular</span>}
-                  <span className={s.tagBadge} style={{ background: tc.bg, color: tc.color }}>{r.tag}</span>
-                </div>
-                {/* Body */}
-                <div className={s.cardBody}>
-                  <div className={s.cardName}>{r.name}</div>
-                  <div className={s.cardPartner}>{r.partner}</div>
-                  <div className={s.cardDesc}>{r.description}</div>
-                  <div className={s.cardCost}>
-                    <IconBolt /> {r.cost.toLocaleString()} XP
+        loading ? (
+          <p style={{ color: "#6b7280" }}>Loading rewards…</p>
+        ) : (
+          <div className={s.grid}>
+            {visible.map(r => {
+              const affordable = xpBalance >= r.xp_cost;
+              const tag = rewardTag(r.reward_type);
+              const tc = tagColors[tag];
+              return (
+                <div key={r.id} className={`${s.card} ${!affordable ? s.cardDimmed : ""}`}>
+                  <div className={s.cardVisual} style={{ background: rewardGradient(r.reward_type) }}>
+                    {rewardVisual(r.reward_type)}
+                    <span className={s.tagBadge} style={{ background: tc.bg, color: tc.color }}>{tag}</span>
                   </div>
-                  <button
-                    type="button"
-                    className={`${s.redeemBtn} ${!affordable ? s.redeemBtnDisabled : ""}`}
-                    disabled={!affordable}
-                    onClick={() => openModal(r)}
-                  >
-                    <IconGift />
-                    {affordable ? "Redeem Now" : `Need ${(r.cost - XP_BALANCE).toLocaleString()} more XP`}
-                  </button>
+                  <div className={s.cardBody}>
+                    <div className={s.cardName}>{r.title}</div>
+                    <div className={s.cardDesc}>{r.description}</div>
+                    <div className={s.cardCost}>
+                      <IconBolt /> {r.xp_cost.toLocaleString()} XP
+                    </div>
+                    <button
+                      type="button"
+                      className={`${s.redeemBtn} ${!affordable ? s.redeemBtnDisabled : ""}`}
+                      disabled={!affordable}
+                      onClick={() => openModal(r)}
+                    >
+                      <IconGift />
+                      {affordable ? "Redeem Now" : `Need ${(r.xp_cost - xpBalance).toLocaleString()} more XP`}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-          {visible.length === 0 && (
-            <div className={s.empty}>No rewards match your search.</div>
-          )}
-        </div>
+              );
+            })}
+            {visible.length === 0 && (
+              <div className={s.empty}>No rewards match your search.</div>
+            )}
+          </div>
+        )
       )}
 
       {/* ── History tab ── */}
@@ -387,21 +339,30 @@ export default function RewardCatalogPage() {
         <div className={s.historyCard}>
           <div className={s.historyHeader}>
             <span className={s.historyTitle}>Redemption History</span>
-            <span className={s.historySub}>{history.length} redemptions</span>
+            <span className={s.historySub}>{redemptions.length} redemptions</span>
           </div>
-          {history.map(h => (
-            <div key={h.id} className={s.historyRow}>
-              <div className={s.historyIcon}><IconCheck /></div>
-              <div className={s.historyBody}>
-                <div className={s.historyName}>{h.name}</div>
-                <div className={s.historyDate}>{h.date}</div>
-              </div>
-              <div className={s.historyCost}>-{h.cost} XP</div>
-              <span className={`${s.historyStatus} ${h.status === "Delivered" ? s.historyDelivered : s.historyProcessing}`}>
-                {h.status}
-              </span>
-            </div>
-          ))}
+          {loading ? (
+            <p style={{ color: "#6b7280", padding: "1rem 0" }}>Loading history…</p>
+          ) : redemptions.length === 0 ? (
+            <p style={{ color: "#6b7280", padding: "1rem 0" }}>No redemptions yet.</p>
+          ) : (
+            redemptions.map(h => {
+              const reward = rewardMap[h.reward_id];
+              return (
+                <div key={h.id} className={s.historyRow}>
+                  <div className={s.historyIcon}><IconCheck /></div>
+                  <div className={s.historyBody}>
+                    <div className={s.historyName}>{reward?.title ?? "Reward"}</div>
+                    <div className={s.historyDate}>{formatDate(h.created_at)}</div>
+                  </div>
+                  <div className={s.historyCost}>-{h.xp_spent} XP</div>
+                  <span className={`${s.historyStatus} ${h.status === "confirmed" || h.status === "used" ? s.historyDelivered : s.historyProcessing}`}>
+                    {h.status.charAt(0).toUpperCase() + h.status.slice(1)}
+                  </span>
+                </div>
+              );
+            })
+          )}
         </div>
       )}
 
@@ -411,18 +372,21 @@ export default function RewardCatalogPage() {
           <div className={s.modal} onClick={e => e.stopPropagation()}>
             {!modal.done ? (
               <>
-                <div className={s.modalVisual} style={{ background: modal.reward.gradient }}>
-                  {modal.reward.visual}
+                <div className={s.modalVisual} style={{ background: rewardGradient(modal.reward.reward_type) }}>
+                  {rewardVisual(modal.reward.reward_type)}
                 </div>
-                <h3 className={s.modalTitle}>{modal.reward.name}</h3>
+                <h3 className={s.modalTitle}>{modal.reward.title}</h3>
                 <p className={s.modalDesc}>{modal.reward.description}</p>
-                <div className={s.modalCost}><IconBolt /> {modal.reward.cost.toLocaleString()} XP will be deducted</div>
+                <div className={s.modalCost}><IconBolt /> {modal.reward.xp_cost.toLocaleString()} XP will be deducted</div>
                 <div className={s.modalBalance}>
-                  Balance: {XP_BALANCE.toLocaleString()} → {(XP_BALANCE - modal.reward.cost).toLocaleString()} XP
+                  Balance: {xpBalance.toLocaleString()} → {(xpBalance - modal.reward.xp_cost).toLocaleString()} XP
                 </div>
+                {redeemError && <p style={{ color: "#ef4444", fontSize: "0.8rem", margin: "0.5rem 0 0" }}>{redeemError}</p>}
                 <div className={s.modalActions}>
                   <button type="button" className={s.modalCancel} onClick={closeModal}>Cancel</button>
-                  <button type="button" className={s.modalConfirm} onClick={confirm}>Confirm Redemption</button>
+                  <button type="button" className={s.modalConfirm} onClick={confirm} disabled={redeeming}>
+                    {redeeming ? "Processing…" : "Confirm Redemption"}
+                  </button>
                 </div>
               </>
             ) : (
@@ -430,9 +394,13 @@ export default function RewardCatalogPage() {
                 <div className={s.modalSuccessIcon}><IconCheck /></div>
                 <h3 className={s.modalTitle}>Redeemed!</h3>
                 <p className={s.modalDesc}>
-                  <strong>{modal.reward.name}</strong> has been redeemed successfully.
-                  Check your email for delivery details.
+                  <strong>{modal.reward.title}</strong> has been redeemed successfully.
                 </p>
+                {modal.code && (
+                  <p style={{ fontFamily: "monospace", background: "#f3f4f6", padding: "0.5rem 1rem", borderRadius: "6px", fontSize: "0.9rem", margin: "0.5rem 0" }}>
+                    Code: <strong>{modal.code}</strong>
+                  </p>
+                )}
                 <button type="button" className={s.modalConfirm} onClick={closeModal}>Done</button>
               </>
             )}

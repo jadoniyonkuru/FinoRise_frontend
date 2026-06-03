@@ -7,13 +7,13 @@
 }
 
 .sidebar {
-  background: linear-gradient(180deg, #0a2239 0%, #0c2d4f 100%);
-  color: #c5d4e8;
+  background: var(--surface);
+  color: var(--text-muted);
   padding: 1.35rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  border-right: 1px solid var(--border);
 }
 
 .brand {
@@ -39,7 +39,7 @@
 }
 
 .brandName {
-  color: #fff;
+  color: var(--text);
   font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -52,7 +52,7 @@
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: #6d8aab;
+  color: var(--text-muted);
 }
 
 .subNav {
@@ -73,27 +73,27 @@
 }
 
 .subLink {
-  color: #9eb5cc;
+  color: var(--text-muted);
 }
 
 .subLink:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  background: var(--surface-elevated);
 }
 
 .subLinkActive {
-  color: #fff;
-  background: rgba(30, 64, 175, 0.55);
+  color: var(--learner);
+  background: color-mix(in srgb, var(--learner) 12%, var(--surface));
   font-weight: 600;
 }
 
 .logout {
   margin-top: auto;
   padding: 0.6rem 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--border);
   border-radius: 9px;
   background: transparent;
-  color: #9eb5cc;
+  color: var(--text-muted);
   cursor: pointer;
   font-family: inherit;
   font-size: 0.85rem;
@@ -102,8 +102,8 @@
 }
 
 .logout:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.28);
+  color: var(--text);
+  border-color: color-mix(in srgb, var(--learner) 50%, var(--border));
 }
 
 .mainWrap {

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminLayout from "@/admin/AdminLayout";
 import cardStyles from "@/components/StatCard.module.css";
 import styles from "./user-management.module.css";
+import { adminService } from "@/api/services/admin.service";
 
 /* ── Icons ── */
 function SearchIcon() {
@@ -45,25 +46,25 @@ const roleOptions: { value: AdminRole; label: string; description: string }[] = 
   { value: "analytics_viewer",    label: "Analytics dashboard",     description: "View reporting and platform insights" },
 ];
 
-/* ── Sample data ── */
-const INITIAL_USERS: ManagedUser[] = [
-  { id: "1",  name: "Aline Mukamana",   email: "aline@finorise.com",    role: "admin",              status: "Active",   avatarColor: "#0ea5e9" },
-  { id: "2",  name: "Jean Ndayisaba",   email: "jean@finorise.com",     role: "module_manager",     status: "Active",   avatarColor: "#8b5cf6" },
-  { id: "3",  name: "Keza Uwase",       email: "keza@finorise.com",     role: "rewards_manager",    status: "Active",   avatarColor: "#22c55e" },
-  { id: "4",  name: "Eric Habimana",    email: "eric@finorise.com",     role: "simulation_manager", status: "Active",   avatarColor: "#f59e0b" },
-  { id: "5",  name: "Marie Ingabire",   email: "marie@finorise.com",    role: "analytics_viewer",   status: "Active",   avatarColor: "#f97316" },
-  { id: "6",  name: "Patrick Niyombi",  email: "patrick@finorise.com",  role: "learner",            status: "Active",   avatarColor: "#06b6d4" },
-  { id: "7",  name: "Grace Umuhoza",    email: "grace@finorise.com",    role: "partner",            status: "Active",   avatarColor: "#ec4899" },
-  { id: "8",  name: "Samuel Hakizimana",email: "samuel@finorise.com",   role: "learner",            status: "Disabled", avatarColor: "#64748b" },
-  { id: "9",  name: "Diane Mutoni",     email: "diane@finorise.com",    role: "module_manager",     status: "Active",   avatarColor: "#10b981" },
-  { id: "10", name: "Claude Irakoze",   email: "claude@finorise.com",   role: "analytics_viewer",   status: "Disabled", avatarColor: "#6366f1" },
-];
+const AVATAR_COLORS = ["#0ea5e9","#8b5cf6","#22c55e","#f59e0b","#f97316","#ec4899","#06b6d4","#10b981","#6366f1","#64748b"];
+
+function toManagedUser(u: { id: string; full_name: string; email: string; role: string }, idx: number): ManagedUser {
+  return {
+    id: u.id,
+    name: u.full_name,
+    email: u.email,
+    role: (u.role as AdminRole) ?? "learner",
+    status: "Active",
+    avatarColor: AVATAR_COLORS[idx % AVATAR_COLORS.length],
+  };
+}
 
 type FilterType = "All" | "Active" | "Disabled";
 
 /* ── Component ── */
 export default function UserManagementPage() {
-  const [users, setUsers] = useState<ManagedUser[]>(INITIAL_USERS);
+  const [users, setUsers] = useState<ManagedUser[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("All");
 
@@ -73,10 +74,20 @@ export default function UserManagementPage() {
 
   /* Delete confirm */
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   /* Add user modal */
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState({ name: "", email: "", role: "learner" as AdminRole });
+
+  useEffect(() => {
+    adminService.getUsers()
+      .then((fetched) => {
+        setUsers(fetched.map((u, i) => toManagedUser(u, i)));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   /* ── Derived ── */
   const visible = users.filter((u) => {
@@ -88,10 +99,10 @@ export default function UserManagementPage() {
   });
 
   const stats = [
-    { label: "Total users",       value: String(users.length),                                                      hint: "All accounts" },
-    { label: "Admins",            value: String(users.filter(u => u.role === "admin").length),                      hint: "Full access" },
-    { label: "Managers",          value: String(users.filter(u => u.role.endsWith("_manager")).length),             hint: "Modules, simulations, rewards" },
-    { label: "Analytics viewers", value: String(users.filter(u => u.role === "analytics_viewer").length),           hint: "Reporting access" },
+    { label: "Total users",       value: String(users.length),                                            hint: "All accounts" },
+    { label: "Admins",            value: String(users.filter(u => u.role === "admin").length),            hint: "Full access" },
+    { label: "Learners",          value: String(users.filter(u => u.role === "learner").length),          hint: "Learning accounts" },
+    { label: "Partners",          value: String(users.filter(u => u.role === "partner").length),          hint: "Partner access" },
   ];
 
   /* ── Handlers ── */
@@ -108,10 +119,18 @@ export default function UserManagementPage() {
     setEditTarget(null);
   }
 
-  function confirmDelete() {
+  async function confirmDelete() {
     if (!deleteTarget) return;
-    setUsers(prev => prev.filter(u => u.id !== deleteTarget.id));
-    setDeleteTarget(null);
+    setDeleting(true);
+    try {
+      await adminService.deleteUser(deleteTarget.id);
+      setUsers(prev => prev.filter(u => u.id !== deleteTarget.id));
+    } catch {
+      // keep user in list if delete failed
+    } finally {
+      setDeleting(false);
+      setDeleteTarget(null);
+    }
   }
 
   function handleRoleChange(userId: string, role: AdminRole) {
@@ -120,14 +139,13 @@ export default function UserManagementPage() {
 
   function saveAdd() {
     if (!addForm.name.trim() || !addForm.email.trim()) return;
-    const colors = ["#0ea5e9","#8b5cf6","#22c55e","#f59e0b","#f97316","#ec4899","#06b6d4","#10b981"];
     const newUser: ManagedUser = {
       id: String(Date.now()),
       name: addForm.name,
       email: addForm.email,
       role: addForm.role,
       status: "Active",
-      avatarColor: colors[users.length % colors.length],
+      avatarColor: AVATAR_COLORS[users.length % AVATAR_COLORS.length],
     };
     setUsers(prev => [...prev, newUser]);
     setShowAdd(false);
@@ -185,7 +203,8 @@ export default function UserManagementPage() {
 
         {/* User rows */}
         <div className={styles.roleTable}>
-          {visible.length === 0 && <div className={styles.empty}>No users match your search.</div>}
+          {loading && <div className={styles.empty}>Loading users…</div>}
+          {!loading && visible.length === 0 && <div className={styles.empty}>No users match your search.</div>}
           {visible.map((user) => {
             const currentRole = roleOptions.find(r => r.value === user.role);
             return (
@@ -282,7 +301,7 @@ export default function UserManagementPage() {
 
       {/* ── Delete Confirm Modal ── */}
       {deleteTarget && (
-        <div className={styles.overlay} onClick={() => setDeleteTarget(null)}>
+        <div className={styles.overlay} onClick={() => !deleting && setDeleteTarget(null)}>
           <div className={styles.deleteModal} onClick={e => e.stopPropagation()}>
             <div className={styles.deleteIconWrap}><AlertIcon /></div>
             <h3 className={styles.deleteTitle}>Delete user?</h3>
@@ -290,8 +309,10 @@ export default function UserManagementPage() {
               Are you sure you want to delete <strong>{deleteTarget.name}</strong>? This action cannot be undone and will revoke all platform access.
             </p>
             <div className={styles.modalActions}>
-              <button type="button" className={styles.btnCancel} onClick={() => setDeleteTarget(null)}>Cancel</button>
-              <button type="button" className={styles.btnDeleteConfirm} onClick={confirmDelete}>Yes, delete</button>
+              <button type="button" className={styles.btnCancel} onClick={() => setDeleteTarget(null)} disabled={deleting}>Cancel</button>
+              <button type="button" className={styles.btnDeleteConfirm} onClick={confirmDelete} disabled={deleting}>
+                {deleting ? "Deleting…" : "Yes, delete"}
+              </button>
             </div>
           </div>
         </div>

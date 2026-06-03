@@ -28,7 +28,7 @@
 .lessonTitle {
   font-size: 1.4rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   letter-spacing: -0.02em;
   margin: 0;
 }
@@ -48,7 +48,7 @@
   align-items: center;
   gap: 0.5rem;
   font-size: 0.8rem;
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .breadcrumbSep {
@@ -69,8 +69,8 @@
   padding: 0.55rem 1rem;
   border: 1.5px solid #e5e7eb;
   border-radius: 9px;
-  background: #fff;
-  color: #374151;
+  background: var(--surface);
+  color: var(--text-muted);
   font-size: 0.84rem;
   font-weight: 600;
   font-family: inherit;
@@ -113,8 +113,8 @@
 
 /* ── Video player ── */
 .videoCard {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   overflow: hidden;
 }
@@ -157,7 +157,7 @@
 
 .videoPlayer:hover .playCircle {
   transform: scale(1.08);
-  background: #fff;
+  background: var(--surface);
 }
 
 /* Bottom controls bar */
@@ -236,7 +236,7 @@
 .lessonContentTitle {
   font-size: 1.1rem;
   font-weight: 800;
-  color: #111827;
+  color: var(--text);
   margin: 0 0 0.6rem;
   letter-spacing: -0.01em;
 }
@@ -263,10 +263,10 @@
   gap: 0.4rem;
   padding: 0.75rem 1rem;
   border: none;
-  background: #fff;
+  background: var(--surface);
   font-size: 0.84rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--text-muted);
   cursor: pointer;
   font-family: inherit;
   border-bottom: 2px solid transparent;
@@ -274,7 +274,7 @@
 }
 
 .lessonTab:hover {
-  color: #374151;
+  color: var(--text-muted);
 }
 
 .lessonTabActive {
@@ -305,7 +305,7 @@
   align-items: flex-start;
   gap: 0.65rem;
   font-size: 0.875rem;
-  color: #374151;
+  color: var(--text-muted);
   line-height: 1.55;
 }
 
@@ -346,8 +346,8 @@
 
 /* ── Right: Curriculum panel ── */
 .curriculumPanel {
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 14px;
   padding: 1.25rem;
   position: sticky;
@@ -359,7 +359,7 @@
   font-weight: 800;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-bottom: 0.85rem;
 }
 
@@ -372,7 +372,7 @@
 
 .progressLabel {
   font-size: 0.78rem;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .progressPct {
@@ -447,7 +447,7 @@
 .lessonItemTitle {
   font-size: 0.8rem;
   font-weight: 500;
-  color: #374151;
+  color: var(--text-muted);
   line-height: 1.3;
 }
 
@@ -457,7 +457,7 @@
 }
 
 .lessonItemTitleLocked {
-  color: #9ca3af;
+  color: var(--text-muted);
 }
 
 .currentTag {
@@ -476,7 +476,7 @@
   align-items: center;
   gap: 0.3rem;
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: var(--text-muted);
   margin-top: 0.15rem;
 }
 
@@ -490,7 +490,7 @@
   border: 1.5px solid #e5e7eb;
   border-radius: 8px;
   background: transparent;
-  color: #374151;
+  color: var(--text-muted);
   font-size: 0.8rem;
   font-weight: 600;
   font-family: inherit;

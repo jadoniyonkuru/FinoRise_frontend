@@ -13,8 +13,8 @@ export const gamificationService = {
   },
 
   async getBadges(): Promise<Badge[]> {
-    const res = await apiClient.get<Badge[]>('/api/gamification/badges');
-    return res.data;
+    const res = await apiClient.get<{ badges: Badge[] }>('/api/gamification/badges');
+    return res.data.badges;
   },
 
   async getStreak(): Promise<StreakInfo> {
@@ -23,7 +23,7 @@ export const gamificationService = {
   },
 
   async getLeaderboard(): Promise<LeaderboardEntry[]> {
-    const res = await apiClient.get<LeaderboardEntry[]>('/api/gamification/leaderboard');
-    return res.data;
+    const res = await apiClient.get<{ leaderboard: LeaderboardEntry[] }>('/api/gamification/leaderboard');
+    return res.data.leaderboard;
   },
 };

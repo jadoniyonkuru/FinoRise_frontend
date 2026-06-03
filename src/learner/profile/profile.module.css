@@ -6,7 +6,7 @@
 
 .card {
   background: #ffffff;
-  border: 1px solid #e4e7f3;
+  border: 1px solid var(--border);
   border-radius: 14px;
   box-shadow: 0 12px 26px rgba(15, 23, 42, 0.07);
 }
@@ -41,7 +41,7 @@
 
 .profileName {
   margin: 0 0 0.95rem;
-  color: #0f172a;
+  color: var(--text);
   font-size: 1.75rem;
   font-weight: 800;
   line-height: 1.15;
@@ -50,7 +50,7 @@
 
 .profileEmail {
   margin: 0 0 1.15rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 1.08rem;
   line-height: 1.35;
 }
@@ -90,7 +90,7 @@
 
 .sectionTitle {
   margin: 0 0 2.15rem;
-  color: #0f172a;
+  color: var(--text);
   font-size: 1.08rem;
   font-weight: 800;
   line-height: 1.3;
@@ -124,7 +124,7 @@
 }
 
 .fieldValue {
-  color: #0f172a;
+  color: var(--text);
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.45;
@@ -136,7 +136,7 @@
   border: 1px solid #cbd5e1;
   border-radius: 9px;
   background: #ffffff;
-  color: #0f172a;
+  color: var(--text);
   font: inherit;
   font-size: 1rem;
   padding: 0 0.9rem;
@@ -178,7 +178,7 @@
 .cancelBtn {
   border: 1px solid #cbd5e1;
   background: #ffffff;
-  color: #64748b;
+  color: var(--text-muted);
 }
 
 @media (max-width: 1080px) {
