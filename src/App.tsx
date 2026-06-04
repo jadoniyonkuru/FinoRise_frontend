@@ -1,4 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import ProtectedRoute from "@/components/ProtectedRoute";
+import HomePage from "@/pages/HomePage";
+
 import LoginPage from "@/auth/login/LoginPage";
 import AdminLoginPage from "@/auth/admin-login/AdminLoginPage";
 import RegisterPage from "@/auth/register/RegisterPage";
@@ -35,52 +38,57 @@ import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
 
 import PlatformDashboard from "@/portal/PlatformDashboard";
 
+function P({ children }: { children: React.ReactNode }) {
+  return <ProtectedRoute>{children}</ProtectedRoute>;
+}
+
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
-      <Route path="/dashboard" element={<PlatformDashboard />} />
-
-      {/* Auth (renamed to /account for platform compatibility) */}
+      {/* Public */}
+      <Route path="/" element={<HomePage />} />
       <Route path="/account/login" element={<LoginPage />} />
       <Route path="/account/admin-login" element={<AdminLoginPage />} />
       <Route path="/account/register" element={<RegisterPage />} />
       <Route path="/account/reset-password" element={<ResetPasswordPage />} />
 
-      {/* Learner */}
-      <Route path="/learner/dashboard" element={<LearnerDashboard />} />
-      <Route path="/learner/modules" element={<LearnerModulesPage />} />
-      <Route path="/learner/modules/:moduleId" element={<ModuleDetailPage />} />
-      <Route path="/learner/simulations" element={<LearnerSimulationsPage />} />
-      <Route path="/learner/rewards" element={<LearnerRewardsPage />} />
-      <Route path="/learner/ai-coach" element={<AICoachPage />} />
-      <Route path="/learner/profile" element={<LearnerProfile />} />
-      <Route path="/learner/settings" element={<LearnerSettingsPage />} />
-      <Route path="/learner/analytics" element={<LearnerAnalyticsPage />} />
-      <Route path="/learner/lesson" element={<LessonViewPage />} />
-      <Route path="/learner/quiz" element={<ModuleQuizPage />} />
-      <Route path="/learner/simulation-runner" element={<SimulationRunnerPage />} />
-      <Route path="/learner/insights" element={<BehavioralInsightsPage />} />
-      <Route path="/learner/gamification" element={<GamificationPage />} />
-      <Route path="/learner/reward-catalog" element={<RewardCatalogPage />} />
+      {/* Portal (protected) */}
+      <Route path="/dashboard" element={<P><PlatformDashboard /></P>} />
 
-      {/* Admin */}
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/user-management" element={<UserManagementPage />} />
-      <Route path="/admin/module-manager" element={<ModuleManagerPage />} />
-      <Route path="/admin/simulation-manager" element={<SimulationManagerPage />} />
-      <Route path="/admin/rewards-manager" element={<RewardsManagerPage />} />
-      <Route path="/admin/analytics" element={<AnalyticsPage />} />
-      <Route path="/admin/profile" element={<AdminProfile />} />
+      {/* Learner (protected) */}
+      <Route path="/learner/dashboard" element={<P><LearnerDashboard /></P>} />
+      <Route path="/learner/modules" element={<P><LearnerModulesPage /></P>} />
+      <Route path="/learner/modules/:moduleId" element={<P><ModuleDetailPage /></P>} />
+      <Route path="/learner/simulations" element={<P><LearnerSimulationsPage /></P>} />
+      <Route path="/learner/rewards" element={<P><LearnerRewardsPage /></P>} />
+      <Route path="/learner/ai-coach" element={<P><AICoachPage /></P>} />
+      <Route path="/learner/profile" element={<P><LearnerProfile /></P>} />
+      <Route path="/learner/settings" element={<P><LearnerSettingsPage /></P>} />
+      <Route path="/learner/analytics" element={<P><LearnerAnalyticsPage /></P>} />
+      <Route path="/learner/lesson" element={<P><LessonViewPage /></P>} />
+      <Route path="/learner/quiz" element={<P><ModuleQuizPage /></P>} />
+      <Route path="/learner/simulation-runner" element={<P><SimulationRunnerPage /></P>} />
+      <Route path="/learner/insights" element={<P><BehavioralInsightsPage /></P>} />
+      <Route path="/learner/gamification" element={<P><GamificationPage /></P>} />
+      <Route path="/learner/reward-catalog" element={<P><RewardCatalogPage /></P>} />
 
-      {/* Partner */}
-      <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-      <Route path="/partner/programs" element={<PartnerProgramsPage />} />
-      <Route path="/partner/impact" element={<PartnerImpactPage />} />
-      <Route path="/partner/profile" element={<PartnerProfile />} />
+      {/* Admin (protected) */}
+      <Route path="/admin/dashboard" element={<P><AdminDashboard /></P>} />
+      <Route path="/admin/user-management" element={<P><UserManagementPage /></P>} />
+      <Route path="/admin/module-manager" element={<P><ModuleManagerPage /></P>} />
+      <Route path="/admin/simulation-manager" element={<P><SimulationManagerPage /></P>} />
+      <Route path="/admin/rewards-manager" element={<P><RewardsManagerPage /></P>} />
+      <Route path="/admin/analytics" element={<P><AnalyticsPage /></P>} />
+      <Route path="/admin/profile" element={<P><AdminProfile /></P>} />
+
+      {/* Partner (protected) */}
+      <Route path="/partner/dashboard" element={<P><PartnerDashboard /></P>} />
+      <Route path="/partner/programs" element={<P><PartnerProgramsPage /></P>} />
+      <Route path="/partner/impact" element={<P><PartnerImpactPage /></P>} />
+      <Route path="/partner/profile" element={<P><PartnerProfile /></P>} />
 
       {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/account/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
