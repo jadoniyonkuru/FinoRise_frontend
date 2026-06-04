@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router";
 import LoginPage from "@/auth/login/LoginPage";
 import AdminLoginPage from "@/auth/admin-login/AdminLoginPage";
 import RegisterPage from "@/auth/register/RegisterPage";
@@ -34,11 +34,12 @@ import PartnerProgramsPage from "@/partner/programs/PartnerProgramsPage";
 import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
 
 import PlatformDashboard from "@/portal/PlatformDashboard";
+import LandingPage from "@/landing/LandingPage";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<LandingPage />} />
       <Route path="/dashboard" element={<PlatformDashboard />} />
 
       {/* Auth */}
@@ -80,7 +81,7 @@ export default function App() {
       <Route path="/partner/profile" element={<PartnerProfile />} />
 
       {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/auth/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

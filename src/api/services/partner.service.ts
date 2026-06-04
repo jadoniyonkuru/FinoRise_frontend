@@ -17,7 +17,11 @@ export const partnerService = {
     return res.data.data;
   },
 
-  async updateProfile(data: { full_name?: string; phone?: string }): Promise<User> {
+  async updateProfile(data: {
+    full_name?: string;
+    phone?: string;
+    avatar_url?: string | null;
+  }): Promise<User> {
     const res = await apiClient.put<ApiResponse<User>>('/api/partner/profile', data);
     return res.data.data;
   },

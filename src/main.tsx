@@ -1,7 +1,8 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter } from "react-router";
 import { AuthProvider } from "./context/AuthContext";
+import { LearnerProgressProvider } from "./context/LearnerProgressContext";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
 import "./index.css";
@@ -12,9 +13,11 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
-        <ThemeProvider>
-          <App />
-        </ThemeProvider>
+        <LearnerProgressProvider>
+          <ThemeProvider>
+            <App />
+          </ThemeProvider>
+        </LearnerProgressProvider>
       </AuthProvider>
     </BrowserRouter>
   </StrictMode>

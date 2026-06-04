@@ -1,4 +1,4 @@
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router";
 import type { ReactNode } from "react";
 import type { NavItem } from "@/components/DashboardLayout";
 import ThemeToggle from "@/components/ThemeToggle";

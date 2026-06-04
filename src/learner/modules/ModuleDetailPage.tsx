@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router";
 import LearnerLayout from "../LearnerLayout";
 import { modulesService } from "@/api";
-import type { Module, Lesson, ModuleProgress } from "@/api";
+import type { Module, Lesson } from "@/api";
+import { useLearnerProgress } from "@/context/LearnerProgressContext";
 import s from "./module-detail-page.module.css";
 
 function TextIcon() {
@@ -20,9 +21,13 @@ export default function ModuleDetailPage() {
 
   const [mod, setMod] = useState<Module | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [progress, setProgress] = useState<ModuleProgress | null>(null);
+  const { progress: allProgress, refreshProgress } = useLearnerProgress();
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  const progress = moduleId
+    ? allProgress.find((p) => p.module_id === moduleId) ?? null
+    : null;
 
   useEffect(() => {
     if (!moduleId) { setNotFound(true); return; }
@@ -30,16 +35,15 @@ export default function ModuleDetailPage() {
     Promise.all([
       modulesService.getById(moduleId),
       modulesService.getLessons(moduleId),
-      modulesService.getMyProgress(),
+      refreshProgress(),
     ])
-      .then(([module, lessonList, progressList]) => {
+      .then(([module, lessonList]) => {
         setMod(module);
         setLessons(lessonList.sort((a, b) => a.order_index - b.order_index));
-        setProgress(progressList.find(p => p.module_id === moduleId) ?? null);
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false));
-  }, [moduleId]);
+  }, [moduleId, refreshProgress]);
 
   if (loading) {
     return (

@@ -5,6 +5,7 @@ export interface User {
   full_name: string;
   email: string;
   phone?: string;
+  avatar_url?: string | null;
   role: UserRole;
   xp_total: number;
   level: number;

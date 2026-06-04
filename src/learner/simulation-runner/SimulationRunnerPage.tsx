@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router";
 import LearnerLayout from "../LearnerLayout";
+import { useAuth } from "@/context/AuthContext";
 import { simulationsService } from "@/api";
 import type { SimStep, SimChoice, SubmitChoiceResult } from "@/api";
 import s from "./simulation-runner.module.css";
@@ -64,6 +65,7 @@ type Decision = { stepNumber: number; choiceText: string; outcome: string };
 
 /* ─── Component ─── */
 export default function SimulationRunnerPage() {
+  const { syncXpEarned, refreshUser } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const simulationId = searchParams.get("id") ?? "";
@@ -121,9 +123,15 @@ export default function SimulationRunnerPage() {
       ]);
 
       if (res.status === "completed") {
+        const earned = res.xp_earned ?? xpReward;
         setFinalScore(res.final_score ?? 0);
-        setXpEarned(res.xp_earned ?? xpReward);
+        setXpEarned(earned);
         setDone(true);
+        if (earned > 0) {
+          void syncXpEarned(earned);
+        } else {
+          void refreshUser();
+        }
       }
     } catch {
       setFeedback({ outcome: "An error occurred. Please try again.", financial_impact: 0 });

@@ -54,4 +54,62 @@ export const simulationsService = {
   async remove(id: string): Promise<void> {
     await apiClient.delete(`/api/simulations/${id}`);
   },
+
+  async addStep(
+    simulationId: string,
+    data: {
+      step_number: number;
+      scenario_text: string;
+      subject_title?: string;
+      subject_description?: string;
+      choices?: { choice_text: string; outcome_text?: string; financial_impact?: number; xp_bonus?: number }[];
+    }
+  ): Promise<void> {
+    await apiClient.post(`/api/simulations/${simulationId}/steps`, data);
+  },
+
+  async createWithSubjects(
+    simulation: {
+      title: string;
+      description: string;
+      category: string;
+      difficulty: string;
+      xp_reward?: number;
+      is_published?: boolean;
+    },
+    subjects: {
+      title: string;
+      description: string;
+      questions: { question: string; answer: string }[];
+    }[]
+  ): Promise<Simulation> {
+    const created = await this.create(simulation);
+    let stepNumber = 1;
+    for (const subject of subjects) {
+      for (const q of subject.questions) {
+        const question = q.question.trim();
+        const answer = q.answer.trim();
+        if (!question || !answer) continue;
+        try {
+          await this.addStep(created.id, {
+            step_number: stepNumber++,
+            scenario_text: question,
+            subject_title: subject.title.trim() || undefined,
+            subject_description: subject.description.trim() || undefined,
+            choices: [
+              {
+                choice_text: answer,
+                outcome_text: `Correct: ${answer}`,
+                financial_impact: 0,
+                xp_bonus: 5,
+              },
+            ],
+          });
+        } catch {
+          /* step endpoint may be unavailable; simulation still created */
+        }
+      }
+    }
+    return created;
+  },
 };

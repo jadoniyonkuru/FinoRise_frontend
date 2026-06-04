@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import LearnerLayout from "../LearnerLayout";
 import { analyticsService, modulesService } from "@/api";
 import { useAuth } from "@/context/AuthContext";

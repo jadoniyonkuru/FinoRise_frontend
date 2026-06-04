@@ -23,8 +23,23 @@ export const authService = {
     return res.data.user;
   },
 
-  async updateProfile(data: { full_name?: string; phone?: string }): Promise<User> {
+  async updateProfile(data: {
+    full_name?: string;
+    phone?: string;
+    avatar_url?: string | null;
+  }): Promise<User> {
     const res = await apiClient.put<{ message: string; user: User }>('/api/auth/profile', data);
+    return res.data.user;
+  },
+
+  async uploadAvatar(file: File): Promise<User> {
+    const form = new FormData();
+    form.append('avatar', file);
+    const res = await apiClient.post<{ message?: string; user: User }>(
+      '/api/auth/profile/avatar',
+      form,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    );
     return res.data.user;
   },
 

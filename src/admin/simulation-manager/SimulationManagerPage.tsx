@@ -83,6 +83,31 @@ function fromApiSim(s: { id: string; title: string; category: string; is_publish
 
 type FilterType = "All" | "Live" | "Draft";
 
+type SimQuestionDraft = { id: string; question: string; answer: string };
+type SimSubjectDraft = { id: string; title: string; description: string; questions: SimQuestionDraft[] };
+
+function newId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+}
+
+function emptyQuestion(): SimQuestionDraft {
+  return { id: newId(), question: "", answer: "" };
+}
+
+function emptySubject(): SimSubjectDraft {
+  return { id: newId(), title: "", description: "", questions: [emptyQuestion()] };
+}
+
+function getInitialAddForm() {
+  return {
+    topic: "budgeting" as SimCategory,
+    difficulty: "beginner" as "beginner" | "intermediate" | "advanced",
+    xp_reward: 50,
+    access: "preview" as UISim["access"],
+    subjects: [emptySubject()],
+  };
+}
+
 export default function SimulationManagerPage() {
   const [simulations, setSimulations] = useState<UISim[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +122,7 @@ export default function SimulationManagerPage() {
   const [deleting, setDeleting] = useState(false);
 
   const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState({ title: "", description: "", topic: "budgeting" as SimCategory, difficulty: "beginner" as "beginner" | "intermediate" | "advanced", xp_reward: 50, access: "preview" as UISim["access"] });
+  const [addForm, setAddForm] = useState(getInitialAddForm);
   const [adding, setAdding] = useState(false);
 
   useEffect(() => {
@@ -177,22 +202,103 @@ export default function SimulationManagerPage() {
     setSimulations((prev) => prev.map((s) => (s.id === simId ? { ...s, access } : s)));
   }
 
+  function updateSubject(subjectId: string, patch: Partial<SimSubjectDraft>) {
+    setAddForm((f) => ({
+      ...f,
+      subjects: f.subjects.map((s) => (s.id === subjectId ? { ...s, ...patch } : s)),
+    }));
+  }
+
+  function updateQuestion(subjectId: string, questionId: string, patch: Partial<SimQuestionDraft>) {
+    setAddForm((f) => ({
+      ...f,
+      subjects: f.subjects.map((s) =>
+        s.id === subjectId
+          ? { ...s, questions: s.questions.map((q) => (q.id === questionId ? { ...q, ...patch } : q)) }
+          : s
+      ),
+    }));
+  }
+
+  function addQuestionToSubject(subjectId: string) {
+    setAddForm((f) => ({
+      ...f,
+      subjects: f.subjects.map((s) =>
+        s.id === subjectId ? { ...s, questions: [...s.questions, emptyQuestion()] } : s
+      ),
+    }));
+  }
+
+  function removeQuestion(subjectId: string, questionId: string) {
+    setAddForm((f) => ({
+      ...f,
+      subjects: f.subjects.map((s) => {
+        if (s.id !== subjectId) return s;
+        const next = s.questions.filter((q) => q.id !== questionId);
+        return { ...s, questions: next.length ? next : [emptyQuestion()] };
+      }),
+    }));
+  }
+
+  function addSubject() {
+    setAddForm((f) => ({ ...f, subjects: [...f.subjects, emptySubject()] }));
+  }
+
+  function removeSubject(subjectId: string) {
+    setAddForm((f) => {
+      const next = f.subjects.filter((s) => s.id !== subjectId);
+      return { ...f, subjects: next.length ? next : [emptySubject()] };
+    });
+  }
+
   async function saveAdd() {
-    if (!addForm.title.trim()) return;
+    const primary = addForm.subjects[0];
+    if (!primary?.title.trim()) return;
+    const hasValidQuestion = addForm.subjects.some((s) =>
+      s.questions.some((q) => q.question.trim() && q.answer.trim())
+    );
+    if (!hasValidQuestion) return;
+
+    const simTitle =
+      addForm.subjects.length === 1
+        ? primary.title.trim()
+        : addForm.subjects.map((s) => s.title.trim()).filter(Boolean).join(" · ") || primary.title.trim();
+
+    const simDescription =
+      addForm.subjects.length === 1
+        ? primary.description.trim()
+        : addForm.subjects.map((s) => s.description.trim()).filter(Boolean).join("\n\n");
+
     setAdding(true);
     try {
-      const created = await simulationsService.create({
-        title: addForm.title,
-        description: addForm.description,
-        category: addForm.topic,
-        difficulty: addForm.difficulty,
-        xp_reward: addForm.xp_reward,
-        is_published: false,
-      });
-      setSimulations((prev) => [fromApiSim(created, prev.length), ...prev]);
+      const created = await simulationsService.createWithSubjects(
+        {
+          title: simTitle,
+          description: simDescription,
+          category: addForm.topic,
+          difficulty: addForm.difficulty,
+          xp_reward: addForm.xp_reward,
+          is_published: false,
+        },
+        addForm.subjects.map((s) => ({
+          title: s.title,
+          description: s.description,
+          questions: s.questions,
+        }))
+      );
+      const questionCount = addForm.subjects.reduce(
+        (n, s) => n + s.questions.filter((q) => q.question.trim() && q.answer.trim()).length,
+        0
+      );
+      setSimulations((prev) => [
+        { ...fromApiSim(created, prev.length), scenarios: questionCount },
+        ...prev,
+      ]);
       setShowAdd(false);
-      setAddForm({ title: "", description: "", topic: "budgeting", difficulty: "beginner", xp_reward: 50, access: "preview" });
-    } catch { /* silent */ } finally {
+      setAddForm(getInitialAddForm());
+    } catch {
+      /* silent */
+    } finally {
       setAdding(false);
     }
   }
@@ -393,28 +499,8 @@ export default function SimulationManagerPage() {
 
       {showAdd && (
         <div className={styles.overlay} onClick={() => !adding && setShowAdd(false)}>
-          <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+          <div className={`${styles.modal} ${styles.modalWide}`} onClick={(e) => e.stopPropagation()}>
             <h3 className={styles.modalTitle}>Add simulation</h3>
-
-            <div className={styles.modalField}>
-              <label>Title</label>
-              <input
-                className={styles.modalInput}
-                value={addForm.title}
-                onChange={(e) => setAddForm((f) => ({ ...f, title: e.target.value }))}
-                placeholder="Simulation title"
-              />
-            </div>
-
-            <div className={styles.modalField}>
-              <label>Description</label>
-              <input
-                className={styles.modalInput}
-                value={addForm.description}
-                onChange={(e) => setAddForm((f) => ({ ...f, description: e.target.value }))}
-                placeholder="Brief description"
-              />
-            </div>
 
             <div className={styles.modalField}>
               <label>Category</label>
@@ -423,7 +509,11 @@ export default function SimulationManagerPage() {
                 value={addForm.topic}
                 onChange={(e) => setAddForm((f) => ({ ...f, topic: e.target.value as SimCategory }))}
               >
-                {CATEGORY_OPTIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                {CATEGORY_OPTIONS.map((c) => (
+                  <option key={c.value} value={c.value}>
+                    {c.label}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -432,7 +522,9 @@ export default function SimulationManagerPage() {
               <select
                 className={styles.modalSelect}
                 value={addForm.difficulty}
-                onChange={(e) => setAddForm((f) => ({ ...f, difficulty: e.target.value as typeof addForm.difficulty }))}
+                onChange={(e) =>
+                  setAddForm((f) => ({ ...f, difficulty: e.target.value as typeof addForm.difficulty }))
+                }
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -440,11 +532,117 @@ export default function SimulationManagerPage() {
               </select>
             </div>
 
+            <section className={styles.modalSection}>
+              <h4 className={styles.modalSectionTitle}>Subjects &amp; questions</h4>
+              <p className={styles.modalSectionHint}>
+                Add a subject (title and description), then one or more questions with the correct answer for learners.
+              </p>
+
+              {addForm.subjects.map((subject, subjectIdx) => (
+                <div key={subject.id} className={styles.subjectCard}>
+                  <div className={styles.subjectCardHeader}>
+                    <span className={styles.subjectCardLabel}>
+                      Subject {addForm.subjects.length > 1 ? subjectIdx + 1 : ""}
+                    </span>
+                    {addForm.subjects.length > 1 && (
+                      <button
+                        type="button"
+                        className={styles.btnRemove}
+                        onClick={() => removeSubject(subject.id)}
+                      >
+                        Remove subject
+                      </button>
+                    )}
+                  </div>
+
+                  <div className={styles.modalField}>
+                    <label>Subject title</label>
+                    <input
+                      className={styles.modalInput}
+                      value={subject.title}
+                      onChange={(e) => updateSubject(subject.id, { title: e.target.value })}
+                      placeholder="e.g. Monthly budgeting basics"
+                    />
+                  </div>
+
+                  <div className={styles.modalField}>
+                    <label>Subject description</label>
+                    <textarea
+                      className={styles.modalTextarea}
+                      value={subject.description}
+                      onChange={(e) => updateSubject(subject.id, { description: e.target.value })}
+                      placeholder="Brief description of what this subject covers"
+                      rows={2}
+                    />
+                  </div>
+
+                  {subject.questions.map((q, qIdx) => (
+                    <div key={q.id} className={styles.questionBlock}>
+                      <div className={styles.questionBlockHeader}>
+                        <span className={styles.questionIndex}>Question {qIdx + 1}</span>
+                        {subject.questions.length > 1 && (
+                          <button
+                            type="button"
+                            className={styles.btnRemove}
+                            onClick={() => removeQuestion(subject.id, q.id)}
+                          >
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                      <div className={styles.modalField}>
+                        <label>Question</label>
+                        <textarea
+                          className={styles.modalTextarea}
+                          value={q.question}
+                          onChange={(e) => updateQuestion(subject.id, q.id, { question: e.target.value })}
+                          placeholder="Enter the question learners will see"
+                          rows={2}
+                        />
+                      </div>
+                      <div className={styles.modalField}>
+                        <label>Answer</label>
+                        <input
+                          className={styles.modalInput}
+                          value={q.answer}
+                          onChange={(e) => updateQuestion(subject.id, q.id, { answer: e.target.value })}
+                          placeholder="Correct answer"
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    className={styles.btnGhost}
+                    onClick={() => addQuestionToSubject(subject.id)}
+                  >
+                    <PlusIcon /> Add question
+                  </button>
+                </div>
+              ))}
+
+              <button type="button" className={styles.btnGhost} onClick={addSubject}>
+                <PlusIcon /> Add another subject
+              </button>
+            </section>
+
             <div className={styles.modalActions}>
               <button type="button" className={styles.btnCancel} onClick={() => setShowAdd(false)} disabled={adding}>
                 Cancel
               </button>
-              <button type="button" className={styles.btnSave} onClick={saveAdd} disabled={adding}>
+              <button
+                type="button"
+                className={styles.btnSave}
+                onClick={saveAdd}
+                disabled={
+                  adding ||
+                  !addForm.subjects[0]?.title.trim() ||
+                  !addForm.subjects.some((s) =>
+                    s.questions.some((q) => q.question.trim() && q.answer.trim())
+                  )
+                }
+              >
                 {adding ? "Creating…" : "Add simulation"}
               </button>
             </div>
