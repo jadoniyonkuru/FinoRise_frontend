@@ -202,7 +202,7 @@ export default function AdminLoginPage() {
             <div className={styles.field}>
               <div className={styles.fieldRow}>
                 <label htmlFor="password">Password</label>
-                <Link to="/auth/reset-password" className={styles.forgotLink}>
+                <Link to="/account/reset-password" className={styles.forgotLink}>
                   Forgot password?
                 </Link>
               </div>
@@ -242,7 +242,7 @@ export default function AdminLoginPage() {
               <span className={styles.dividerLine} />
             </div>
 
-            <Link to="/auth/login" className={styles.backLink}>
+            <Link to="/account/login" className={styles.backLink}>
               <ChevronLeftIcon />
               Back to learner / partner login
             </Link>

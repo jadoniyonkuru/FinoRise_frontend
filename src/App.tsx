@@ -41,11 +41,11 @@ export default function App() {
       <Route path="/" element={<Navigate to="/dashboard" replace />} />
       <Route path="/dashboard" element={<PlatformDashboard />} />
 
-      {/* Auth */}
-      <Route path="/auth/login" element={<LoginPage />} />
-      <Route path="/auth/admin-login" element={<AdminLoginPage />} />
-      <Route path="/auth/register" element={<RegisterPage />} />
-      <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+      {/* Auth (renamed to /account for platform compatibility) */}
+      <Route path="/account/login" element={<LoginPage />} />
+      <Route path="/account/admin-login" element={<AdminLoginPage />} />
+      <Route path="/account/register" element={<RegisterPage />} />
+      <Route path="/account/reset-password" element={<ResetPasswordPage />} />
 
       {/* Learner */}
       <Route path="/learner/dashboard" element={<LearnerDashboard />} />
@@ -80,7 +80,7 @@ export default function App() {
       <Route path="/partner/profile" element={<PartnerProfile />} />
 
       {/* Catch-all */}
-      <Route path="*" element={<Navigate to="/auth/login" replace />} />
+      <Route path="*" element={<Navigate to="/account/login" replace />} />
     </Routes>
   );
 }

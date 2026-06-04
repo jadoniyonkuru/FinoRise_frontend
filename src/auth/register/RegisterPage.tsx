@@ -49,7 +49,7 @@ export default function RegisterPage() {
     setSubmitting(true);
     try {
       await register({ full_name, email, password });
-      navigate("/auth/login");
+      navigate("/account/login");
     } catch {
       setError("Registration failed. Email may already be in use.");
     } finally {
@@ -119,7 +119,7 @@ export default function RegisterPage() {
           </button>
 
           <p className={styles.footer}>
-            Already have an account? <Link to="/auth/login">Log in</Link>
+            Already have an account? <Link to="/account/login">Log in</Link>
           </p>
         </form>
       </section>

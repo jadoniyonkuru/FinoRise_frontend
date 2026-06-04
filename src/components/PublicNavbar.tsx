@@ -20,13 +20,13 @@ function FinoRiseLogo() {
 export default function PublicNavbar() {
   return (
     <nav className={styles.navbar}>
-      <Link to="/auth/login" className={styles.brand}>
+      <Link to="/account/login" className={styles.brand}>
         <FinoRiseLogo />
         <span className={styles.brandName}>FinoRise</span>
       </Link>
       <div className={styles.actions}>
-        <Link to="/auth/login" className={styles.login}>Login</Link>
-        <Link to="/auth/register" className={styles.signup}>Sign Up</Link>
+        <Link to="/account/login" className={styles.login}>Login</Link>
+        <Link to="/account/register" className={styles.signup}>Sign Up</Link>
       </div>
     </nav>
   );

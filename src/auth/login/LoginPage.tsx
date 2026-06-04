@@ -218,7 +218,7 @@ export default function LoginPage() {
               <div className={styles.field}>
                 <div className={styles.fieldLabelRow}>
                   <label htmlFor="password">Password</label>
-                  <Link to="/auth/reset-password" className={styles.forgotLink}>
+                  <Link to="/account/reset-password" className={styles.forgotLink}>
                     Forgot password?
                   </Link>
                 </div>
@@ -285,11 +285,11 @@ export default function LoginPage() {
 
             <p className={styles.cardFooter}>
               Don't have an account?{" "}
-              <Link to="/auth/register">Sign up for free</Link>
+              <Link to="/account/register">Sign up for free</Link>
             </p>
             <p className={styles.cardFooter}>
               Are you an admin?{" "}
-              <Link to="/auth/admin-login">Admin portal →</Link>
+              <Link to="/account/admin-login">Admin portal →</Link>
             </p>
             <div className={styles.secureNote}>
               <ShieldCheckIcon />
@@ -306,9 +306,9 @@ export default function LoginPage() {
           <span>© 2024 FinoRise AI. Gamifying financial freedom.</span>
         </div>
         <div className={styles.footerRight}>
-          <Link to="/auth/login">Privacy Policy</Link>
-          <Link to="/auth/login">Terms of Service</Link>
-          <Link to="/auth/login">Help Center</Link>
+          <Link to="/account/login">Privacy Policy</Link>
+          <Link to="/account/login">Terms of Service</Link>
+          <Link to="/account/login">Help Center</Link>
         </div>
       </footer>
     </div>

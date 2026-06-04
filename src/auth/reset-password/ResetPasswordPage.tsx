@@ -97,7 +97,7 @@ export default function ResetPasswordPage() {
                   We've sent a reset link to your email or phone number.
                   Check your inbox and follow the instructions.
                 </p>
-                <Link to="/auth/login" className={styles.backBtn}>
+                <Link to="/account/login" className={styles.backBtn}>
                   <ArrowLeftIcon />
                   Back to Login
                 </Link>
@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
               <div className={styles.cardFooter}>
                 <p className={styles.createLink}>
                   New to FinoRise?{" "}
-                  <Link to="/auth/register">Create an account</Link>
+                  <Link to="/account/register">Create an account</Link>
                 </p>
               </div>
             </>
@@ -166,14 +166,14 @@ export default function ResetPasswordPage() {
                 <button
                   type="button"
                   className={styles.backLink}
-                  onClick={() => navigate("/auth/login")}
+                  onClick={() => navigate("/account/login")}
                 >
                   <ArrowLeftIcon />
                   Back to Login
                 </button>
                 <p className={styles.createLink}>
                   New to FinoRise?{" "}
-                  <Link to="/auth/register">Create an account</Link>
+                  <Link to="/account/register">Create an account</Link>
                 </p>
               </div>
             </>

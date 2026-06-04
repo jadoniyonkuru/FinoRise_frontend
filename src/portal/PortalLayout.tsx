@@ -58,7 +58,7 @@ export default function PortalLayout({
           </>
         )}
 
-        <button type="button" className={styles.logout} onClick={() => navigate("/auth/login")}>
+        <button type="button" className={styles.logout} onClick={() => navigate("/account/login")}>
           Log out
         </button>
       </aside>
@@ -75,7 +75,7 @@ export default function PortalLayout({
               </div>
               <div className={styles.headerActions}>
                 <ThemeToggle />
-                <Link to="/auth/login" className={styles.switchRole}>
+                <Link to="/account/login" className={styles.switchRole}>
                   Switch role
                 </Link>
               </div>
