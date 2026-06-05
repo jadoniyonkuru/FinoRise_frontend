@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import PublicNavbar from "@/components/PublicNavbar";
 import s from "./home.module.css";
 

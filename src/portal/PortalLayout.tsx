@@ -61,7 +61,7 @@ export default function PortalLayout({
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  className={({ isActive }) => (isActive ? styles.subLinkActive : styles.subLink)}
+                  className={({ isActive }: { isActive: boolean }) => (isActive ? styles.subLinkActive : styles.subLink)}
                 >
                   {item.label}
                 </NavLink>
