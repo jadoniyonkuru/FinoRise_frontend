@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router";
 import styles from "./admin-login.module.css";
 
 /* ── Icons ── */
@@ -202,7 +202,7 @@ export default function AdminLoginPage() {
             <div className={styles.field}>
               <div className={styles.fieldRow}>
                 <label htmlFor="password">Password</label>
-                <Link to="/account/reset-password" className={styles.forgotLink}>
+                <Link to="/auth/reset-password" className={styles.forgotLink}>
                   Forgot password?
                 </Link>
               </div>
@@ -242,7 +242,7 @@ export default function AdminLoginPage() {
               <span className={styles.dividerLine} />
             </div>
 
-            <Link to="/account/login" className={styles.backLink}>
+            <Link to="/auth/login" className={styles.backLink}>
               <ChevronLeftIcon />
               Back to learner / partner login
             </Link>

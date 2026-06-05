@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { modulesService } from "@/api";
 import type { Module as ApiModule } from "@/api";
+import { useLearnerProgress } from "@/context/LearnerProgressContext";
 import LearnerLayout from "../LearnerLayout";
 import s from "./modules.module.css";
 
@@ -106,10 +107,13 @@ function categoryIcon(category: string): React.ReactNode {
 }
 
 export default function LearnerModulesPage() {
+  const { progress, isModuleCompleted } = useLearnerProgress();
   const [activeFilter, setActiveFilter] = useState<FilterKey>("All");
   const [search, setSearch] = useState("");
   const [modules, setModules] = useState<ApiModule[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const completedCount = modules.filter((m) => isModuleCompleted(m.id)).length;
 
   useEffect(() => {
     modulesService.getAll()
@@ -126,7 +130,7 @@ export default function LearnerModulesPage() {
       activeFilter === "All"
         ? true
         : activeFilter === "Completed"
-        ? false
+        ? isModuleCompleted(m.id)
         : m.category === activeFilter;
 
     const matchSearch =
@@ -155,6 +159,10 @@ export default function LearnerModulesPage() {
           <div className={s.headerStat}>
             <div className={s.statLabel}>Available</div>
             <div className={s.statValue}>{modules.length}</div>
+          </div>
+          <div className={s.headerStat}>
+            <div className={s.statLabel}>Completed</div>
+            <div className={s.statValue}>{completedCount}</div>
           </div>
         </div>
       </div>
@@ -191,13 +199,17 @@ export default function LearnerModulesPage() {
         ) : visible.length === 0 ? (
           <div className={s.empty}>No modules match your search.</div>
         ) : (
-          visible.map((m) => (
-            <div key={m.id} className={s.card}>
+          visible.map((m) => {
+            const done = isModuleCompleted(m.id);
+            const prog = progress.find((p) => p.module_id === m.id);
+            return (
+            <div key={m.id} className={s.card} data-completed={String(done)}>
               <div className={s.cardTop}>
                 <div className={s.cardIcon}>{categoryIcon(m.category)}</div>
                 <span className={`${s.badge} ${difficultyClass(m.difficulty)}`}>
                   {m.difficulty}
                 </span>
+                {done && <span className={s.completedBadge}>Completed</span>}
               </div>
 
               <div>
@@ -212,10 +224,16 @@ export default function LearnerModulesPage() {
                   </span>
                   <span className={s.metaItem}>{m.category}</span>
                 </div>
-                <Link to={`/learner/modules/${m.id}`} className={s.startBtn}>Start</Link>
+                <Link to={`/learner/modules/${m.id}`} className={s.startBtn}>
+                  {done ? "Review" : "Start"}
+                </Link>
+                {done && prog?.score != null && (
+                  <span className={s.scoreHint}>{Math.round(prog.score)}% quiz</span>
+                )}
               </div>
             </div>
-          ))
+          );
+          })
         )}
       </div>
     </LearnerLayout>

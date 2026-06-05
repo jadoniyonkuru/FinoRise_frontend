@@ -22,6 +22,15 @@ export const gamificationService = {
     return res.data;
   },
 
+  /** Record today's learning activity; backend updates streak_days */
+  async recordLearningActivity(data?: {
+    activity_type?: 'lesson' | 'quiz' | 'simulation';
+    reference_id?: string;
+  }): Promise<StreakInfo> {
+    const res = await apiClient.post<StreakInfo>('/api/gamification/streak/record', data ?? {});
+    return res.data;
+  },
+
   async getLeaderboard(): Promise<LeaderboardEntry[]> {
     const res = await apiClient.get<{ leaderboard: LeaderboardEntry[] }>('/api/gamification/leaderboard');
     return res.data.leaderboard;

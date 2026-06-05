@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router";
 import LearnerLayout from "../LearnerLayout";
-import { modulesService } from "@/api";
+import { modulesService, gamificationService } from "@/api";
 import { useAuth } from "@/context/AuthContext";
+import { useLearnerProgress } from "@/context/LearnerProgressContext";
+import type { Module } from "@/api";
 import type { QuizQuestion, QuizResult } from "@/api";
 import s from "./module-quiz.module.css";
 
@@ -67,10 +69,12 @@ function IconRepeat() {
 /* ─── Component ─── */
 export default function ModuleQuizPage() {
   const navigate = useNavigate();
-  const { refreshUser } = useAuth();
+  const { syncXpEarned, refreshUser } = useAuth();
+  const { markModuleCompleted, refreshProgress } = useLearnerProgress();
   const [searchParams] = useSearchParams();
   const moduleId = searchParams.get("moduleId") ?? "";
 
+  const [moduleInfo, setModuleInfo] = useState<Module | null>(null);
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -83,10 +87,14 @@ export default function ModuleQuizPage() {
   useEffect(() => {
     if (!moduleId) { setError("No module specified."); setLoading(false); return; }
 
-    modulesService.getQuiz(moduleId)
-      .then((quiz) => {
+    Promise.all([
+      modulesService.getQuiz(moduleId),
+      modulesService.getById(moduleId).catch(() => null),
+    ])
+      .then(([quiz, mod]) => {
         setQuestions(quiz.questions);
         setSelected(Array(quiz.questions.length).fill(null));
+        if (mod) setModuleInfo(mod);
       })
       .catch(() => setError("Quiz not available for this module."))
       .finally(() => setLoading(false));
@@ -127,8 +135,42 @@ export default function ModuleQuizPage() {
     try {
       const res = await modulesService.submitQuiz(moduleId, answers);
       setResult(res);
+
+      if (res.xp_earned > 0) {
+        await syncXpEarned(res.xp_earned);
+      } else {
+        await refreshUser();
+      }
+
+      try {
+        await gamificationService.recordLearningActivity({
+          activity_type: "quiz",
+          reference_id: moduleId,
+        });
+      } catch {
+        /* streak endpoint may be unavailable */
+      }
+
       if (res.passed) {
-        try { await modulesService.complete(moduleId); } catch { /* already completed is fine */ }
+        try {
+          const completeRes = await modulesService.complete(moduleId);
+          if (completeRes.xp_awarded > 0) {
+            await syncXpEarned(completeRes.xp_awarded);
+          }
+        } catch {
+          /* already completed is fine */
+        }
+        markModuleCompleted(moduleId, Math.round(res.score), moduleInfo
+          ? {
+              title: moduleInfo.title,
+              category: moduleInfo.category,
+              difficulty: moduleInfo.difficulty,
+              xp_reward: moduleInfo.xp_reward,
+            }
+          : undefined);
+        await refreshProgress();
+        await refreshUser();
+      } else {
         await refreshUser();
       }
     } catch {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import DashboardLayout from "@/components/DashboardLayout";
 import { partnerNavItems } from "../partnerNav";
 import { partnerService } from "@/api/services/partner.service";

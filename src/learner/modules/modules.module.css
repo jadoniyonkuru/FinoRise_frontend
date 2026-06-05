@@ -188,6 +188,31 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.completedBadge {
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  background: #dcfce7;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+.card[data-completed="true"] {
+  border-color: rgba(34, 197, 94, 0.35);
+}
+
+.scoreHint {
+  font-size: 0.72rem;
+  color: #16a34a;
+  font-weight: 600;
+  width: 100%;
+  text-align: right;
+  margin-top: 0.25rem;
 }
 
 .cardIcon {

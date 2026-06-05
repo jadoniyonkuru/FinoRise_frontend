@@ -180,7 +180,44 @@
 
 /* status badge */
 .statusActive   { border-radius: 999px; padding: 0.25rem 0.7rem; background: rgba(34,197,94,0.1);  color: #16a34a; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+.statusPending  { border-radius: 999px; padding: 0.25rem 0.7rem; background: rgba(251,191,36,0.12); color: #d97706; font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
 .statusDisabled { border-radius: 999px; padding: 0.25rem 0.7rem; background: rgba(100,116,139,0.1); color: var(--text-muted); font-size: 0.74rem; font-weight: 700; white-space: nowrap; }
+
+.actionSuccess {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(34,197,94,0.1);
+  color: #16a34a;
+  font-size: 0.9rem;
+}
+
+.actionError {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  background: rgba(239,68,68,0.08);
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+.modalHint {
+  margin: -0.5rem 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.btnResend {
+  border: 1px solid rgba(251,191,36,0.35);
+  background: rgba(251,191,36,0.08);
+  color: #d97706;
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
 
 /* ── Action buttons ── */
 .actions {

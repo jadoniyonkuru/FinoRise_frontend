@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
 import { gamificationService } from "@/api";
 import type { Badge as ApiBadge, LeaderboardEntry } from "@/api";

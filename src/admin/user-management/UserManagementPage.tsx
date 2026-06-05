@@ -3,6 +3,8 @@ import AdminLayout from "@/admin/AdminLayout";
 import cardStyles from "@/components/StatCard.module.css";
 import styles from "./user-management.module.css";
 import { adminService } from "@/api/services/admin.service";
+import type { AccountStatus, UserRole } from "@/api/types";
+import { roleLabel } from "@/lib/roles";
 
 /* ── Icons ── */
 function SearchIcon() {
@@ -22,21 +24,16 @@ function AlertIcon() {
 }
 
 /* ── Types ── */
-type AdminRole =
-  | "admin" | "learner" | "partner"
-  | "module_manager" | "simulation_manager"
-  | "rewards_manager" | "analytics_viewer";
-
 type ManagedUser = {
   id: string;
   name: string;
   email: string;
-  role: AdminRole;
-  status: "Active" | "Disabled";
+  role: UserRole;
+  status: "Active" | "Disabled" | "Pending invite";
   avatarColor: string;
 };
 
-const roleOptions: { value: AdminRole; label: string; description: string }[] = [
+const roleOptions: { value: UserRole; label: string; description: string }[] = [
   { value: "admin",               label: "Admin",                   description: "Full access to all admin tools" },
   { value: "learner",             label: "Learner",                 description: "Learning dashboard access" },
   { value: "partner",             label: "Partner",                 description: "Partner impact dashboard access" },
@@ -48,18 +45,27 @@ const roleOptions: { value: AdminRole; label: string; description: string }[] = 
 
 const AVATAR_COLORS = ["#0ea5e9","#8b5cf6","#22c55e","#f59e0b","#f97316","#ec4899","#06b6d4","#10b981","#6366f1","#64748b"];
 
-function toManagedUser(u: { id: string; full_name: string; email: string; role: string }, idx: number): ManagedUser {
+function mapAccountStatus(status?: AccountStatus): ManagedUser["status"] {
+  if (status === "pending_invite") return "Pending invite";
+  if (status === "disabled") return "Disabled";
+  return "Active";
+}
+
+function toManagedUser(
+  u: { id: string; full_name: string; email: string; role: string; account_status?: AccountStatus },
+  idx: number
+): ManagedUser {
   return {
     id: u.id,
     name: u.full_name,
     email: u.email,
-    role: (u.role as AdminRole) ?? "learner",
-    status: "Active",
+    role: (u.role as UserRole) ?? "learner",
+    status: mapAccountStatus(u.account_status),
     avatarColor: AVATAR_COLORS[idx % AVATAR_COLORS.length],
   };
 }
 
-type FilterType = "All" | "Active" | "Disabled";
+type FilterType = "All" | "Active" | "Disabled" | "Pending invite";
 
 /* ── Component ── */
 export default function UserManagementPage() {
@@ -70,7 +76,16 @@ export default function UserManagementPage() {
 
   /* Edit modal */
   const [editTarget, setEditTarget] = useState<ManagedUser | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", email: "", role: "" as AdminRole, status: "Active" as "Active" | "Disabled" });
+  const [editForm, setEditForm] = useState({
+    name: "",
+    email: "",
+    role: "" as UserRole,
+    status: "Active" as ManagedUser["status"],
+  });
+  const [saving, setSaving] = useState(false);
+  const [inviting, setInviting] = useState(false);
+  const [actionError, setActionError] = useState("");
+  const [actionSuccess, setActionSuccess] = useState("");
 
   /* Delete confirm */
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null);
@@ -78,7 +93,7 @@ export default function UserManagementPage() {
 
   /* Add user modal */
   const [showAdd, setShowAdd] = useState(false);
-  const [addForm, setAddForm] = useState({ name: "", email: "", role: "learner" as AdminRole });
+  const [addForm, setAddForm] = useState({ name: "", email: "", role: "learner" as UserRole });
 
   useEffect(() => {
     adminService.getUsers()
@@ -111,12 +126,33 @@ export default function UserManagementPage() {
     setEditForm({ name: user.name, email: user.email, role: user.role, status: user.status });
   }
 
-  function saveEdit() {
+  async function saveEdit() {
     if (!editTarget) return;
-    setUsers(prev => prev.map(u => u.id === editTarget.id
-      ? { ...u, name: editForm.name, email: editForm.email, role: editForm.role, status: editForm.status }
-      : u));
-    setEditTarget(null);
+    setSaving(true);
+    setActionError("");
+    try {
+      const account_status: AccountStatus =
+        editForm.status === "Disabled"
+          ? "disabled"
+          : editForm.status === "Pending invite"
+            ? "pending_invite"
+            : "active";
+      const updated = await adminService.updateUser(editTarget.id, {
+        full_name: editForm.name,
+        email: editForm.email,
+        role: editForm.role,
+        account_status,
+      });
+      setUsers((prev) =>
+        prev.map((u) => (u.id === editTarget.id ? toManagedUser(updated, prev.indexOf(u)) : u))
+      );
+      setEditTarget(null);
+      setActionSuccess("User updated.");
+    } catch {
+      setActionError("Failed to update user.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function confirmDelete() {
@@ -133,27 +169,55 @@ export default function UserManagementPage() {
     }
   }
 
-  function handleRoleChange(userId: string, role: AdminRole) {
-    setUsers(prev => prev.map(u => u.id === userId ? { ...u, role } : u));
+  async function handleRoleChange(userId: string, role: UserRole) {
+    const previous = users.find((u) => u.id === userId);
+    if (!previous) return;
+    setUsers((prev) => prev.map((u) => (u.id === userId ? { ...u, role } : u)));
+    try {
+      await adminService.updateUser(userId, { role });
+    } catch {
+      setUsers((prev) => prev.map((u) => (u.id === userId ? previous : u)));
+      setActionError("Failed to update role.");
+    }
   }
 
-  function saveAdd() {
+  async function resendInvite(userId: string) {
+    setActionError("");
+    try {
+      await adminService.resendInvite(userId);
+      setActionSuccess("Invite email resent.");
+    } catch {
+      setActionError("Failed to resend invite.");
+    }
+  }
+
+  async function saveAdd() {
     if (!addForm.name.trim() || !addForm.email.trim()) return;
-    const newUser: ManagedUser = {
-      id: String(Date.now()),
-      name: addForm.name,
-      email: addForm.email,
-      role: addForm.role,
-      status: "Active",
-      avatarColor: AVATAR_COLORS[users.length % AVATAR_COLORS.length],
-    };
-    setUsers(prev => [...prev, newUser]);
-    setShowAdd(false);
-    setAddForm({ name: "", email: "", role: "learner" });
+    setInviting(true);
+    setActionError("");
+    const email = addForm.email.trim();
+    try {
+      const { user, message } = await adminService.inviteUser({
+        full_name: addForm.name.trim(),
+        email,
+        role: addForm.role,
+      });
+      setUsers((prev) => [...prev, toManagedUser(user, prev.length)]);
+      setShowAdd(false);
+      setAddForm({ name: "", email: "", role: "learner" });
+      setActionSuccess(message || `Invite sent to ${email}.`);
+    } catch {
+      setActionError("Failed to send invite. Check the email and try again.");
+    } finally {
+      setInviting(false);
+    }
   }
 
   return (
-    <AdminLayout title="User management" subtitle="Assign access roles and manage admin permissions.">
+    <AdminLayout title="User management" subtitle="Invite users by email; they set a password via the link and land on the dashboard for their role.">
+
+      {actionSuccess && <p className={styles.actionSuccess}>{actionSuccess}</p>}
+      {actionError && <p className={styles.actionError}>{actionError}</p>}
 
       {/* Top bar */}
       <div className={styles.topBar}>
@@ -193,7 +257,7 @@ export default function UserManagementPage() {
 
         {/* Filter tabs */}
         <div className={styles.filterRow}>
-          {(["All", "Active", "Disabled"] as FilterType[]).map(f => (
+          {(["All", "Active", "Pending invite", "Disabled"] as FilterType[]).map(f => (
             <button key={f} type="button" className={styles.filterTab}
               data-active={String(filter === f)} onClick={() => setFilter(f)}>
               {f} ({f === "All" ? users.length : users.filter(u => u.status === f).length})
@@ -226,7 +290,7 @@ export default function UserManagementPage() {
                   <select
                     id={`role-${user.id}`}
                     value={user.role}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value as AdminRole)}
+                    onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
                   >
                     {roleOptions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                   </select>
@@ -234,12 +298,25 @@ export default function UserManagementPage() {
                 </div>
 
                 {/* Status */}
-                <span className={user.status === "Active" ? styles.statusActive : styles.statusDisabled}>
+                <span
+                  className={
+                    user.status === "Active"
+                      ? styles.statusActive
+                      : user.status === "Pending invite"
+                        ? styles.statusPending
+                        : styles.statusDisabled
+                  }
+                >
                   {user.status}
                 </span>
 
                 {/* Actions */}
                 <div className={styles.actions}>
+                  {user.status === "Pending invite" && (
+                    <button type="button" className={styles.btnResend} onClick={() => resendInvite(user.id)}>
+                      Resend invite
+                    </button>
+                  )}
                   <button type="button" className={styles.btnEdit} onClick={() => openEdit(user)}>
                     <EditIcon /> Edit
                   </button>
@@ -274,7 +351,7 @@ export default function UserManagementPage() {
             <div className={styles.modalField}>
               <label>Role</label>
               <select className={styles.modalSelect} value={editForm.role}
-                onChange={e => setEditForm(f => ({ ...f, role: e.target.value as AdminRole }))}>
+                onChange={e => setEditForm(f => ({ ...f, role: e.target.value as UserRole }))}>
                 {roleOptions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
@@ -293,7 +370,9 @@ export default function UserManagementPage() {
 
             <div className={styles.modalActions}>
               <button type="button" className={styles.btnCancel} onClick={() => setEditTarget(null)}>Cancel</button>
-              <button type="button" className={styles.btnSave} onClick={saveEdit}>Save changes</button>
+              <button type="button" className={styles.btnSave} onClick={saveEdit} disabled={saving}>
+                {saving ? "Saving…" : "Save changes"}
+              </button>
             </div>
           </div>
         </div>
@@ -322,7 +401,10 @@ export default function UserManagementPage() {
       {showAdd && (
         <div className={styles.overlay} onClick={() => setShowAdd(false)}>
           <div className={styles.modal} onClick={e => e.stopPropagation()}>
-            <h3 className={styles.modalTitle}>Add New User</h3>
+            <h3 className={styles.modalTitle}>Invite New User</h3>
+            <p className={styles.modalHint}>
+              An email with an account setup link will be sent. The user confirms their password, then is directed to the {roleLabel(addForm.role)} dashboard.
+            </p>
 
             <div className={styles.modalField}>
               <label>Full name</label>
@@ -339,14 +421,16 @@ export default function UserManagementPage() {
             <div className={styles.modalField}>
               <label>Role</label>
               <select className={styles.modalSelect} value={addForm.role}
-                onChange={e => setAddForm(f => ({ ...f, role: e.target.value as AdminRole }))}>
+                onChange={e => setAddForm(f => ({ ...f, role: e.target.value as UserRole }))}>
                 {roleOptions.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
               </select>
             </div>
 
             <div className={styles.modalActions}>
               <button type="button" className={styles.btnCancel} onClick={() => setShowAdd(false)}>Cancel</button>
-              <button type="button" className={styles.btnSave} onClick={saveAdd}>Add user</button>
+              <button type="button" className={styles.btnSave} onClick={saveAdd} disabled={inviting}>
+                {inviting ? "Sending invite…" : "Send invite"}
+              </button>
             </div>
           </div>
         </div>

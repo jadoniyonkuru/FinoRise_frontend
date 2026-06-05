@@ -9,6 +9,8 @@ interface AuthContextValue {
   register: (data: { full_name: string; email: string; password: string; phone?: string }) => Promise<User>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  /** Apply XP from quiz/simulation; syncs profile and updates header + rewards balance */
+  syncXpEarned: (amount: number) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -57,8 +59,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(updated);
   }
 
+  async function syncXpEarned(amount: number) {
+    if (amount <= 0) return;
+    const previous = user?.xp_total ?? 0;
+    try {
+      const updated = await authService.getProfile();
+      if (updated.xp_total >= previous + amount) {
+        setUser(updated);
+      } else {
+        setUser({ ...updated, xp_total: updated.xp_total + amount });
+      }
+    } catch {
+      setUser((u) => (u ? { ...u, xp_total: u.xp_total + amount } : u));
+    }
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, register, logout, refreshUser, syncXpEarned }}
+    >
       {children}
     </AuthContext.Provider>
   );
