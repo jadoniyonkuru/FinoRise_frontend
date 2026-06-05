@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import LearnerLayout from "../LearnerLayout";
 import { useAuth } from "@/context/AuthContext";
-import { simulationsService } from "@/api";
+import { simulationsService, gamificationService } from "@/api";
 import type { SimStep, SimChoice, SubmitChoiceResult } from "@/api";
 import s from "./simulation-runner.module.css";
 
@@ -127,6 +127,14 @@ export default function SimulationRunnerPage() {
         setFinalScore(res.final_score ?? 0);
         setXpEarned(earned);
         setDone(true);
+        try {
+          await gamificationService.recordLearningActivity({
+            activity_type: "simulation",
+            reference_id: simulationId,
+          });
+        } catch {
+          /* streak endpoint may be unavailable */
+        }
         if (earned > 0) {
           void syncXpEarned(earned);
         } else {

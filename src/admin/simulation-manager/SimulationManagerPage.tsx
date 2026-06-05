@@ -4,6 +4,8 @@ import cardStyles from "@/components/StatCard.module.css";
 import styles from "./simulation-manager.module.css";
 import { simulationsService } from "@/api/services/simulations.service";
 import type { SimCategory } from "@/api/types";
+import { useAuth } from "@/context/AuthContext";
+import { canPublishContent } from "@/lib/roles";
 
 function SearchIcon() {
   return (
@@ -47,6 +49,7 @@ type UISim = {
   id: string;
   title: string;
   topic: string;
+  xp_reward: number;
   scenarios: number;
   status: SimStatus;
   access: "public" | "cohort" | "preview";
@@ -69,11 +72,15 @@ const CATEGORY_OPTIONS: { value: SimCategory; label: string }[] = [
 
 const ACCENT_COLORS = ["#0ea5e9","#8b5cf6","#22c55e","#f59e0b","#f97316","#ec4899","#06b6d4","#10b981"];
 
-function fromApiSim(s: { id: string; title: string; category: string; is_published: boolean }, idx: number): UISim {
+function fromApiSim(
+  s: { id: string; title: string; category: string; is_published: boolean; xp_reward?: number },
+  idx: number
+): UISim {
   return {
     id: s.id,
     title: s.title,
     topic: s.category,
+    xp_reward: s.xp_reward ?? 50,
     scenarios: 0,
     status: s.is_published ? "Live" : "Draft",
     access: s.is_published ? "public" : "preview",
@@ -109,13 +116,21 @@ function getInitialAddForm() {
 }
 
 export default function SimulationManagerPage() {
+  const { user } = useAuth();
+  const canPublish = canPublishContent(user?.role ?? "");
   const [simulations, setSimulations] = useState<UISim[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterType>("All");
 
   const [editTarget, setEditTarget] = useState<UISim | null>(null);
-  const [editForm, setEditForm] = useState({ title: "", topic: "budgeting" as SimCategory, status: "Live" as SimStatus, access: "public" as UISim["access"] });
+  const [editForm, setEditForm] = useState({
+    title: "",
+    topic: "budgeting" as SimCategory,
+    status: "Live" as SimStatus,
+    access: "public" as UISim["access"],
+    xp_reward: 50,
+  });
   const [saving, setSaving] = useState(false);
 
   const [deleteTarget, setDeleteTarget] = useState<UISim | null>(null);
@@ -161,6 +176,7 @@ export default function SimulationManagerPage() {
       topic: (sim.topic as SimCategory) || "budgeting",
       status: sim.status,
       access: sim.access,
+      xp_reward: sim.xp_reward,
     });
   }
 
@@ -168,15 +184,24 @@ export default function SimulationManagerPage() {
     if (!editTarget) return;
     setSaving(true);
     try {
+      const nextStatus = canPublish ? editForm.status : "Draft";
       await simulationsService.update(editTarget.id, {
         title: editForm.title,
         category: editForm.topic,
-        is_published: editForm.status === "Live",
+        xp_reward: editForm.xp_reward,
+        is_published: nextStatus === "Live",
       });
       setSimulations((prev) =>
         prev.map((s) =>
           s.id === editTarget.id
-            ? { ...s, title: editForm.title, topic: editForm.topic, status: editForm.status, access: editForm.access }
+            ? {
+                ...s,
+                title: editForm.title,
+                topic: editForm.topic,
+                status: nextStatus,
+                access: editForm.access,
+                xp_reward: editForm.xp_reward,
+              }
             : s
         )
       );
@@ -184,6 +209,15 @@ export default function SimulationManagerPage() {
     } catch { /* silent */ } finally {
       setSaving(false);
     }
+  }
+
+  async function handlePublish(id: string) {
+    try {
+      await simulationsService.update(id, { is_published: true });
+      setSimulations((prev) =>
+        prev.map((s) => (s.id === id ? { ...s, status: "Live" as SimStatus, access: "public" } : s))
+      );
+    } catch { /* silent */ }
   }
 
   async function confirmDelete() {
@@ -304,7 +338,7 @@ export default function SimulationManagerPage() {
   }
 
   return (
-    <AdminLayout title="Simulation setup" subtitle="Configure scenarios, tests, scoring, and live simulation access.">
+    <AdminLayout title="Simulation setup" subtitle="Creators save drafts; only admins publish. Adjust XP rewards when editing.">
       <div className={styles.topBar}>
         <label className={styles.searchWrap}>
           <span className={styles.searchIcon}>
@@ -399,6 +433,11 @@ export default function SimulationManagerPage() {
                   <button type="button" className={styles.btnEdit} onClick={() => openEdit(sim)}>
                     <EditIcon /> Edit
                   </button>
+                  {canPublish && sim.status === "Draft" && (
+                    <button type="button" className={styles.btnPublish} onClick={() => handlePublish(sim.id)}>
+                      Publish
+                    </button>
+                  )}
                   <button type="button" className={styles.btnDelete} onClick={() => setDeleteTarget(sim)}>
                     <TrashIcon /> Delete
                   </button>
@@ -436,16 +475,29 @@ export default function SimulationManagerPage() {
             </div>
 
             <div className={styles.modalField}>
-              <label>Status</label>
-              <select
-                className={styles.modalSelect}
-                value={editForm.status}
-                onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value as SimStatus }))}
-              >
-                <option value="Live">Live</option>
-                <option value="Draft">Draft</option>
-              </select>
+              <label>XP reward</label>
+              <input
+                className={styles.modalInput}
+                type="number"
+                min={0}
+                value={editForm.xp_reward}
+                onChange={(e) => setEditForm((f) => ({ ...f, xp_reward: Number(e.target.value) }))}
+              />
             </div>
+
+            {canPublish && (
+              <div className={styles.modalField}>
+                <label>Status</label>
+                <select
+                  className={styles.modalSelect}
+                  value={editForm.status}
+                  onChange={(e) => setEditForm((f) => ({ ...f, status: e.target.value as SimStatus }))}
+                >
+                  <option value="Live">Live</option>
+                  <option value="Draft">Draft</option>
+                </select>
+              </div>
+            )}
 
             <div className={styles.modalField}>
               <label>Learner access</label>
@@ -530,6 +582,17 @@ export default function SimulationManagerPage() {
                 <option value="intermediate">Intermediate</option>
                 <option value="advanced">Advanced</option>
               </select>
+            </div>
+
+            <div className={styles.modalField}>
+              <label>XP reward</label>
+              <input
+                className={styles.modalInput}
+                type="number"
+                min={0}
+                value={addForm.xp_reward}
+                onChange={(e) => setAddForm((f) => ({ ...f, xp_reward: Number(e.target.value) }))}
+              />
             </div>
 
             <section className={styles.modalSection}>
@@ -643,7 +706,7 @@ export default function SimulationManagerPage() {
                   )
                 }
               >
-                {adding ? "Creating…" : "Add simulation"}
+                {adding ? "Saving draft…" : "Save as draft"}
               </button>
             </div>
           </div>

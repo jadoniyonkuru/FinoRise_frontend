@@ -201,6 +201,23 @@
 
 .btnEdit:hover { border-color: #0ea5e9; color: #0284c7; }
 
+.btnPublish {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.42rem 0.75rem;
+  border: 1px solid rgba(14,165,233,0.35);
+  border-radius: 8px;
+  background: rgba(14,165,233,0.1);
+  color: #0284c7;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.btnPublish:hover { background: rgba(14,165,233,0.18); }
+
 .btnDelete {
   display: inline-flex;
   align-items: center;

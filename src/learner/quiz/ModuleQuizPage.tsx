@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import LearnerLayout from "../LearnerLayout";
-import { modulesService } from "@/api";
+import { modulesService, gamificationService } from "@/api";
 import { useAuth } from "@/context/AuthContext";
 import { useLearnerProgress } from "@/context/LearnerProgressContext";
 import type { Module } from "@/api";
@@ -142,6 +142,15 @@ export default function ModuleQuizPage() {
         await refreshUser();
       }
 
+      try {
+        await gamificationService.recordLearningActivity({
+          activity_type: "quiz",
+          reference_id: moduleId,
+        });
+      } catch {
+        /* streak endpoint may be unavailable */
+      }
+
       if (res.passed) {
         try {
           const completeRes = await modulesService.complete(moduleId);
@@ -160,6 +169,8 @@ export default function ModuleQuizPage() {
             }
           : undefined);
         await refreshProgress();
+        await refreshUser();
+      } else {
         await refreshUser();
       }
     } catch {

@@ -155,6 +155,8 @@
   border-radius: 9px;
   background: var(--surface);
   white-space: nowrap;
+  cursor: pointer;
+  font-family: inherit;
 }
 
 .switchRole:hover {

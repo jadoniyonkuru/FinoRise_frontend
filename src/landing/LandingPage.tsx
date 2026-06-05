@@ -108,9 +108,6 @@ export default function LandingPage({ asBackdrop = false }: LandingPageProps) {
           <Link to="/auth/login" className={styles.btnOutline}>
             Login
           </Link>
-          <Link to="/auth/register" className={styles.btnSolid}>
-            Get Started
-          </Link>
         </div>
       </header>
 

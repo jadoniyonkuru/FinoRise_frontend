@@ -1,15 +1,32 @@
-export type UserRole = 'learner' | 'admin' | 'partner';
+export type UserRole =
+  | 'learner'
+  | 'admin'
+  | 'partner'
+  | 'module_manager'
+  | 'simulation_manager'
+  | 'rewards_manager'
+  | 'analytics_viewer';
+
+export type AccountStatus = 'active' | 'disabled' | 'pending_invite';
+
+export type UserGender = 'male' | 'female' | 'other' | 'prefer_not_to_say';
 
 export interface User {
   id: string;
   full_name: string;
+  first_name?: string;
+  middle_name?: string;
+  last_name?: string;
   email: string;
   phone?: string;
+  gender?: UserGender | string | null;
   avatar_url?: string | null;
   role: UserRole;
+  account_status?: AccountStatus;
   xp_total: number;
   level: number;
   streak_days: number;
+  average_quiz_score?: number | null;
 }
 
 export interface Module {

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "@/context/AuthContext";
+import { getDashboardPath } from "@/lib/roles";
 import AuthScreenLayout, { authStyles } from "@/auth/shared/AuthScreenLayout";
 
 export default function LoginPage() {
@@ -19,7 +20,7 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       const user = await login(email, password);
-      navigate(`/${user.role}/dashboard`);
+      navigate(getDashboardPath(user.role), { replace: true });
     } catch {
       setError("Invalid email or password. Please try again.");
     } finally {

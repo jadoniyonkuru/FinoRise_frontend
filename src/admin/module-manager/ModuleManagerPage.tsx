@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import AdminLayout from "@/admin/AdminLayout";
 import s from "./module-manager.module.css";
 import { modulesService } from "@/api/services/modules.service";
+import { useAuth } from "@/context/AuthContext";
+import { canPublishContent } from "@/lib/roles";
 
 /* ── Icons ── */
 function SearchIcon() {
@@ -32,6 +34,8 @@ type Module = {
   title: string;
   description: string;
   category: string;
+  difficulty: string;
+  xp_reward: number;
   categoryColor: string;
   tagBg: string;
   status: Status;
@@ -65,6 +69,8 @@ function fromApiModule(m: { id: string; title: string; description: string; cate
     title: m.title,
     description: m.description,
     category: m.category,
+    difficulty: m.difficulty,
+    xp_reward: m.xp_reward,
     categoryColor: st.color,
     tagBg: st.bg,
     status,
@@ -79,6 +85,8 @@ type Filter = "All" | Status;
 
 /* ── Component ── */
 export default function ModuleManagerPage() {
+  const { user } = useAuth();
+  const canPublish = canPublishContent(user?.role ?? "");
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
   const [archivedIds, setArchivedIds] = useState<Set<string>>(new Set());
@@ -89,6 +97,17 @@ export default function ModuleManagerPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [addForm, setAddForm] = useState({ title: "", description: "", category: "", difficulty: "beginner", xp_reward: 100 });
   const [saving, setSaving] = useState(false);
+
+  /* Edit modal */
+  const [editTarget, setEditTarget] = useState<Module | null>(null);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    category: "",
+    difficulty: "beginner",
+    xp_reward: 100,
+  });
+  const [editSaving, setEditSaving] = useState(false);
 
   /* Delete confirm */
   const [deleteTarget, setDeleteTarget] = useState<Module | null>(null);
@@ -173,6 +192,39 @@ export default function ModuleManagerPage() {
     }
   }
 
+  function openEdit(mod: Module) {
+    setEditTarget(mod);
+    setEditForm({
+      title: mod.title,
+      description: mod.description,
+      category: mod.category,
+      difficulty: mod.difficulty,
+      xp_reward: mod.xp_reward,
+    });
+  }
+
+  async function saveEdit() {
+    if (!editTarget) return;
+    setEditSaving(true);
+    try {
+      const updated = await modulesService.update(editTarget.id, {
+        title: editForm.title,
+        description: editForm.description,
+        category: editForm.category,
+        difficulty: editForm.difficulty,
+        xp_reward: editForm.xp_reward,
+      });
+      setModules((prev) =>
+        prev.map((m) =>
+          m.id === editTarget.id ? { ...fromApiModule(updated, archivedIds), lessons: m.lessons, learners: m.learners, completion: m.completion } : m
+        )
+      );
+      setEditTarget(null);
+    } catch { /* silent */ } finally {
+      setEditSaving(false);
+    }
+  }
+
   async function confirmDelete() {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -186,7 +238,7 @@ export default function ModuleManagerPage() {
   }
 
   return (
-    <AdminLayout title="Learning module creation" subtitle="Create, publish, and maintain financial learning modules.">
+    <AdminLayout title="Learning module creation" subtitle="Creators save drafts; only admins can publish. XP rewards can be adjusted anytime.">
       {/* Top bar */}
       <div className={s.topBar}>
         <label className={s.searchWrap}>
@@ -260,6 +312,9 @@ export default function ModuleManagerPage() {
                   <span className={s.tag} style={{ background: m.tagBg, color: m.categoryColor }}>
                     {m.category}
                   </span>
+                  <span className={s.tag} style={{ background: "rgba(14,165,233,0.1)", color: "#0ea5e9" }}>
+                    {m.xp_reward} XP
+                  </span>
                 </div>
 
                 <div className={s.metricsRow}>
@@ -284,7 +339,10 @@ export default function ModuleManagerPage() {
               </div>
 
               <div className={s.actions}>
-                {m.status === "Draft" && (
+                <button type="button" className={s.btnEdit} onClick={() => openEdit(m)}>
+                  Edit
+                </button>
+                {canPublish && m.status === "Draft" && (
                   <button type="button" className={s.btnPublish} onClick={() => handlePublish(m.id)}>
                     Publish
                   </button>
@@ -348,7 +406,58 @@ export default function ModuleManagerPage() {
             <div className={s.modalActions}>
               <button type="button" className={s.btnCancel} onClick={() => setShowAdd(false)} disabled={saving}>Cancel</button>
               <button type="button" className={s.btnSave} onClick={handleCreate} disabled={saving}>
-                {saving ? "Creating…" : "Create"}
+                {saving ? "Saving draft…" : "Save as draft"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Edit Module Modal ── */}
+      {editTarget && (
+        <div className={s.overlay} onClick={() => !editSaving && setEditTarget(null)}>
+          <div className={s.modal} onClick={e => e.stopPropagation()}>
+            <h3 className={s.modalTitle}>Edit module</h3>
+
+            <div className={s.modalField}>
+              <label>Title</label>
+              <input className={s.modalInput} value={editForm.title}
+                onChange={e => setEditForm(f => ({ ...f, title: e.target.value }))} />
+            </div>
+
+            <div className={s.modalField}>
+              <label>Description</label>
+              <textarea className={s.modalTextarea} value={editForm.description}
+                onChange={e => setEditForm(f => ({ ...f, description: e.target.value }))} rows={3} />
+            </div>
+
+            <div className={s.modalField}>
+              <label>Category</label>
+              <input className={s.modalInput} value={editForm.category}
+                onChange={e => setEditForm(f => ({ ...f, category: e.target.value }))} />
+            </div>
+
+            <div className={s.modalRow}>
+              <div className={s.modalField}>
+                <label>Difficulty</label>
+                <select className={s.modalSelect} value={editForm.difficulty}
+                  onChange={e => setEditForm(f => ({ ...f, difficulty: e.target.value }))}>
+                  <option value="beginner">Beginner</option>
+                  <option value="intermediate">Intermediate</option>
+                  <option value="advanced">Advanced</option>
+                </select>
+              </div>
+              <div className={s.modalField}>
+                <label>XP reward</label>
+                <input className={s.modalInput} type="number" min={0} value={editForm.xp_reward}
+                  onChange={e => setEditForm(f => ({ ...f, xp_reward: Number(e.target.value) }))} />
+              </div>
+            </div>
+
+            <div className={s.modalActions}>
+              <button type="button" className={s.btnCancel} onClick={() => setEditTarget(null)} disabled={editSaving}>Cancel</button>
+              <button type="button" className={s.btnSave} onClick={saveEdit} disabled={editSaving}>
+                {editSaving ? "Saving…" : "Save changes"}
               </button>
             </div>
           </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import LearnerLayout from "../LearnerLayout";
-import { modulesService } from "@/api";
+import { modulesService, gamificationService } from "@/api";
 import type { Lesson } from "@/api";
 import s from "./lesson-view.module.css";
 
@@ -161,6 +161,10 @@ export default function LessonViewPage() {
       const next = new Set(prev);
       next.add(lesson.id);
       localStorage.setItem(`finorise_visited_${moduleId}`, JSON.stringify([...next]));
+      void gamificationService.recordLearningActivity({
+        activity_type: "lesson",
+        reference_id: lesson.id,
+      }).catch(() => {});
       return next;
     });
   }, [lesson?.id, moduleId]);

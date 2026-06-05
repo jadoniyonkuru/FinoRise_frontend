@@ -3,6 +3,9 @@ import LoginPage from "@/auth/login/LoginPage";
 import AdminLoginPage from "@/auth/admin-login/AdminLoginPage";
 import RegisterPage from "@/auth/register/RegisterPage";
 import ResetPasswordPage from "@/auth/reset-password/ResetPasswordPage";
+import AcceptInvitePage from "@/auth/accept-invite/AcceptInvitePage";
+import ProtectedRoute from "@/auth/guards/ProtectedRoute";
+import GuestRoute from "@/auth/guards/GuestRoute";
 
 import LearnerDashboard from "@/learner/dashboard/LearnerDashboard";
 import LearnerProfile from "@/learner/profile/LearnerProfile";
@@ -36,49 +39,73 @@ import PartnerImpactPage from "@/partner/impact/PartnerImpactPage";
 import PlatformDashboard from "@/portal/PlatformDashboard";
 import LandingPage from "@/landing/LandingPage";
 
+const adminRoles = ["admin", "module_manager", "simulation_manager", "rewards_manager", "analytics_viewer"] as const;
+
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route
+        path="/"
+        element={
+          <GuestRoute>
+            <LandingPage />
+          </GuestRoute>
+        }
+      />
       <Route path="/dashboard" element={<PlatformDashboard />} />
 
       {/* Auth */}
-      <Route path="/auth/login" element={<LoginPage />} />
+      <Route
+        path="/auth/login"
+        element={
+          <GuestRoute>
+            <LoginPage />
+          </GuestRoute>
+        }
+      />
       <Route path="/auth/admin-login" element={<AdminLoginPage />} />
-      <Route path="/auth/register" element={<RegisterPage />} />
+      <Route
+        path="/auth/register"
+        element={
+          <GuestRoute>
+            <RegisterPage />
+          </GuestRoute>
+        }
+      />
       <Route path="/auth/reset-password" element={<ResetPasswordPage />} />
+      <Route path="/auth/accept-invite" element={<AcceptInvitePage />} />
 
       {/* Learner */}
-      <Route path="/learner/dashboard" element={<LearnerDashboard />} />
-      <Route path="/learner/modules" element={<LearnerModulesPage />} />
-      <Route path="/learner/modules/:moduleId" element={<ModuleDetailPage />} />
-      <Route path="/learner/simulations" element={<LearnerSimulationsPage />} />
-      <Route path="/learner/rewards" element={<LearnerRewardsPage />} />
-      <Route path="/learner/ai-coach" element={<AICoachPage />} />
-      <Route path="/learner/profile" element={<LearnerProfile />} />
-      <Route path="/learner/settings" element={<LearnerSettingsPage />} />
-      <Route path="/learner/analytics" element={<LearnerAnalyticsPage />} />
-      <Route path="/learner/lesson" element={<LessonViewPage />} />
-      <Route path="/learner/quiz" element={<ModuleQuizPage />} />
-      <Route path="/learner/simulation-runner" element={<SimulationRunnerPage />} />
-      <Route path="/learner/insights" element={<BehavioralInsightsPage />} />
-      <Route path="/learner/gamification" element={<GamificationPage />} />
-      <Route path="/learner/reward-catalog" element={<RewardCatalogPage />} />
+      <Route path="/learner/dashboard" element={<ProtectedRoute roles={["learner"]}><LearnerDashboard /></ProtectedRoute>} />
+      <Route path="/learner/modules" element={<ProtectedRoute roles={["learner"]}><LearnerModulesPage /></ProtectedRoute>} />
+      <Route path="/learner/modules/:moduleId" element={<ProtectedRoute roles={["learner"]}><ModuleDetailPage /></ProtectedRoute>} />
+      <Route path="/learner/simulations" element={<ProtectedRoute roles={["learner"]}><LearnerSimulationsPage /></ProtectedRoute>} />
+      <Route path="/learner/rewards" element={<ProtectedRoute roles={["learner"]}><LearnerRewardsPage /></ProtectedRoute>} />
+      <Route path="/learner/ai-coach" element={<ProtectedRoute roles={["learner"]}><AICoachPage /></ProtectedRoute>} />
+      <Route path="/learner/profile" element={<ProtectedRoute roles={["learner"]}><LearnerProfile /></ProtectedRoute>} />
+      <Route path="/learner/settings" element={<ProtectedRoute roles={["learner"]}><LearnerSettingsPage /></ProtectedRoute>} />
+      <Route path="/learner/analytics" element={<ProtectedRoute roles={["learner"]}><LearnerAnalyticsPage /></ProtectedRoute>} />
+      <Route path="/learner/lesson" element={<ProtectedRoute roles={["learner"]}><LessonViewPage /></ProtectedRoute>} />
+      <Route path="/learner/quiz" element={<ProtectedRoute roles={["learner"]}><ModuleQuizPage /></ProtectedRoute>} />
+      <Route path="/learner/simulation-runner" element={<ProtectedRoute roles={["learner"]}><SimulationRunnerPage /></ProtectedRoute>} />
+      <Route path="/learner/insights" element={<ProtectedRoute roles={["learner"]}><BehavioralInsightsPage /></ProtectedRoute>} />
+      <Route path="/learner/gamification" element={<ProtectedRoute roles={["learner"]}><GamificationPage /></ProtectedRoute>} />
+      <Route path="/learner/reward-catalog" element={<ProtectedRoute roles={["learner"]}><RewardCatalogPage /></ProtectedRoute>} />
 
       {/* Admin */}
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
-      <Route path="/admin/user-management" element={<UserManagementPage />} />
-      <Route path="/admin/module-manager" element={<ModuleManagerPage />} />
-      <Route path="/admin/simulation-manager" element={<SimulationManagerPage />} />
-      <Route path="/admin/rewards-manager" element={<RewardsManagerPage />} />
-      <Route path="/admin/analytics" element={<AnalyticsPage />} />
-      <Route path="/admin/profile" element={<AdminProfile />} />
+      <Route path="/admin/dashboard" element={<ProtectedRoute roles={["admin"]} adminPath="/admin/dashboard"><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin/user-management" element={<ProtectedRoute roles={["admin"]} adminPath="/admin/user-management"><UserManagementPage /></ProtectedRoute>} />
+      <Route path="/admin/module-manager" element={<ProtectedRoute roles={[...adminRoles]} adminPath="/admin/module-manager"><ModuleManagerPage /></ProtectedRoute>} />
+      <Route path="/admin/simulation-manager" element={<ProtectedRoute roles={[...adminRoles]} adminPath="/admin/simulation-manager"><SimulationManagerPage /></ProtectedRoute>} />
+      <Route path="/admin/rewards-manager" element={<ProtectedRoute roles={[...adminRoles]} adminPath="/admin/rewards-manager"><RewardsManagerPage /></ProtectedRoute>} />
+      <Route path="/admin/analytics" element={<ProtectedRoute roles={[...adminRoles]} adminPath="/admin/analytics"><AnalyticsPage /></ProtectedRoute>} />
+      <Route path="/admin/profile" element={<ProtectedRoute roles={[...adminRoles]} adminPath="/admin/profile"><AdminProfile /></ProtectedRoute>} />
 
       {/* Partner */}
-      <Route path="/partner/dashboard" element={<PartnerDashboard />} />
-      <Route path="/partner/programs" element={<PartnerProgramsPage />} />
-      <Route path="/partner/impact" element={<PartnerImpactPage />} />
-      <Route path="/partner/profile" element={<PartnerProfile />} />
+      <Route path="/partner/dashboard" element={<ProtectedRoute roles={["partner"]}><PartnerDashboard /></ProtectedRoute>} />
+      <Route path="/partner/programs" element={<ProtectedRoute roles={["partner"]}><PartnerProgramsPage /></ProtectedRoute>} />
+      <Route path="/partner/impact" element={<ProtectedRoute roles={["partner"]}><PartnerImpactPage /></ProtectedRoute>} />
+      <Route path="/partner/profile" element={<ProtectedRoute roles={["partner"]}><PartnerProfile /></ProtectedRoute>} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

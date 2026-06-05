@@ -1,7 +1,8 @@
-import { Link, NavLink, useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import type { ReactNode } from "react";
 import type { NavItem } from "@/components/DashboardLayout";
 import ThemeToggle from "@/components/ThemeToggle";
+import { useAuth } from "@/context/AuthContext";
 import type { PortalArea } from "./portalTabs";
 import styles from "./PortalLayout.module.css";
 
@@ -32,6 +33,17 @@ export default function PortalLayout({
   topSlot,
 }: Props) {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    navigate("/auth/login", { replace: true });
+  }
+
+  function handleSwitchRole() {
+    logout();
+    navigate("/auth/login", { replace: true });
+  }
 
   return (
     <div className={styles.page}>
@@ -58,7 +70,7 @@ export default function PortalLayout({
           </>
         )}
 
-        <button type="button" className={styles.logout} onClick={() => navigate("/auth/login")}>
+        <button type="button" className={styles.logout} onClick={handleLogout}>
           Log out
         </button>
       </aside>
@@ -75,9 +87,9 @@ export default function PortalLayout({
               </div>
               <div className={styles.headerActions}>
                 <ThemeToggle />
-                <Link to="/auth/login" className={styles.switchRole}>
+                <button type="button" className={styles.switchRole} onClick={handleSwitchRole}>
                   Switch role
-                </Link>
+                </button>
               </div>
             </header>
           )}
